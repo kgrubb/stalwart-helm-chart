@@ -1,4 +1,4 @@
-name: Release Charts
+name: Release
 
 on:
   push:
@@ -13,8 +13,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -23,127 +22,39 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Detect chart changes
-        id: changes
+      - name: Bump chart version
+        id: bump
         run: |
           BEFORE="${{ github.event.before }}"
           AFTER="${{ github.sha }}"
+          MSG='${{ github.event.head_commit.message }}'
 
-          if [[ "$BEFORE" == "0000000000000000000000000000000000000000" ]]; then
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-            echo "skip_bump=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
+          [[ "$BEFORE" == "0000000000000000000000000000000000000000" ]] && exit 0
+          git diff --name-only "$BEFORE" "$AFTER" | grep -q '^charts/' || exit 0
+          echo "charts_changed=true" >> "$GITHUB_OUTPUT"
 
-          if git diff --name-only "$BEFORE" "$AFTER" | grep -q '^charts/'; then
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-            echo "before=$BEFORE" >> "$GITHUB_OUTPUT"
-          else
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-          fi
+          [[ "$MSG" =~ ^chore\(release\): ]] && exit 0
 
-      - name: Bump chart version from conventional commits
-        if: >-
-          steps.changes.outputs.changed == 'true' &&
-          steps.changes.outputs.skip_bump != 'true' &&
-          !startsWith(github.event.head_commit.message, 'chore(release):')
-        run: |
           chmod +x scripts/bump-chart-version.sh
-          ./scripts/bump-chart-version.sh \
-            "${{ steps.changes.outputs.before }}" \
-            "${{ github.sha }}"
+          ./scripts/bump-chart-version.sh "$BEFORE" "$AFTER"
+          git diff --quiet charts/stalwart/Chart.yaml || echo "bumped=true" >> "$GITHUB_OUTPUT"
 
-      - name: Commit version bump
-        if: >-
-          steps.changes.outputs.changed == 'true' &&
-          steps.changes.outputs.skip_bump != 'true' &&
-          !startsWith(github.event.head_commit.message, 'chore(release):')
-        run: |
-          if git diff --quiet charts/stalwart/Chart.yaml; then
-            echo "No chart version change to commit."
-            exit 0
-          fi
-          NEW_VERSION=$(awk '/^version:/ { print $2 }' charts/stalwart/Chart.yaml)
-          git add charts/stalwart/Chart.yaml
-          git commit -m "chore(release): bump chart to ${NEW_VERSION}"
-          git push
+      - uses: azure/setup-helm@v5
+        if: steps.bump.outputs.charts_changed == 'true' || steps.bump.outputs.bumped == 'true'
 
-      - name: Check published chart index
-        id: index
-        run: |
-          if ! git ls-remote --heads origin gh-pages | grep -q gh-pages; then
-            echo "branch=false" >> "$GITHUB_OUTPUT"
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          echo "branch=true" >> "$GITHUB_OUTPUT"
-          git fetch origin gh-pages
-          if git show origin/gh-pages:index.yaml >/dev/null 2>&1; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Decide whether to release
-        id: release
-        run: |
-          msg='${{ github.event.head_commit.message }}'
-          if [[ "${{ steps.changes.outputs.changed }}" == "true" ]] || \
-             [[ "${{ steps.index.outputs.exists }}" == "false" ]] || \
-             [[ "$msg" =~ ^chore\(release\): ]]; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "run=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Install Helm
-        if: steps.release.outputs.run == 'true'
-        uses: azure/setup-helm@v4
-
-      - name: Install chart-releaser
-        if: steps.release.outputs.run == 'true'
-        run: |
-          curl -sSL -o /tmp/cr.tgz \
-            "https://github.com/helm/chart-releaser/releases/download/v1.7.0/chart-releaser_1.7.0_linux_amd64.tar.gz"
-          tar -xzf /tmp/cr.tgz -C /tmp
-          sudo mv /tmp/cr /usr/local/bin/cr
-          cr version
-
-      - name: Initialize gh-pages branch
-        if: >-
-          steps.release.outputs.run == 'true' &&
-          steps.index.outputs.branch == 'false'
-        run: |
-          git switch --orphan gh-pages
-          git reset --hard
-          git commit --allow-empty -m "Initialize gh-pages for chart releases"
-          git push origin gh-pages
-          git switch -f main
-          git fetch origin gh-pages
-
-      - name: Publish initial chart release
-        if: >-
-          steps.release.outputs.run == 'true' &&
-          steps.index.outputs.exists == 'false'
-        env:
-          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        run: |
-          shopt -s nullglob
-          for chart_dir in charts/*/; do
-            cr package "$chart_dir" --config cr.yaml
-          done
-          cr upload --config cr.yaml --skip-existing .cr-release-packages/*.tgz
-          mkdir -p .cr-index
-          cr index --config cr.yaml --push
-
-      - name: Run chart-releaser
-        if: >-
-          steps.release.outputs.run == 'true' &&
-          steps.index.outputs.exists == 'true'
+      - name: Publish charts
+        if: steps.bump.outputs.charts_changed == 'true' || steps.bump.outputs.bumped == 'true'
         uses: helm/chart-releaser-action@v1.7.0
         with:
           charts_dir: charts
           config: cr.yaml
         env:
-          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit version bump
+        if: steps.bump.outputs.bumped == 'true'
+        run: |
+          VERSION=$(awk '/^version:/ { print $2 }' charts/stalwart/Chart.yaml)
+          git add charts/stalwart/Chart.yaml
+          git commit -m "chore(release): bump chart to ${VERSION}"
+          git push

@@ -21,9 +21,9 @@ pushShard: ""
 # scraping the pod logs for the generated temporary password.
 # Remove it once a permanent administrator account has been provisioned.
 recoveryAdmin:
-  enabled: true
+  enabled: false
   username: admin
-  password: "change-me"
+  password: ""
 
 # Starts the pods in recovery mode. Suspends mail services and
 # exposes only the management listener on the configured port.
@@ -64,7 +64,7 @@ service:
 # Ingress for the HTTP / HTTPS listeners only.
 ingress:
   enabled: false
-  className: nginx
+  className: ""
   annotations: {}
   hosts:
     - host: mail.example.org
