@@ -68,25 +68,8 @@ jobs:
           git commit -m "chore(release): bump chart to ${NEW_VERSION}"
           git push
 
-      - name: Install Helm
-        if: >-
-          steps.changes.outputs.changed == 'true' ||
-          startsWith(github.event.head_commit.message, 'chore(release):')
-        uses: azure/setup-helm@v4
-
-      - name: Install chart-releaser
-        if: >-
-          steps.changes.outputs.changed == 'true' ||
-          startsWith(github.event.head_commit.message, 'chore(release):')
-        run: |
-          curl -sSL https://raw.githubusercontent.com/helm/chart-releaser/v1.7.0/install.sh | bash
-          echo "$HOME/bin" >> "$GITHUB_PATH"
-
       - name: Check published chart index
         id: index
-        if: >-
-          steps.changes.outputs.changed == 'true' ||
-          startsWith(github.event.head_commit.message, 'chore(release):')
         run: |
           if git ls-remote --heads origin gh-pages | grep -q gh-pages; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
@@ -94,10 +77,31 @@ jobs:
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Decide whether to release
+        id: release
+        run: |
+          msg='${{ github.event.head_commit.message }}'
+          if [[ "${{ steps.changes.outputs.changed }}" == "true" ]] || \
+             [[ "$msg" == chore(release):* ]] || \
+             [[ "${{ steps.index.outputs.exists }}" == "false" ]]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install Helm
+        if: steps.release.outputs.run == 'true'
+        uses: azure/setup-helm@v4
+
+      - name: Install chart-releaser
+        if: steps.release.outputs.run == 'true'
+        run: |
+          curl -sSL https://raw.githubusercontent.com/helm/chart-releaser/v1.7.0/install.sh | bash
+          echo "$HOME/bin" >> "$GITHUB_PATH"
+
       - name: Publish initial chart release
         if: >-
-          (steps.changes.outputs.changed == 'true' ||
-          startsWith(github.event.head_commit.message, 'chore(release):')) &&
+          steps.release.outputs.run == 'true' &&
           steps.index.outputs.exists == 'false'
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
@@ -111,8 +115,7 @@ jobs:
 
       - name: Run chart-releaser
         if: >-
-          (steps.changes.outputs.changed == 'true' ||
-          startsWith(github.event.head_commit.message, 'chore(release):')) &&
+          steps.release.outputs.run == 'true' &&
           steps.index.outputs.exists == 'true'
         uses: helm/chart-releaser-action@v1.7.0
         with:
