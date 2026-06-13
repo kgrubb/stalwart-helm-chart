@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>stalwart Helm Repository</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f6f8fa;
+      --card: #ffffff;
+      --text: #1f2328;
+      --muted: #656d76;
+      --border: #d0d7de;
+      --accent: #0969da;
+      --code-bg: #f6f8fa;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0d1117;
+        --card: #161b22;
+        --text: #e6edf3;
+        --muted: #8b949e;
+        --border: #30363d;
+        --accent: #58a6ff;
+        --code-bg: #0d1117;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 4rem;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    img { width: 48px; height: 48px; }
+    h1 { margin: 0; font-size: 1.75rem; }
+    p { color: var(--muted); margin: 0.25rem 0 0; }
+    section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    h2 {
+      margin: 0 0 0.75rem;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    pre {
+      margin: 0;
+      padding: 1rem;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 0.875rem;
+      line-height: 1.45;
+    }
+    ul { margin: 0; padding-left: 1.25rem; }
+    li { margin: 0.35rem 0; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <img src="https://stalw.art/img/logo.svg" alt="Stalwart">
+      <div>
+        <h1>stalwart</h1>
+        <p>Helm chart for the Stalwart mail and collaboration server</p>
+      </div>
+    </header>
+
+    <section>
+      <h2>Add repository</h2>
+      <pre>helm repo add kgrubb-stalwart https://kgrubb.github.io/stalwart-helm-chart
+helm repo update</pre>
+    </section>
+
+    <section>
+      <h2>Install</h2>
+      <pre>helm install stalwart kgrubb-stalwart/stalwart \
+  -n mail --create-namespace</pre>
+    </section>
+
+    <section>
+      <h2>Repository</h2>
+      <ul>
+        <li><a href="index.yaml">index.yaml</a></li>
+        <li><a href="https://github.com/kgrubb/stalwart-helm-chart">Source</a></li>
+        <li><a href="https://stalw.art/docs/cluster/orchestration/kubernetes/">Stalwart Kubernetes docs</a></li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>

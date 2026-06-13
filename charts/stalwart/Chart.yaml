@@ -9,6 +9,7 @@ icon: https://stalw.art/img/logo.svg
 sources:
   - https://github.com/stalwartlabs/stalwart
   - https://stalw.art/docs/cluster/orchestration/kubernetes/
+  - https://github.com/kgrubb/stalwart-helm-chart
 maintainers:
   - name: kgrubb
     url: https://github.com/kgrubb
@@ -18,3 +19,11 @@ keywords:
   - imap
   - jmap
   - stalwart
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/kgrubb/stalwart-helm-chart/issues
+    - name: source
+      url: https://github.com/kgrubb/stalwart-helm-chart

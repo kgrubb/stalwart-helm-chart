@@ -38,7 +38,7 @@ jobs:
           echo "charts_changed=true" >> "$GITHUB_OUTPUT"
           echo "since_ref=${last_tag:-$BEFORE}" >> "$GITHUB_OUTPUT"
 
-          chmod +x scripts/{bump-chart-version,generate-changelog}.sh
+          chmod +x scripts/{bump-chart-version,generate-changelog,sync-gh-pages}.sh
           ./scripts/bump-chart-version.sh "$BEFORE" "$AFTER"
           echo "version=$(awk '/^version:/ { print $2 }' charts/stalwart/Chart.yaml)" >> "$GITHUB_OUTPUT"
 
@@ -61,8 +61,15 @@ jobs:
         with:
           charts_dir: charts
           config: cr.yaml
+          packages_with_index: true
         env:
           CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sync gh-pages assets
+        if: steps.bump.outputs.charts_changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./scripts/sync-gh-pages.sh
 
       - name: Commit release artifacts
         if: steps.bump.outputs.charts_changed == 'true'

@@ -1,0 +1,29 @@
+name: Sync Pages
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - pages/**
+      - scripts/sync-gh-pages.sh
+      - .github/workflows/sync-pages.yml
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: azure/setup-helm@v5
+
+      - name: Sync gh-pages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          chmod +x scripts/sync-gh-pages.sh
+          ./scripts/sync-gh-pages.sh
