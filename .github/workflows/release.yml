@@ -99,7 +99,7 @@ jobs:
           curl -sSL -o /tmp/cr.tgz \
             "https://github.com/helm/chart-releaser/releases/download/v1.7.0/chart-releaser_1.7.0_linux_amd64.tar.gz"
           tar -xzf /tmp/cr.tgz -C /tmp
-          sudo mv /tmp/chart-releaser /usr/local/bin/cr
+          sudo mv /tmp/cr /usr/local/bin/cr
           cr version
 
       - name: Publish initial chart release
