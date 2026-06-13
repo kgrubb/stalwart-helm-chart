@@ -8,15 +8,18 @@ AFTER_SHA="${2:?after sha required}"
 current_version=$(awk '/^version:/ { print $2 }' "$CHART_FILE")
 
 bump_level="patch"
+breaking_re='^[a-zA-Z]+(\([^)]+\))?!:'
+feat_re='^feat(\([^)]+\))?:'
+
 while IFS= read -r subject; do
   [[ -z "$subject" || "$subject" =~ ^chore\(release\): ]] && continue
 
-  if [[ "$subject" =~ BREAKING[[:space:]]CHANGE ]] || [[ "$subject" =~ ^[a-zA-Z]+(\([^)]+\))?!: ]]; then
+  if [[ "$subject" =~ BREAKING[[:space:]]CHANGE ]] || [[ "$subject" =~ $breaking_re ]]; then
     bump_level="major"
     break
   fi
 
-  if [[ "$subject" =~ ^feat(\([^)]+\))?: ]] && [[ "$bump_level" != "major" ]]; then
+  if [[ "$subject" =~ $feat_re ]] && [[ "$bump_level" != "major" ]]; then
     bump_level="minor"
   fi
 done < <(git log --format=%s "${BEFORE_SHA}..${AFTER_SHA}")
