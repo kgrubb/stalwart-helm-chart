@@ -1,0 +1,58 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/kgrubb/stalwart-helm-chart/issues
+    - name: source
+      url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/signKey: |
+    fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
+    url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+apiVersion: v2
+appVersion: v0.16.8
+description: Helm chart for the Stalwart mail and collaboration server
+home: https://stalw.art
+icon: https://stalw.art/img/logo.svg
+keywords:
+- - mail
+- - smtp
+- - imap
+- - jmap
+- - stalwart
+maintainers:
+- - email: 8471701+kgrubb@users.noreply.github.com
+  name: kgrubb
+  url: https://github.com/kgrubb
+name: stalwart
+sources:
+- - https://github.com/stalwartlabs/stalwart
+- - https://stalw.art/docs/cluster/orchestration/kubernetes/
+- - https://github.com/kgrubb/stalwart-helm-chart
+type: application
+version: 0.2.5
+
+...
+files:
+  stalwart-0.2.5.tgz: sha256:148d7ced98133d8eba54da43aa40a19bdd3a03623834351cb0adb91c21aa956a
+-----BEGIN PGP SIGNATURE-----
+
+wsFcBAEBCgAQBQJqLNXLCRDKmZpzOV9F/QAA64IQABKBzSEUg/U1vxzsZy/zeURD
+Es4dKNV5vxfg3iFCPfUrkpAcPsShu6g0JJu5PIvYu3y4SvvGsAuDlPX5fgJjzNmT
+64QNvNRfdtgYB0YOAAAoMpFGwcWrEVspIBs/nDoIyTaYCoVWs/L6UMyTbcNhlRWW
+Da48II9jriadgE9ytBL/liIPQDD7JJnaRSORdx7NpDwxWRcliObC6BuCmku8AsyI
+OSuc7CJLp6TQ6gzO7TwThArFHtgHgDaaNaRARv6DXXXq0OHqaQhCKtpQRG3YDxHw
+QFrXjlqRfplDAxWg15pcprUAlSOlqAiigLfDTqfXqwPlYgWAqsT183HGUN9MMksl
+KFDpRN1v4Mb3VWXJ5STkVxwc4FW4QtoQI5oEA+5Gbnjn9pTDMO/w0bTVynO0eh1L
+dfpGjSeoh9Tj0tGZO0TtLIdlhmrUip/5OppXEygHo1sqI3Sn09lX78IimVLx8eKj
+vniTCf1iGvhdfaWmAq2dpwfnkBTdp1jn231/d9jKXgcXho+4C2h1i3Tw+o4FQCD4
+xhdlN5LdO0Mu8Dyq69tDcGzZhtx0HCIEuQ7pE09gnjLTExWhv7dvklxP4ek5rd3z
+zC9M38GVWFD5NZF4wOr95MtQ2AgLHCl5adKdzqrsXmJLOY7M3PeTZt4Ec2U3ZwkI
+EFF+0LH962eSn/DvTtkG
+=JdOO
+-----END PGP SIGNATURE-----
