@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.8] - 2026-06-13
+
+### Fixed
+- generate changelog from squash-merged PR commits ([#21](https://github.com/kgrubb/stalwart-helm-chart/pull/21))
+  - Read PR numbers from squash commit subjects instead of merge commits
+  - Skip chore(release) bot commits
+  - Map chore, docs, and ci prefixes to Changed
+
+
+
 ## [0.2.7] - 2026-06-13
 
 ### Changed
