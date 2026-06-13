@@ -16,7 +16,7 @@ entries:
         url: https://kgrubb.github.io/stalwart-helm-chart/public.key
     apiVersion: v2
     appVersion: v0.16.8
-    created: "2026-06-13T04:00:14.148309127Z"
+    created: "2026-06-13T15:27:01.261968099Z"
     description: Helm chart for the Stalwart mail and collaboration server
     digest: 148d7ced98133d8eba54da43aa40a19bdd3a03623834351cb0adb91c21aa956a
     home: https://stalw.art
@@ -38,7 +38,7 @@ entries:
     - https://github.com/kgrubb/stalwart-helm-chart
     type: application
     urls:
-    - stalwart-0.2.5.tgz
+    - https://kgrubb.github.io/stalwart-helm-chart/stalwart-0.2.5.tgz
     version: 0.2.5
   - annotations:
       artifacthub.io/category: integration-delivery
@@ -55,7 +55,7 @@ entries:
         url: https://kgrubb.github.io/stalwart-helm-chart/public.key
     apiVersion: v2
     appVersion: v0.16.8
-    created: "2026-06-13T03:57:38.686216239Z"
+    created: "2026-06-13T15:27:01.261510353Z"
     description: Helm chart for the Stalwart mail and collaboration server
     digest: fee8ccbc2949e1716b4fd1acf472e38a370584055d607fc7dd05d45255fa3dae
     home: https://stalw.art
@@ -77,7 +77,7 @@ entries:
     - https://github.com/kgrubb/stalwart-helm-chart
     type: application
     urls:
-    - stalwart-0.2.4.tgz
+    - https://kgrubb.github.io/stalwart-helm-chart/stalwart-0.2.4.tgz
     version: 0.2.4
   - annotations:
       artifacthub.io/category: integration-delivery
@@ -94,7 +94,7 @@ entries:
         url: https://kgrubb.github.io/stalwart-helm-chart/public.key
     apiVersion: v2
     appVersion: v0.16.8
-    created: "2026-06-13T03:56:47.73892512Z"
+    created: "2026-06-13T15:27:01.261040047Z"
     description: Helm chart for the Stalwart mail and collaboration server
     digest: 121cb1ee62e190f297a11384f22f238817d9cd72772e23571d1e3311d0c9ae40
     home: https://stalw.art
@@ -128,7 +128,7 @@ entries:
           url: https://github.com/kgrubb/stalwart-helm-chart
     apiVersion: v2
     appVersion: v0.16.8
-    created: "2026-06-13T03:56:47.738454684Z"
+    created: "2026-06-13T15:27:01.260578335Z"
     description: Helm chart for the Stalwart mail and collaboration server
     digest: 2adedbb84ee4340e51260de692cc75f6f8b2cc8f96f2746850fc98272add3def
     home: https://stalw.art
@@ -153,7 +153,7 @@ entries:
     version: 0.2.1
   - apiVersion: v2
     appVersion: v0.16.8
-    created: "2026-06-13T03:56:47.737974873Z"
+    created: "2026-06-13T15:27:01.260067328Z"
     description: Helm chart for the Stalwart mail and collaboration server
     digest: dda3bdd88c1b5463cda00d051e38e8a686a3dca9176f24d029716304ed986a43
     home: https://stalw.art
@@ -177,7 +177,7 @@ entries:
     version: 0.2.0
   - apiVersion: v2
     appVersion: v0.16.8
-    created: "2026-06-13T03:56:47.737591745Z"
+    created: "2026-06-13T15:27:01.259664174Z"
     description: Helm chart for the Stalwart mail and collaboration server
     digest: 005b01debec57ce2bc18ff4a4eb61818f383ea0d12fb3dad0ce1b40ffb62934e
     home: https://stalw.art
@@ -201,7 +201,7 @@ entries:
     version: 0.1.1
   - apiVersion: v2
     appVersion: v0.16.8
-    created: "2026-06-13T03:56:47.737158023Z"
+    created: "2026-06-13T15:27:01.259240018Z"
     description: Helm chart for the Stalwart mail and collaboration server
     digest: 6d5a9237465859d34b6edc69843264efe53df132034e7fecebaf624fac325541
     home: https://stalw.art
@@ -224,4 +224,4 @@ entries:
     urls:
     - https://kgrubb.github.io/stalwart-helm-chart/stalwart-0.1.0.tgz
     version: 0.1.0
-generated: "2026-06-13T04:00:14.148333965Z"
+generated: "2026-06-13T15:27:01.258633197Z"
