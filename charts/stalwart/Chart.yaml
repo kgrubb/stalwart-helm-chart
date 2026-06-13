@@ -1,6 +1,6 @@
 apiVersion: v2
 name: stalwart
-description: Helm chart for deploying the Stalwart mail and collaboration server
+description: Helm chart for the Stalwart mail and collaboration server
 type: application
 version: 0.2.0
 appVersion: "v0.16.8"
