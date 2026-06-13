@@ -67,14 +67,14 @@ jobs:
           echo "GNUPGHOME=$gpg_dir" >> "$GITHUB_ENV"
           printf '%s' "$GPG_PRIVATE_KEY" | gpg --batch --import
           gpg --list-secret-keys --keyid-format long
-          gpg --list-secret-keys --keyid-format long | grep -q "${{ secrets.GPG_KEY_UID }}"
-          gpg --export-secret-keys "${{ secrets.GPG_KEY_UID }}" > "$gpg_dir/secring.gpg"
+          gpg --list-secret-keys --keyid-format long | grep -q "CA999A73395F45FD"
+          gpg --export-secret-keys AFB495384FDAD4EDC0EBF8FECA999A73395F45FD > "$gpg_dir/secring.gpg"
           test -s "$gpg_dir/secring.gpg"
           printf '\n' > "$gpg_dir/passphrase"
           echo "CR_KEYRING=$gpg_dir/secring.gpg" >> "$GITHUB_ENV"
           echo "CR_PASSPHRASE_FILE=$gpg_dir/passphrase" >> "$GITHUB_ENV"
           echo "CR_SIGN=true" >> "$GITHUB_ENV"
-          echo "CR_KEY=${{ secrets.GPG_KEY_UID }}" >> "$GITHUB_ENV"
+          echo "CR_KEY=8471701+kgrubb@users.noreply.github.com" >> "$GITHUB_ENV"
 
       - name: Publish charts
         if: steps.bump.outputs.charts_changed == 'true'
@@ -87,7 +87,7 @@ jobs:
           CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GNUPGHOME: ${{ env.GNUPGHOME }}
           CR_SIGN: true
-          CR_KEY: ${{ secrets.GPG_KEY_UID }}
+          CR_KEY: 8471701+kgrubb@users.noreply.github.com
           CR_KEYRING: ${{ env.CR_KEYRING }}
           CR_PASSPHRASE_FILE: ${{ env.CR_PASSPHRASE_FILE }}
 
