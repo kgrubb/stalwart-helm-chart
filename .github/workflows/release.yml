@@ -57,13 +57,18 @@ jobs:
 
       - name: Import GPG key
         if: steps.bump.outputs.charts_changed == 'true'
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
         run: |
-          gpg_dir=.cr-gpg
+          gpg_dir="$RUNNER_TEMP/gpg"
           mkdir -p "$gpg_dir"
-          base64 -d <<< "${{ secrets.GPG_KEYRING_BASE64 }}" > "$gpg_dir/secring.gpg"
-          gpg --no-default-keyring --secret-keyring "$gpg_dir/secring.gpg" --list-secret-keys
-          : > "$gpg_dir/passphrase"
-          echo "CR_KEYRING=$gpg_dir/secring.gpg" >> "$GITHUB_ENV"
+          chmod 700 "$gpg_dir"
+          echo "GNUPGHOME=$gpg_dir" >> "$GITHUB_ENV"
+          printf '%s' "$GPG_PRIVATE_KEY" | gpg --batch --import
+          gpg --list-secret-keys --keyid-format long
+          gpg --list-secret-keys --keyid-format long | grep -q "${{ secrets.GPG_KEY_UID }}"
+          printf '\n' > "$gpg_dir/passphrase"
+          echo "CR_KEYRING=$gpg_dir/pubring.kbx" >> "$GITHUB_ENV"
           echo "CR_PASSPHRASE_FILE=$gpg_dir/passphrase" >> "$GITHUB_ENV"
           echo "CR_SIGN=true" >> "$GITHUB_ENV"
           echo "CR_KEY=${{ secrets.GPG_KEY_UID }}" >> "$GITHUB_ENV"
@@ -77,6 +82,7 @@ jobs:
           packages_with_index: true
         env:
           CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GNUPGHOME: ${{ env.GNUPGHOME }}
           CR_SIGN: true
           CR_KEY: ${{ secrets.GPG_KEY_UID }}
           CR_KEYRING: ${{ env.CR_KEYRING }}
