@@ -1,0 +1,58 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/kgrubb/stalwart-helm-chart/issues
+    - name: source
+      url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/signKey: |
+    fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
+    url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+apiVersion: v2
+appVersion: v0.16.8
+description: Helm chart for the Stalwart mail and collaboration server
+home: https://stalw.art
+icon: https://stalw.art/img/logo.svg
+keywords:
+- - mail
+- - smtp
+- - imap
+- - jmap
+- - stalwart
+maintainers:
+- - email: 8471701+kgrubb@users.noreply.github.com
+  name: kgrubb
+  url: https://github.com/kgrubb
+name: stalwart
+sources:
+- - https://github.com/stalwartlabs/stalwart
+- - https://stalw.art/docs/cluster/orchestration/kubernetes/
+- - https://github.com/kgrubb/stalwart-helm-chart
+type: application
+version: 0.2.3
+
+...
+files:
+  stalwart-0.2.3.tgz: sha256:121cb1ee62e190f297a11384f22f238817d9cd72772e23571d1e3311d0c9ae40
+-----BEGIN PGP SIGNATURE-----
+
+wsFcBAEBCgAQBQJqLNTSCRDKmZpzOV9F/QAAFYMQAI9aINexZBIV0h94hkqA4h6q
+1eOoqGBj9CEMOl0KmQSrAFDtemq4ZLPHmMmXn1/CB3wM9BNFniKZr7D7OEdDCcQ6
+X/xhFMwzRYd9EFOkWHYBIMlyB8Ml2icVuHaab+L0LX06awywVmPwWFiNPn768195
+dia5AW100Q6Q8AFB9FSeFWl89ptw5tnmSjHWzRpwRRLXiFPmJqzoHVUv/ffh80Qn
+n+NztPRn+a7vj9hs5CCR4WGTtmcXmtVygAiq0JKxtVOYr7LGyo98AUF0SJ0mBSNl
+PfR2SznN82TgRuVYhtYmp/aaVM4tFFsngOWRQn9raPiJ9ctq+yHsNLhN5y5VlXMl
+uRrQx+X0xy9NE3Ml2Wh4VQeoZDjUz4RydwBg7off/7gGZVdKRU4hNiTA7vbgw8t/
+Rrri+jr1T5jnpzB5RpIVq9OweV2TsqPkJ/R3LbmgGzvOOccFWw9avX7UrAwn8bNB
+P5jLOmG140KHVpFs9kxVEaBpqhNjdAfaLMa8yoiwEIhUE4GN9iogqtTlCcRSLvcA
+G0koM+jzlSPVedpf+TevOoEZE7OTj+nJhCyI5/RnXqrHcZgNvThY7dih9b4HHVXg
+rW4l2dJJkLGR/Ih1gLqL12Ubtlk5/l5bm5ck/qFNCtYCTLij6xLlHiNpBvOqzJVw
+BAcfp/qH35jsMByMbS6C
+=guZv
+-----END PGP SIGNATURE-----
