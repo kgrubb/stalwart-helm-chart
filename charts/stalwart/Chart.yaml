@@ -1,0 +1,21 @@
+apiVersion: v2
+name: stalwart
+description: Helm chart for the Stalwart mail and collaboration server
+type: application
+version: 0.1.0
+appVersion: "v0.16.8"
+home: https://stalw.art
+sources:
+  - https://github.com/stalwartlabs/stalwart
+  - https://stalw.art/docs/cluster/orchestration/kubernetes/
+maintainers:
+  - name: kgrubb
+    url: https://github.com/kgrubb
+  - name: Stalwart Labs
+    url: https://stalw.art
+keywords:
+  - mail
+  - smtp
+  - imap
+  - jmap
+  - stalwart

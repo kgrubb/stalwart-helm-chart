@@ -1,0 +1,122 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "stalwart.fullname" . }}
+  labels:
+    {{- include "stalwart.labels" . | nindent 4 }}
+spec:
+  serviceName: {{ include "stalwart.fullname" . }}-headless
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "stalwart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "stalwart.selectorLabels" . | nindent 8 }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: stalwart
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.containerSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          args:
+            - "--config"
+            - "/etc/stalwart/config.json"
+          env:
+            {{- if .Values.role }}
+            - name: STALWART_ROLE
+              value: {{ .Values.role | quote }}
+            {{- end }}
+            {{- if .Values.pushShard }}
+            - name: STALWART_PUSH_SHARD
+              value: {{ .Values.pushShard | quote }}
+            {{- end }}
+            {{- if .Values.recoveryMode.enabled }}
+            - name: STALWART_RECOVERY_MODE
+              value: "true"
+            - name: STALWART_RECOVERY_MODE_PORT
+              value: {{ .Values.recoveryMode.port | quote }}
+            - name: STALWART_RECOVERY_MODE_LOG_LEVEL
+              value: {{ .Values.recoveryMode.logLevel | quote }}
+            {{- end }}
+            {{- range $key, $value := .Values.extraEnv }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+          envFrom:
+            - secretRef:
+                name: {{ include "stalwart.fullname" . }}-env
+          ports:
+            - name: smtp
+              containerPort: 25
+            - name: smtps
+              containerPort: 465
+            - name: submission
+              containerPort: 587
+            - name: imap
+              containerPort: 143
+            - name: imaps
+              containerPort: 993
+            - name: pop3
+              containerPort: 110
+            - name: pop3s
+              containerPort: 995
+            - name: sieve
+              containerPort: 4190
+            - name: http
+              containerPort: 80
+            - name: https
+              containerPort: 443
+            - name: mgmt
+              containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /healthz/live
+              port: mgmt
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz/ready
+              port: mgmt
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          volumeMounts:
+            - name: config
+              mountPath: /etc/stalwart/config.json
+              subPath: config.json
+              readOnly: true
+            {{- if .Values.persistence.enabled }}
+            - name: data
+              mountPath: /var/lib/stalwart
+            {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "stalwart.fullname" . }}-config
+  {{- if .Values.persistence.enabled }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - {{ .Values.persistence.accessMode | quote }}
+        {{- if .Values.persistence.storageClass }}
+        storageClassName: {{ .Values.persistence.storageClass | quote }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.size | quote }}
+  {{- end }}

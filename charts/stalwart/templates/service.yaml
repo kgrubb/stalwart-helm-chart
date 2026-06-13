@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "stalwart.fullname" . }}-headless
+  labels:
+    {{- include "stalwart.labels" . | nindent 4 }}
+spec:
+  clusterIP: None
+  selector:
+    {{- include "stalwart.selectorLabels" . | nindent 4 }}
+  ports:
+    - name: mgmt
+      port: 8080
+      targetPort: mgmt
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "stalwart.fullname" . }}
+  labels:
+    {{- include "stalwart.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    {{- include "stalwart.selectorLabels" . | nindent 4 }}
+  ports:
+    - name: smtp
+      port: {{ .Values.service.ports.smtp }}
+      targetPort: smtp
+    - name: smtps
+      port: {{ .Values.service.ports.smtps }}
+      targetPort: smtps
+    - name: submission
+      port: {{ .Values.service.ports.submission }}
+      targetPort: submission
+    - name: imap
+      port: {{ .Values.service.ports.imap }}
+      targetPort: imap
+    - name: imaps
+      port: {{ .Values.service.ports.imaps }}
+      targetPort: imaps
+    - name: pop3
+      port: {{ .Values.service.ports.pop3 }}
+      targetPort: pop3
+    - name: pop3s
+      port: {{ .Values.service.ports.pop3s }}
+      targetPort: pop3s
+    - name: sieve
+      port: {{ .Values.service.ports.sieve }}
+      targetPort: sieve
+    - name: http
+      port: {{ .Values.service.ports.http }}
+      targetPort: http
+    - name: https
+      port: {{ .Values.service.ports.https }}
+      targetPort: https
+    - name: mgmt
+      port: {{ .Values.service.ports.mgmt }}
+      targetPort: mgmt

@@ -1,0 +1,4 @@
+owner: kgrubb
+git-repo: stalwart-helm-chart
+package-path: .cr-release-packages
+charts-repo: https://kgrubb.github.io/stalwart-helm-chart

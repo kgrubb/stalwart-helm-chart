@@ -1,0 +1,9 @@
+# Chart-releaser artifacts
+.cr-release-packages/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
