@@ -71,7 +71,12 @@ jobs:
       - name: Check published chart index
         id: index
         run: |
-          if git ls-remote --heads origin gh-pages | grep -q gh-pages; then
+          if ! git ls-remote --heads origin gh-pages | grep -q gh-pages; then
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if git fetch origin gh-pages && git show origin/gh-pages:index.yaml >/dev/null 2>&1; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
           else
             echo "exists=false" >> "$GITHUB_OUTPUT"
@@ -125,8 +130,9 @@ jobs:
           for chart_dir in charts/*/; do
             cr package "$chart_dir" --config cr.yaml
           done
-          cr upload --config cr.yaml .cr-release-packages/*.tgz
-          cr index --config cr.yaml
+          cr upload --config cr.yaml --skip-existing .cr-release-packages/*.tgz
+          mkdir -p .cr-index
+          cr index --config cr.yaml --push
 
       - name: Run chart-releaser
         if: >-
