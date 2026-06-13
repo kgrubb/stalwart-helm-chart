@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-06-13
+
+### Added
+- generate Keep a Changelog release notes from merged PRs ([#4](https://github.com/kgrubb/stalwart-helm-chart/pull/4))
+  - Generates Keep a Changelog release notes from merged PR `## Summary` bullets, categorized by conventional PR titles
+  - Writes `charts/stalwart/RELEASE-NOTES.md` for chart-releaser and prepends each release to `CHANGELOG.md`
+
+
+
 ## [0.1.1] - 2026-06-13
 
 ### Fixed
