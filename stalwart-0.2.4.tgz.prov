@@ -1,0 +1,58 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/kgrubb/stalwart-helm-chart/issues
+    - name: source
+      url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/signKey: |
+    fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
+    url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+apiVersion: v2
+appVersion: v0.16.8
+description: Helm chart for the Stalwart mail and collaboration server
+home: https://stalw.art
+icon: https://stalw.art/img/logo.svg
+keywords:
+- - mail
+- - smtp
+- - imap
+- - jmap
+- - stalwart
+maintainers:
+- - email: 8471701+kgrubb@users.noreply.github.com
+  name: kgrubb
+  url: https://github.com/kgrubb
+name: stalwart
+sources:
+- - https://github.com/stalwartlabs/stalwart
+- - https://stalw.art/docs/cluster/orchestration/kubernetes/
+- - https://github.com/kgrubb/stalwart-helm-chart
+type: application
+version: 0.2.4
+
+...
+files:
+  stalwart-0.2.4.tgz: sha256:fee8ccbc2949e1716b4fd1acf472e38a370584055d607fc7dd05d45255fa3dae
+-----BEGIN PGP SIGNATURE-----
+
+wsFcBAEBCgAQBQJqLNUvCRDKmZpzOV9F/QAA3UgQAJslXFVRPvK3hQBQqauFlC/E
+xZ8aEAWxCOaViaTozG6FR82SfIQRUX2zdEWgG0VyVw2hyT9USizaRd+np5R5fdAw
+06J9wxvr9yFZ/wN5tTh8zyioUgRPfxeOjWAGxnyKIA+JrWtuJRSVTf0ZJLe/mVyG
+vGn4jdi1j2BtucIquhUVuecAR2Fqp4p7k1QEz3OgkLa7oSVFluC7MZSoS/Kf3LB/
+t0PMqAFx7S8TZERsV5cemL/QtCckRADTmAm8rLgLScUIX7J6FM0bWMdypvQB+9TC
+2TA7V9rSMswvN9M7dRxPMYtGeAcX+k43hnZvZ5DUP18wOe0ocyV3kNk4Dy19pqYO
+ehXkkUHsQTQL7G0/0h5GjQcJb5POYol6/eUWhzo8/OM8aXgpYFRLB8YBmlyQDcRr
+nDxlJJhcy+turJGnzUUGuxILcWWQv4QkyxN7GH313I1U5dVVXWCrJxwRch64bhQx
+bpX8TsDGmDLXoRL24IYx9Yc8JUut+/VzvtacjNKkbR21JaHoza0CGUoD/wVPK/E9
+eu5Bw7CzdnsF0Dzk7LkhQtZKhv/4s5wUCLjI+SjBZ36KGS8sn+ti+GSes7oLVbXa
+uCfGbB3/VK+hO3pqtXw3/jVfRGX8Vfl6r2dHBHM9jGjj8m04lsdVRekQRn7eySsT
+mScls+VKeK9WXUkttTiQ
+=Ao/s
+-----END PGP SIGNATURE-----
