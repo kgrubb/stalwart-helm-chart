@@ -82,8 +82,8 @@ jobs:
         run: |
           msg='${{ github.event.head_commit.message }}'
           if [[ "${{ steps.changes.outputs.changed }}" == "true" ]] || \
-             [[ "$msg" == chore(release):* ]] || \
-             [[ "${{ steps.index.outputs.exists }}" == "false" ]]; then
+             [[ "${{ steps.index.outputs.exists }}" == "false" ]] || \
+             [[ "$msg" =~ ^chore\(release\): ]]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
