@@ -61,6 +61,7 @@ jobs:
           gpg_dir=.cr-gpg
           mkdir -p "$gpg_dir"
           base64 -d <<< "${{ secrets.GPG_KEYRING_BASE64 }}" > "$gpg_dir/secring.gpg"
+          gpg --no-default-keyring --secret-keyring "$gpg_dir/secring.gpg" --list-secret-keys
           : > "$gpg_dir/passphrase"
           echo "CR_KEYRING=$gpg_dir/secring.gpg" >> "$GITHUB_ENV"
           echo "CR_PASSPHRASE_FILE=$gpg_dir/passphrase" >> "$GITHUB_ENV"
@@ -76,6 +77,10 @@ jobs:
           packages_with_index: true
         env:
           CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CR_SIGN: true
+          CR_KEY: ${{ secrets.GPG_KEY_UID }}
+          CR_KEYRING: ${{ env.CR_KEYRING }}
+          CR_PASSPHRASE_FILE: ${{ env.CR_PASSPHRASE_FILE }}
 
       - name: Sync gh-pages assets
         if: steps.bump.outputs.charts_changed == 'true'
