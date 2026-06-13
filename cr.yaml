@@ -5,3 +5,4 @@ charts-repo: https://kgrubb.github.io/stalwart-helm-chart
 pages-branch: gh-pages
 pages-index-path: index.yaml
 packages-with-index: true
+release-notes-file: RELEASE-NOTES.md

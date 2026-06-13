@@ -1,5 +1,6 @@
 # Chart-releaser artifacts
 .cr-release-packages/
+charts/stalwart/RELEASE-NOTES.md
 
 # OS / editor
 .DS_Store
