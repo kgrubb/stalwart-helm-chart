@@ -27,6 +27,8 @@ annotations:
       url: https://github.com/kgrubb/stalwart-helm-chart/issues
     - name: source
       url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/signKey: |
     fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
     url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+
