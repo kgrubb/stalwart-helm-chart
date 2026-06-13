@@ -1,5 +1,7 @@
 # stalwart
 
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/stalwart-helm)](https://artifacthub.io/packages/search?repo=stalwart-helm)
+
 Helm chart for [Stalwart Mail Server](https://stalw.art/), based on the [official Kubernetes reference](https://stalw.art/docs/cluster/orchestration/kubernetes/).
 
 ## Install
