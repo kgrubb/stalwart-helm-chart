@@ -69,7 +69,7 @@ jobs:
         if: steps.bump.outputs.charts_changed == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./scripts/sync-gh-pages.sh
+        run: ./scripts/sync-gh-pages.sh static
 
       - name: Commit release artifacts
         if: steps.bump.outputs.charts_changed == 'true'

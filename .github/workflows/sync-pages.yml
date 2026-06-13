@@ -2,13 +2,6 @@ name: Sync Pages
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - pages/**
-      - scripts/sync-gh-pages.sh
-      - .github/workflows/sync-pages.yml
 
 permissions:
   contents: write
@@ -26,4 +19,4 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           chmod +x scripts/sync-gh-pages.sh
-          ./scripts/sync-gh-pages.sh
+          ./scripts/sync-gh-pages.sh full
