@@ -63,10 +63,12 @@ jobs:
           gpg_dir="$RUNNER_TEMP/gpg"
           mkdir -p "$gpg_dir"
           chmod 700 "$gpg_dir"
+          export GNUPGHOME="$gpg_dir"
           echo "GNUPGHOME=$gpg_dir" >> "$GITHUB_ENV"
           printf '%s' "$GPG_PRIVATE_KEY" | gpg --batch --import
           gpg --list-secret-keys --keyid-format long
           gpg --list-secret-keys --keyid-format long | grep -q "${{ secrets.GPG_KEY_UID }}"
+          test -f "$gpg_dir/pubring.kbx"
           printf '\n' > "$gpg_dir/passphrase"
           echo "CR_KEYRING=$gpg_dir/pubring.kbx" >> "$GITHUB_ENV"
           echo "CR_PASSPHRASE_FILE=$gpg_dir/passphrase" >> "$GITHUB_ENV"
