@@ -12,6 +12,7 @@ sources:
   - https://github.com/kgrubb/stalwart-helm-chart
 maintainers:
   - name: kgrubb
+    email: 8471701+kgrubb@users.noreply.github.com
     url: https://github.com/kgrubb
 keywords:
   - mail
