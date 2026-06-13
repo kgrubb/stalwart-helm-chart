@@ -68,10 +68,10 @@ jobs:
           printf '%s' "$GPG_PRIVATE_KEY" | gpg --batch --import
           gpg --list-secret-keys --keyid-format long
           gpg --list-secret-keys --keyid-format long | grep -q "${{ secrets.GPG_KEY_UID }}"
-          gpg --export > "$gpg_dir/pubring.gpg"
-          test -s "$gpg_dir/pubring.gpg"
+          gpg --export-secret-keys "${{ secrets.GPG_KEY_UID }}" > "$gpg_dir/secring.gpg"
+          test -s "$gpg_dir/secring.gpg"
           printf '\n' > "$gpg_dir/passphrase"
-          echo "CR_KEYRING=$gpg_dir/pubring.gpg" >> "$GITHUB_ENV"
+          echo "CR_KEYRING=$gpg_dir/secring.gpg" >> "$GITHUB_ENV"
           echo "CR_PASSPHRASE_FILE=$gpg_dir/passphrase" >> "$GITHUB_ENV"
           echo "CR_SIGN=true" >> "$GITHUB_ENV"
           echo "CR_KEY=${{ secrets.GPG_KEY_UID }}" >> "$GITHUB_ENV"
