@@ -30,20 +30,21 @@ jobs:
           MSG='${{ github.event.head_commit.message }}'
 
           [[ "$BEFORE" == "0000000000000000000000000000000000000000" ]] && exit 0
-          git diff --name-only "$BEFORE" "$AFTER" | grep -q '^charts/' || exit 0
-          echo "charts_changed=true" >> "$GITHUB_OUTPUT"
-
           [[ "$MSG" =~ ^chore\(release\): ]] && exit 0
+
+          last_tag=$(git tag -l 'stalwart-*' --sort=-v:refname | head -1)
+          git diff --name-only "${last_tag:-$BEFORE}" "$AFTER" -- charts/ | grep -q . || exit 0
+          echo "charts_changed=true" >> "$GITHUB_OUTPUT"
 
           chmod +x scripts/bump-chart-version.sh
           ./scripts/bump-chart-version.sh "$BEFORE" "$AFTER"
           git diff --quiet charts/stalwart/Chart.yaml || echo "bumped=true" >> "$GITHUB_OUTPUT"
 
       - uses: azure/setup-helm@v5
-        if: steps.bump.outputs.charts_changed == 'true' || steps.bump.outputs.bumped == 'true'
+        if: steps.bump.outputs.charts_changed == 'true'
 
       - name: Publish charts
-        if: steps.bump.outputs.charts_changed == 'true' || steps.bump.outputs.bumped == 'true'
+        if: steps.bump.outputs.charts_changed == 'true'
         uses: helm/chart-releaser-action@v1.7.0
         with:
           charts_dir: charts
