@@ -55,6 +55,18 @@ jobs:
       - uses: azure/setup-helm@v5
         if: steps.bump.outputs.charts_changed == 'true'
 
+      - name: Import GPG key
+        if: steps.bump.outputs.charts_changed == 'true'
+        run: |
+          gpg_dir=.cr-gpg
+          mkdir -p "$gpg_dir"
+          base64 -d <<< "${{ secrets.GPG_KEYRING_BASE64 }}" > "$gpg_dir/secring.gpg"
+          : > "$gpg_dir/passphrase"
+          echo "CR_KEYRING=$gpg_dir/secring.gpg" >> "$GITHUB_ENV"
+          echo "CR_PASSPHRASE_FILE=$gpg_dir/passphrase" >> "$GITHUB_ENV"
+          echo "CR_SIGN=true" >> "$GITHUB_ENV"
+          echo "CR_KEY=${{ secrets.GPG_KEY_UID }}" >> "$GITHUB_ENV"
+
       - name: Publish charts
         if: steps.bump.outputs.charts_changed == 'true'
         uses: helm/chart-releaser-action@v1.7.0

@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "image": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "repository": { "type": "string" },
+        "tag": { "type": "string" },
+        "pullPolicy": {
+          "type": "string",
+          "enum": ["Always", "IfNotPresent", "Never"]
+        }
+      },
+      "required": ["repository", "tag", "pullPolicy"]
+    },
+    "replicaCount": { "type": "integer", "minimum": 1 },
+    "role": { "type": "string" },
+    "pushShard": { "type": "string" },
+    "recoveryAdmin": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "username": { "type": "string", "minLength": 1 },
+        "password": { "type": "string" }
+      },
+      "required": ["enabled", "username", "password"],
+      "if": { "properties": { "enabled": { "const": true } } },
+      "then": { "properties": { "password": { "minLength": 1 } } }
+    },
+    "recoveryMode": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "port": { "type": "integer", "minimum": 1, "maximum": 65535 },
+        "logLevel": {
+          "type": "string",
+          "enum": ["trace", "debug", "info", "warn", "error"]
+        }
+      },
+      "required": ["enabled", "port", "logLevel"]
+    },
+    "extraEnv": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "extraSecretEnv": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "config": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "@type": { "type": "string" },
+        "path": { "type": "string" }
+      },
+      "required": ["@type", "path"]
+    },
+    "service": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["ClusterIP", "NodePort", "LoadBalancer", "ExternalName"]
+        },
+        "ports": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "smtp": { "type": "integer", "minimum": 1, "maximum": 65535 },
+            "smtps": { "type": "integer", "minimum": 1, "maximum": 65535 },
+            "submission": { "type": "integer", "minimum": 1, "maximum": 65535 },
+            "imap": { "type": "integer", "minimum": 1, "maximum": 65535 },
+            "imaps": { "type": "integer", "minimum": 1, "maximum": 65535 },
+            "pop3": { "type": "integer", "minimum": 1, "maximum": 65535 },
+            "pop3s": { "type": "integer", "minimum": 1, "maximum": 65535 },
+            "sieve": { "type": "integer", "minimum": 1, "maximum": 65535 },
+            "http": { "type": "integer", "minimum": 1, "maximum": 65535 },
+            "https": { "type": "integer", "minimum": 1, "maximum": 65535 },
+            "mgmt": { "type": "integer", "minimum": 1, "maximum": 65535 }
+          }
+        }
+      },
+      "required": ["type", "ports"]
+    },
+    "ingress": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "className": { "type": "string" },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "hosts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "host": { "type": "string", "minLength": 1 },
+              "paths": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "path": { "type": "string" },
+                    "pathType": {
+                      "type": "string",
+                      "enum": ["Prefix", "Exact", "ImplementationSpecific"]
+                    },
+                    "portName": { "type": "string" }
+                  },
+                  "required": ["path", "pathType", "portName"]
+                }
+              }
+            },
+            "required": ["host", "paths"]
+          }
+        },
+        "tls": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "secretName": { "type": "string" },
+              "hosts": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "required": ["enabled", "className", "annotations", "hosts", "tls"]
+    },
+    "persistence": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "accessMode": { "type": "string" },
+        "storageClass": { "type": "string" },
+        "size": { "type": "string", "pattern": "^[0-9]+(\\.[0-9]+)?(E|P|T|G|M|K|Ei|Pi|Ti|Gi|Mi|Ki)$" }
+      },
+      "required": ["enabled", "accessMode", "storageClass", "size"]
+    },
+    "resources": { "type": "object" },
+    "podSecurityContext": { "type": "object" },
+    "containerSecurityContext": { "type": "object" }
+  }
+}

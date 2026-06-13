@@ -17,9 +17,10 @@ cp pages/* "$work/gh-pages/"
 if [[ "$MODE" == "full" ]]; then
   cd "$work/gh-pages"
   shopt -s nullglob
-  for tag in $(gh release list --repo "$REPO" --limit 100 --json tagName -q '.[].tagName'); do
-    gh release download "$tag" --repo "$REPO" -D . --pattern '*.tgz' --clobber
-  done
+for tag in $(gh release list --repo "$REPO" --limit 100 --json tagName -q '.[].tagName'); do
+  gh release download "$tag" --repo "$REPO" -D . --pattern '*.tgz' --clobber
+  gh release download "$tag" --repo "$REPO" -D . --pattern '*.prov' --clobber 2>/dev/null || true
+done
   helm repo index . --url "$REPO_URL"
 fi
 
