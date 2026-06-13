@@ -72,11 +72,14 @@ jobs:
         id: index
         run: |
           if ! git ls-remote --heads origin gh-pages | grep -q gh-pages; then
+            echo "branch=false" >> "$GITHUB_OUTPUT"
             echo "exists=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          if git fetch origin gh-pages && git show origin/gh-pages:index.yaml >/dev/null 2>&1; then
+          echo "branch=true" >> "$GITHUB_OUTPUT"
+          git fetch origin gh-pages
+          if git show origin/gh-pages:index.yaml >/dev/null 2>&1; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
           else
             echo "exists=false" >> "$GITHUB_OUTPUT"
@@ -110,7 +113,7 @@ jobs:
       - name: Initialize gh-pages branch
         if: >-
           steps.release.outputs.run == 'true' &&
-          steps.index.outputs.exists == 'false'
+          steps.index.outputs.branch == 'false'
         run: |
           git switch --orphan gh-pages
           git reset --hard
