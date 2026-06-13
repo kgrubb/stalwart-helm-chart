@@ -8,6 +8,7 @@ on:
 permissions:
   contents: write
   pages: write
+  pull-requests: read
 
 jobs:
   release:
@@ -35,10 +36,21 @@ jobs:
           last_tag=$(git tag -l 'stalwart-*' --sort=-v:refname | head -1)
           git diff --name-only "${last_tag:-$BEFORE}" "$AFTER" -- charts/ | grep -q . || exit 0
           echo "charts_changed=true" >> "$GITHUB_OUTPUT"
+          echo "since_ref=${last_tag:-$BEFORE}" >> "$GITHUB_OUTPUT"
 
-          chmod +x scripts/bump-chart-version.sh
+          chmod +x scripts/{bump-chart-version,generate-changelog}.sh
           ./scripts/bump-chart-version.sh "$BEFORE" "$AFTER"
-          git diff --quiet charts/stalwart/Chart.yaml || echo "bumped=true" >> "$GITHUB_OUTPUT"
+          echo "version=$(awk '/^version:/ { print $2 }' charts/stalwart/Chart.yaml)" >> "$GITHUB_OUTPUT"
+
+      - name: Generate changelog
+        if: steps.bump.outputs.charts_changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ./scripts/generate-changelog.sh \
+            "${{ steps.bump.outputs.since_ref }}" \
+            "${{ github.sha }}" \
+            "${{ steps.bump.outputs.version }}"
 
       - uses: azure/setup-helm@v5
         if: steps.bump.outputs.charts_changed == 'true'
@@ -52,10 +64,12 @@ jobs:
         env:
           CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Commit version bump
-        if: steps.bump.outputs.bumped == 'true'
+      - name: Commit release artifacts
+        if: steps.bump.outputs.charts_changed == 'true'
         run: |
+          git add CHANGELOG.md
+          git diff --quiet charts/stalwart/Chart.yaml || git add charts/stalwart/Chart.yaml
+          git diff --staged --quiet && exit 0
           VERSION=$(awk '/^version:/ { print $2 }' charts/stalwart/Chart.yaml)
-          git add charts/stalwart/Chart.yaml
           git commit -m "chore(release): bump chart to ${VERSION}"
           git push
