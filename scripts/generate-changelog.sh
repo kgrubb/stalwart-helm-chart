@@ -22,8 +22,16 @@ section_for() {
     feat!*|*!:*|*BREAKING*) echo changed ;;
     feat:*) echo added ;;
     fix:*) echo fixed ;;
-    perf:*|refactor:*) echo changed ;;
+    perf:*|refactor:*|chore:*|docs:*|ci:*) echo changed ;;
   esac
+}
+
+pr_numbers_since() {
+  git log "${SINCE}..${UNTIL}" --pretty=format:'%s' \
+    | grep -v '^chore(release):' \
+    | grep -oE '#[0-9]+' \
+    | tr -d '#' \
+    | sort -nu
 }
 
 append() {
@@ -61,8 +69,7 @@ while read -r num; do
       append "$section" "  - ${line}"
     done
   fi
-done < <(git log "${SINCE}..${UNTIL}" --merges --pretty=format:'%s' \
-  | grep -oE '#[0-9]+' | tr -d '#' | sort -nu)
+done < <(pr_numbers_since)
 
 if [[ ${#added[@]} -eq 0 && ${#fixed[@]} -eq 0 && ${#changed[@]} -eq 0 ]]; then
   changed=("- Chart update")
