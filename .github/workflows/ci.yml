@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: azure/setup-helm@v5
+
+      - name: Lint chart
+        run: helm lint charts/stalwart --strict
+
+      - name: Render chart
+        run: |
+          helm template test charts/stalwart
+          helm template test charts/stalwart --set recoveryAdmin.enabled=false

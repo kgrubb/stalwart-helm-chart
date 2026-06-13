@@ -16,6 +16,9 @@ spec:
         {{- include "stalwart.selectorLabels" . | nindent 8 }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- if or .Values.recoveryAdmin.enabled (not (empty .Values.extraSecretEnv)) }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- end }}
     spec:
       {{- with .Values.podSecurityContext }}
       securityContext:
@@ -32,6 +35,7 @@ spec:
           args:
             - "--config"
             - "/etc/stalwart/config.json"
+          {{- if or .Values.role .Values.pushShard .Values.recoveryMode.enabled (not (empty .Values.extraEnv)) }}
           env:
             {{- if .Values.role }}
             - name: STALWART_ROLE
@@ -53,9 +57,12 @@ spec:
             - name: {{ $key }}
               value: {{ $value | quote }}
             {{- end }}
+          {{- end }}
+          {{- if or .Values.recoveryAdmin.enabled (not (empty .Values.extraSecretEnv)) }}
           envFrom:
             - secretRef:
                 name: {{ include "stalwart.fullname" . }}-env
+          {{- end }}
           ports:
             - name: smtp
               containerPort: 25

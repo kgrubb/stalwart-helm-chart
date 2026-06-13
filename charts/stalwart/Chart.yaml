@@ -5,14 +5,13 @@ type: application
 version: 0.1.0
 appVersion: "v0.16.8"
 home: https://stalw.art
+icon: https://stalw.art/img/logo.svg
 sources:
   - https://github.com/stalwartlabs/stalwart
   - https://stalw.art/docs/cluster/orchestration/kubernetes/
 maintainers:
   - name: kgrubb
     url: https://github.com/kgrubb
-  - name: Stalwart Labs
-    url: https://stalw.art
 keywords:
   - mail
   - smtp
