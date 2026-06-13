@@ -102,6 +102,18 @@ jobs:
           sudo mv /tmp/cr /usr/local/bin/cr
           cr version
 
+      - name: Initialize gh-pages branch
+        if: >-
+          steps.release.outputs.run == 'true' &&
+          steps.index.outputs.exists == 'false'
+        run: |
+          git switch --orphan gh-pages
+          git reset --hard
+          git commit --allow-empty -m "Initialize gh-pages for chart releases"
+          git push origin gh-pages
+          git switch -f main
+          git fetch origin gh-pages
+
       - name: Publish initial chart release
         if: >-
           steps.release.outputs.run == 'true' &&
