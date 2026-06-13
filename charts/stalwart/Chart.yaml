@@ -12,6 +12,7 @@ sources:
   - https://github.com/kgrubb/stalwart-helm-chart
 maintainers:
   - name: kgrubb
+    email: 8471701+kgrubb@users.noreply.github.com
     url: https://github.com/kgrubb
 keywords:
   - mail
@@ -27,6 +28,7 @@ annotations:
       url: https://github.com/kgrubb/stalwart-helm-chart/issues
     - name: source
       url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/prerelease: "false"
   artifacthub.io/signKey: |
     fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
     url: https://kgrubb.github.io/stalwart-helm-chart/public.key
