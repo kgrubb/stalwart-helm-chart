@@ -1,30 +1,51 @@
+# Container image.
 image:
   repository: stalwartlabs/stalwart
   tag: "v0.16.8"
   pullPolicy: IfNotPresent
 
+# Number of pods in the StatefulSet.
+# Single-node deployments keep this at 1.
 replicaCount: 1
+
+# Maps to STALWART_ROLE. Names a ClusterRole defined in the database.
+# Leave empty on single-node installs to run every task and listener.
 role: ""
+
+# Maps to STALWART_PUSH_SHARD. Only set on nodes whose role delivers
+# push notifications. Leave empty on single-node installs.
 pushShard: ""
 
-# Enable on first install, then disable after provisioning an admin account.
+# Recovery / bootstrap administrator credential.
+# Enable this on first install so the operator can sign in without
+# scraping the pod logs for the generated temporary password.
+# Remove it once a permanent administrator account has been provisioned.
 recoveryAdmin:
   enabled: false
   username: admin
   password: ""
 
+# Starts the pods in recovery mode. Suspends mail services and
+# exposes only the management listener on the configured port.
 recoveryMode:
   enabled: false
   port: 8080
   logLevel: info
 
+# Extra environment variables injected into the container.
 extraEnv: {}
+
+# Extra environment variables injected from the managed Secret.
 extraSecretEnv: {}
 
+# config.json contents. Rendered verbatim into the ConfigMap.
+# Only the DataStore object belongs here.
 config:
   "@type": RocksDb
   path: /var/lib/stalwart
 
+# Service definition. Change `type` to LoadBalancer when a cloud
+# load balancer should expose the mail ports directly.
 service:
   type: ClusterIP
   ports:
@@ -40,6 +61,7 @@ service:
     https: 443
     mgmt: 8080
 
+# Ingress for the HTTP / HTTPS listeners only.
 ingress:
   enabled: false
   className: ""
@@ -52,6 +74,7 @@ ingress:
           portName: https
   tls: []
 
+# Persistent volume for the data directory.
 persistence:
   enabled: true
   accessMode: ReadWriteOnce
