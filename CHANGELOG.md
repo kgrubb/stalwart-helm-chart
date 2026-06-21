@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-06-21
+
+### Added
+- bump Stalwart to v0.16.10 ([#23](https://github.com/kgrubb/stalwart-helm-chart/pull/23))
+  - Update the Stalwart image from v0.16.8 to the latest release, v0.16.10.
+  - Bumps both image.tag (values.yaml) and appVersion (Chart.yaml).
+
+
+
 ## [0.2.9] - 2026-06-21
 
 ### Changed
