@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.9] - 2026-06-21
+
+### Changed
+- satisfy kube-linter and yamllint ([#22](https://github.com/kgrubb/stalwart-helm-chart/pull/22))
+  - Harden the default pod/container securityContext so the kube-linter security checks pass for real: runAsNonRoot, allowPrivilegeEscalation: false, drop all capabilities (keeping NET_BIND_SERVICE for the privileged mail ports), and RuntimeDefault seccomp.
+  - Suppress the dangling-service false positive on both Services via a scoped ignore-check.kube-linter.io annotation -- the backing StatefulSet is invisible to kube-linter when deployed through a HelmChart CRD.
+  - Add .kube-linter.yaml excluding only deployment-specific checks (unset-cpu/memory-requirements, no-read-only-root-filesystem).
+  - Add .yamllint that ignores Helm templates, allows the GitHub Actions on: key, disables document-start, and sets line length to 120.
+
+
+
 ## [0.2.8] - 2026-06-13
 
 ### Fixed
