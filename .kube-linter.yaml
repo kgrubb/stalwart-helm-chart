@@ -1,0 +1,7 @@
+checks:
+  exclude:
+    # requests/limits are environment-specific
+    - "unset-cpu-requirements"
+    - "unset-memory-requirements"
+    # Stalwart writes runtime state outside the data PVC
+    - "no-read-only-root-filesystem"

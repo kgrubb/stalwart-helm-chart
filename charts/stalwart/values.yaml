@@ -81,11 +81,22 @@ persistence:
   storageClass: ""
   size: 20Gi
 
+# Set requests/limits per environment.
 resources: {}
 
 podSecurityContext:
   fsGroup: 2000
   runAsUser: 2000
   runAsGroup: 2000
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
 
-containerSecurityContext: {}
+# NET_BIND_SERVICE is required for the privileged mail ports.
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - NET_BIND_SERVICE

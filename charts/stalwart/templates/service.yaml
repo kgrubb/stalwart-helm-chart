@@ -4,6 +4,8 @@ metadata:
   name: {{ include "stalwart.fullname" . }}-headless
   labels:
     {{- include "stalwart.labels" . | nindent 4 }}
+  annotations:
+    ignore-check.kube-linter.io/dangling-service: "Backing StatefulSet is not visible to kube-linter when deployed via a HelmChart CRD."
 spec:
   clusterIP: None
   selector:
@@ -19,6 +21,8 @@ metadata:
   name: {{ include "stalwart.fullname" . }}
   labels:
     {{- include "stalwart.labels" . | nindent 4 }}
+  annotations:
+    ignore-check.kube-linter.io/dangling-service: "Backing StatefulSet is not visible to kube-linter when deployed via a HelmChart CRD."
 spec:
   type: {{ .Values.service.type }}
   selector:
