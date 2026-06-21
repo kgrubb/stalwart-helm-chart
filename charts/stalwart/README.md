@@ -14,5 +14,8 @@ Deploys [Stalwart Mail Server](https://stalw.art/) as a StatefulSet with persist
 | `service.type` | `ClusterIP` | Use `LoadBalancer` to expose mail ports |
 | `ingress.enabled` | `false` | HTTP/S management only |
 | `persistence.enabled` | `true` | Disable for external DataStore backends |
+| `resources` | `{}` | Set CPU/memory requests and limits per environment |
+| `podSecurityContext` | non-root, `RuntimeDefault` seccomp | Runs as UID/GID 2000 |
+| `containerSecurityContext` | drops all caps, keeps `NET_BIND_SERVICE` | Needed for privileged mail ports |
 
 See [values.yaml](values.yaml) and the [Stalwart Kubernetes docs](https://stalw.art/docs/cluster/orchestration/kubernetes/) for clustering, external stores, and restricted Pod Security Standards.

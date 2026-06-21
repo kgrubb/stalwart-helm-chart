@@ -1,0 +1,18 @@
+---
+extends: default
+
+yaml-files:
+  - "*.yaml"
+  - "*.yml"
+
+# Helm templates are not valid YAML.
+ignore: |
+  charts/*/templates/
+  .cr-release-packages/
+
+rules:
+  document-start: disable
+  truthy:
+    check-keys: false  # allow GitHub Actions "on:"
+  line-length:
+    max: 120
