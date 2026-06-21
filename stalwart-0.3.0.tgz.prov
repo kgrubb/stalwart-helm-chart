@@ -1,0 +1,58 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/kgrubb/stalwart-helm-chart/issues
+    - name: source
+      url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/signKey: |
+    fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
+    url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+apiVersion: v2
+appVersion: v0.16.10
+description: Helm chart for the Stalwart mail and collaboration server
+home: https://stalw.art
+icon: https://kgrubb.github.io/stalwart-helm-chart/logo.svg
+keywords:
+- - mail
+- - smtp
+- - imap
+- - jmap
+- - stalwart
+maintainers:
+- - email: 8471701+kgrubb@users.noreply.github.com
+  name: kgrubb
+  url: https://github.com/kgrubb
+name: stalwart
+sources:
+- - https://github.com/stalwartlabs/stalwart
+- - https://stalw.art/docs/cluster/orchestration/kubernetes/
+- - https://github.com/kgrubb/stalwart-helm-chart
+type: application
+version: 0.3.0
+
+...
+files:
+  stalwart-0.3.0.tgz: sha256:01e5ea6867f04ade40076ef520748c64ff60823f09ab53951f0f92cb5ea220bd
+-----BEGIN PGP SIGNATURE-----
+
+wsFcBAEBCgAQBQJqOFFvCRDKmZpzOV9F/QAAmjAQAA0nC48hXkjGFV++eynNjcgP
+vgqKRy9/eKc0JgYV+S0TNYRV9/vM8lOnpAl2C28Us1FMqEQONbxWHpm6biOGW+4q
+SLhM915A3Snw0bdSYloBDc/R6CiWkZFyDFS2yLBrxdhUirPJ0HOcAS5++5ciHjOw
+wzrmsRB/w79ZbPqn7/hc0YfOSybviMkvyIZ+mh1lV7jcDTNXLOlS4/pUuKJg4mdg
+JoJZnD+Ibhixzj13RepVAr2fYKbJunqGgsU6CgLB8g2xPzPwXRIGoEmAoOyIjPYw
+cYA05YmaNZ+9y3bnaMDRpntZRNFSRbo4xiQW9b4HbHUOWKLit1niug3hlcpGkB3i
+R+4yHG/xvq3Emxmeublt82a9yZyz843WJVQYbGlH3Z66mFK+gmys/byE1rhj+V6e
+PFrnNVtlNCTHEEyVncV0J6xr57QlfKaxJIlWp1cFNVTyu2deIc/uLeIoIG6S3I+I
+54nI6erPZYibhbqgVtNUPMLYd1N3HxWge5xINv+WWGP/2+j+TvM0434ItpZhmYUI
+bDebI2G/V/hTqcPM3c8lXBZpkQUGlr0gePE/m81zCl/nd9aVykZa3HBEi71rwJKJ
+yQfLwR+DRPwNolkLSqCKu8ghkUZju0B/gxL0KgN1gLmduSUo0o2qrByPM22YIkla
+qpF5iA2JmlE7tK8Y59uT
+=y+Iq
+-----END PGP SIGNATURE-----
