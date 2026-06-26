@@ -24,9 +24,13 @@ app.kubernetes.io/name: {{ include "stalwart.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
+{{- define "stalwart.recoveryAdminOnPod" -}}
+{{- or .Values.recoveryAdmin.enabled (and .Values.bootstrap.enabled .Values.recoveryAdmin.existingSecret) -}}
+{{- end -}}
+
 {{- define "stalwart.needsChartEnvSecret" -}}
 {{- $inline := and (not .Values.recoveryAdmin.existingSecret) .Values.recoveryAdmin.password -}}
-{{- if or (not (empty .Values.extraSecretEnv)) (and (or .Values.recoveryAdmin.enabled .Values.bootstrap.enabled) $inline) -}}true{{- end -}}
+{{- if or (not (empty .Values.extraSecretEnv)) (and (include "stalwart.recoveryAdminOnPod" .) (not .Values.recoveryAdmin.existingSecret) $inline) -}}true{{- end -}}
 {{- end -}}
 
 {{- define "stalwart.recoveryAdmin.env" -}}

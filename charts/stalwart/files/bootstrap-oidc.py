@@ -19,6 +19,7 @@ OIDC_FIELDS = (
     "claimName",
     "claimGroups",
 )
+BUILTIN_ROLES = {"User", "Admin"}
 EMPTY = (None, "", [])
 
 
@@ -33,6 +34,29 @@ def basic_auth() -> str:
     if not creds:
         creds = f"{require('RECOVERY_USERNAME')}:{require('RECOVERY_PASSWORD')}"
     return "Basic " + base64.b64encode(creds.encode()).decode()
+
+
+def roles_field(roles) -> dict:
+    if isinstance(roles, str):
+        roles = [roles]
+    if not roles:
+        return {"@type": "User"}
+    if len(roles) == 1 and roles[0] in BUILTIN_ROLES:
+        return {"@type": roles[0]}
+    raise RuntimeError(f"unsupported roles value: {roles!r}")
+
+
+def account_object(kind: str, name: str, domain_id: str, roles) -> dict:
+    return {
+        "@type": kind,
+        "name": name,
+        "domainId": domain_id,
+        "credentials": {},
+        "memberGroupIds": {},
+        "permissions": {"@type": "Inherit"},
+        "quotas": {},
+        "roles": roles_field(roles),
+    }
 
 
 class Jmap:
@@ -94,6 +118,26 @@ class Jmap:
             return found
         return self.create(set_m, obj, f"c{tag}")
 
+    def ensure_principal(
+        self, kind: str, name: str, domain_id: str, roles, tag: str
+    ) -> str:
+        filt = {"name": name, "domainId": domain_id}
+        principal_id = self.first("x:Account/query", filt, f"q{tag}")
+        role_obj = roles_field(roles) if roles else None
+        if principal_id:
+            if role_obj:
+                self.call(
+                    "x:Account/set",
+                    {"update": {principal_id: {"roles": role_obj}}},
+                    f"u{tag}",
+                )
+            return principal_id
+        return self.create(
+            "x:Account/set",
+            account_object(kind, name, domain_id, roles or "User"),
+            f"c{tag}",
+        )
+
 
 def oidc_directory(cfg: dict) -> dict:
     directory = {
@@ -106,7 +150,24 @@ def oidc_directory(cfg: dict) -> dict:
     return directory
 
 
-def reconcile(jmap: Jmap, domain: str, accounts: list, oidc_cfg: dict) -> None:
+def builtin_role_ids(jmap: Jmap) -> dict[str, str]:
+    ids = jmap.call("x:Role/query", {"filter": {}}, "qRoles").get("ids", [])
+    if not ids:
+        return {}
+    listing = jmap.call("x:Role/get", {"ids": ids}, "gRoles").get("list", {})
+    mapping: dict[str, str] = {}
+    for role_id, role in listing.items():
+        description = (role.get("description") or "").lower()
+        if "administrator" in description and "tenant" not in description:
+            mapping["Admin"] = role_id
+        elif description == "user":
+            mapping["User"] = role_id
+    return mapping
+
+
+def reconcile(
+    jmap: Jmap, domain: str, accounts: list, groups: list, oidc_cfg: dict
+) -> None:
     domain_id = jmap.ensure(
         "x:Domain/query",
         "x:Domain/set",
@@ -118,15 +179,23 @@ def reconcile(jmap: Jmap, domain: str, accounts: list, oidc_cfg: dict) -> None:
     for account in accounts:
         if not (name := account.get("name")):
             continue
-        user = {"@type": "User", "name": name, "domainId": domain_id}
-        if roles := account.get("roles"):
-            user["roles"] = roles
-        jmap.ensure(
-            "x:Account/query",
-            "x:Account/set",
-            {"name": name, "domainId": domain_id},
-            user,
+        jmap.ensure_principal(
+            "User",
+            name,
+            domain_id,
+            account.get("roles", "User"),
             f"Acct_{name}",
+        )
+
+    for group in groups:
+        if not (name := group.get("name")):
+            continue
+        jmap.ensure_principal(
+            "Group",
+            name,
+            domain_id,
+            group.get("roles", "User"),
+            f"Grp_{name}",
         )
 
     directory = oidc_directory(oidc_cfg)
@@ -150,11 +219,19 @@ def reconcile(jmap: Jmap, domain: str, accounts: list, oidc_cfg: dict) -> None:
     else:
         dir_id = jmap.create("x:Directory/set", directory, "cDir")
 
+    auth_update: dict = {"directoryId": dir_id}
+    role_ids = builtin_role_ids(jmap)
+    if user_role := role_ids.get("User"):
+        auth_update["defaultUserRoleIds"] = {user_role: True}
+
     auth = jmap.call("x:Authentication/get", {"ids": ["singleton"]}, "gAuth")
-    if auth.get("list", {}).get("singleton", {}).get("directoryId") != dir_id:
+    current = auth.get("list", {}).get("singleton", {})
+    if current.get("directoryId") != dir_id or (
+        user_role and not current.get("defaultUserRoleIds")
+    ):
         jmap.call(
             "x:Authentication/set",
-            {"update": {"singleton": {"directoryId": dir_id}}},
+            {"update": {"singleton": auth_update}},
             "sAuth",
         )
 
@@ -166,6 +243,7 @@ def main() -> None:
         jmap,
         require("BOOTSTRAP_DOMAIN"),
         json.loads(require("BOOTSTRAP_ACCOUNTS")),
+        json.loads(os.environ.get("BOOTSTRAP_GROUPS", "[]")),
         json.loads(require("BOOTSTRAP_OIDC")),
     )
 

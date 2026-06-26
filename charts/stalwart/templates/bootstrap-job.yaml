@@ -51,6 +51,8 @@ spec:
               value: {{ .Values.bootstrap.domain | quote }}
             - name: BOOTSTRAP_ACCOUNTS
               value: {{ .Values.bootstrap.accounts | toJson | quote }}
+            - name: BOOTSTRAP_GROUPS
+              value: {{ .Values.bootstrap.groups | toJson | quote }}
             - name: BOOTSTRAP_OIDC
               value: {{ .Values.bootstrap.oidc | toJson | quote }}
             {{- if .Values.recoveryAdmin.existingSecret }}

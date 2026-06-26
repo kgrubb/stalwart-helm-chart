@@ -88,6 +88,21 @@
             "required": ["name"]
           }
         },
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "roles": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "required": ["name"]
+          }
+        },
         "oidc": {
           "type": "object",
           "additionalProperties": false,
@@ -116,7 +131,7 @@
           ]
         }
       },
-      "required": ["enabled", "apiUrl", "domain", "accounts", "oidc"]
+      "required": ["enabled", "apiUrl", "domain", "accounts", "groups", "oidc"]
     },
     "config": {
       "type": "object",

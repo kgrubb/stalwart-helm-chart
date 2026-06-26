@@ -35,7 +35,7 @@ spec:
           args:
             - "--config"
             - "/etc/stalwart/config.json"
-          {{- if or .Values.role .Values.pushShard .Values.recoveryMode.enabled (not (empty .Values.extraEnv)) (and .Values.recoveryAdmin.enabled .Values.recoveryAdmin.existingSecret) }}
+          {{- if or .Values.role .Values.pushShard .Values.recoveryMode.enabled (not (empty .Values.extraEnv)) (and (include "stalwart.recoveryAdminOnPod" .) .Values.recoveryAdmin.existingSecret) }}
           env:
             {{- if .Values.role }}
             - name: STALWART_ROLE
@@ -57,11 +57,11 @@ spec:
             - name: {{ $key }}
               value: {{ $value | quote }}
             {{- end }}
-            {{- if and .Values.recoveryAdmin.enabled .Values.recoveryAdmin.existingSecret }}
+            {{- if and (include "stalwart.recoveryAdminOnPod" .) .Values.recoveryAdmin.existingSecret }}
             {{- include "stalwart.recoveryAdmin.env" . | nindent 12 }}
             {{- end }}
           {{- end }}
-          {{- if or (not (empty .Values.extraSecretEnv)) (and .Values.recoveryAdmin.enabled (not .Values.recoveryAdmin.existingSecret) .Values.recoveryAdmin.password) }}
+          {{- if or (not (empty .Values.extraSecretEnv)) (and (include "stalwart.recoveryAdminOnPod" .) (not .Values.recoveryAdmin.existingSecret) .Values.recoveryAdmin.password) }}
           envFrom:
             - secretRef:
                 name: {{ include "stalwart.fullname" . }}-env

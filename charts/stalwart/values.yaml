@@ -47,6 +47,7 @@ bootstrap:
   apiUrl: ""
   domain: ""
   accounts: []
+  groups: []
   oidc:
     issuerUrl: ""
     description: ""
