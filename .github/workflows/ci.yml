@@ -26,6 +26,14 @@ jobs:
         run: |
           helm template test charts/stalwart
           helm template test charts/stalwart --set recoveryAdmin.enabled=false
+          helm template test charts/stalwart \
+            --set recoveryAdmin.enabled=true \
+            --set recoveryAdmin.existingSecret=recovery-admin
+          helm template test charts/stalwart \
+            --set recoveryAdmin.password=ci-only \
+            --set bootstrap.enabled=true \
+            --set bootstrap.domain=example.org \
+            --set bootstrap.oidc.issuerUrl=https://sso.example.org/realms/mail
 
       - name: Lint manifests
         uses: stackrox/kube-linter-action@v1

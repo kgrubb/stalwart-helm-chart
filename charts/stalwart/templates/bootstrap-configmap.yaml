@@ -1,0 +1,15 @@
+{{- if .Values.bootstrap.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "stalwart.fullname" . }}-bootstrap
+  labels:
+    {{- include "stalwart.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-weight: "5"
+    helm.sh/hook-delete-policy: before-hook-creation
+data:
+  bootstrap-oidc.py: |
+{{ .Files.Get "files/bootstrap-oidc.py" | indent 4 }}
+{{- end }}

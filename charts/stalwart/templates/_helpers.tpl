@@ -23,3 +23,23 @@ helm.sh/chart: {{ printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | 
 app.kubernetes.io/name: {{ include "stalwart.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
+
+{{- define "stalwart.needsChartEnvSecret" -}}
+{{- $inline := and (not .Values.recoveryAdmin.existingSecret) .Values.recoveryAdmin.password -}}
+{{- if or (not (empty .Values.extraSecretEnv)) (and (or .Values.recoveryAdmin.enabled .Values.bootstrap.enabled) $inline) -}}true{{- end -}}
+{{- end -}}
+
+{{- define "stalwart.recoveryAdmin.env" -}}
+- name: RECOVERY_USERNAME
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.recoveryAdmin.existingSecret }}
+      key: {{ .Values.recoveryAdmin.usernameKey }}
+- name: RECOVERY_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.recoveryAdmin.existingSecret }}
+      key: {{ .Values.recoveryAdmin.passwordKey }}
+- name: STALWART_RECOVERY_ADMIN
+  value: "$(RECOVERY_USERNAME):$(RECOVERY_PASSWORD)"
+{{- end -}}

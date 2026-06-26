@@ -16,7 +16,7 @@ spec:
         {{- include "stalwart.selectorLabels" . | nindent 8 }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
-        {{- if or .Values.recoveryAdmin.enabled (not (empty .Values.extraSecretEnv)) }}
+        {{- if include "stalwart.needsChartEnvSecret" . }}
         checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
         {{- end }}
     spec:
@@ -35,7 +35,7 @@ spec:
           args:
             - "--config"
             - "/etc/stalwart/config.json"
-          {{- if or .Values.role .Values.pushShard .Values.recoveryMode.enabled (not (empty .Values.extraEnv)) }}
+          {{- if or .Values.role .Values.pushShard .Values.recoveryMode.enabled (not (empty .Values.extraEnv)) (and .Values.recoveryAdmin.enabled .Values.recoveryAdmin.existingSecret) }}
           env:
             {{- if .Values.role }}
             - name: STALWART_ROLE
@@ -57,8 +57,11 @@ spec:
             - name: {{ $key }}
               value: {{ $value | quote }}
             {{- end }}
+            {{- if and .Values.recoveryAdmin.enabled .Values.recoveryAdmin.existingSecret }}
+            {{- include "stalwart.recoveryAdmin.env" . | nindent 12 }}
+            {{- end }}
           {{- end }}
-          {{- if or .Values.recoveryAdmin.enabled (not (empty .Values.extraSecretEnv)) }}
+          {{- if or (not (empty .Values.extraSecretEnv)) (and .Values.recoveryAdmin.enabled (not .Values.recoveryAdmin.existingSecret) .Values.recoveryAdmin.password) }}
           envFrom:
             - secretRef:
                 name: {{ include "stalwart.fullname" . }}-env

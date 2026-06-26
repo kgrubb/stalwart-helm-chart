@@ -1,0 +1,73 @@
+{{- if .Values.bootstrap.enabled }}
+{{- if not .Values.bootstrap.domain }}
+{{- fail "bootstrap.domain is required when bootstrap.enabled is true" }}
+{{- end }}
+{{- if not .Values.bootstrap.oidc.issuerUrl }}
+{{- fail "bootstrap.oidc.issuerUrl is required when bootstrap.enabled is true" }}
+{{- end }}
+{{- if and (not .Values.recoveryAdmin.existingSecret) (not .Values.recoveryAdmin.password) }}
+{{- fail "bootstrap requires recoveryAdmin.existingSecret or recoveryAdmin.password" }}
+{{- end }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "stalwart.fullname" . }}-bootstrap
+  labels:
+    {{- include "stalwart.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-weight: "10"
+    helm.sh/hook-delete-policy: before-hook-creation
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 86400
+  activeDeadlineSeconds: 600
+  template:
+    metadata:
+      labels:
+        {{- include "stalwart.selectorLabels" . | nindent 8 }}
+    spec:
+      restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: bootstrap
+          image: python:3.12-alpine
+          imagePullPolicy: IfNotPresent
+          command: ["python3", "/scripts/bootstrap-oidc.py"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          env:
+            - name: STALWART_API_URL
+              value: {{ default (printf "http://%s:%v" (include "stalwart.fullname" .) .Values.service.ports.mgmt) .Values.bootstrap.apiUrl | quote }}
+            - name: BOOTSTRAP_DOMAIN
+              value: {{ .Values.bootstrap.domain | quote }}
+            - name: BOOTSTRAP_ACCOUNTS
+              value: {{ .Values.bootstrap.accounts | toJson | quote }}
+            - name: BOOTSTRAP_OIDC
+              value: {{ .Values.bootstrap.oidc | toJson | quote }}
+            {{- if .Values.recoveryAdmin.existingSecret }}
+            {{- include "stalwart.recoveryAdmin.env" . | nindent 12 }}
+            {{- end }}
+          {{- if not .Values.recoveryAdmin.existingSecret }}
+          envFrom:
+            - secretRef:
+                name: {{ include "stalwart.fullname" . }}-env
+          {{- end }}
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+              readOnly: true
+      volumes:
+        - name: scripts
+          configMap:
+            name: {{ include "stalwart.fullname" . }}-bootstrap
+            defaultMode: 0555
+{{- end }}
