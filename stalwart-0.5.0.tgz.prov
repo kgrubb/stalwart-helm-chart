@@ -1,0 +1,58 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/kgrubb/stalwart-helm-chart/issues
+    - name: source
+      url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/signKey: |
+    fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
+    url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+apiVersion: v2
+appVersion: v0.16.10
+description: Helm chart for the Stalwart mail and collaboration server
+home: https://stalw.art
+icon: https://kgrubb.github.io/stalwart-helm-chart/logo.svg
+keywords:
+- - mail
+- - smtp
+- - imap
+- - jmap
+- - stalwart
+maintainers:
+- - email: 8471701+kgrubb@users.noreply.github.com
+  name: kgrubb
+  url: https://github.com/kgrubb
+name: stalwart
+sources:
+- - https://github.com/stalwartlabs/stalwart
+- - https://stalw.art/docs/cluster/orchestration/kubernetes/
+- - https://github.com/kgrubb/stalwart-helm-chart
+type: application
+version: 0.5.0
+
+...
+files:
+  stalwart-0.5.0.tgz: sha256:046d945af98bf8e21544e2a1befcf4e19febb11d7a8ab723c4c913764a2eac92
+-----BEGIN PGP SIGNATURE-----
+
+wsFcBAEBCgAQBQJqPut1CRDKmZpzOV9F/QAAz6IQAAcTemfrZmsmyxApwddk5yqL
+Q+YPRgcU058201tMQW0brtqSDkuXm4YiKHHmitoVRTgSCiCTWDqk370wPk+qtvge
+EVjy/p6v8/f7CaZn640JbcrJiCJoVvVLPj+1z4MpVRAhRXaHijNCr3qi665mAuMo
+twc8a6iQgAWwBqLeBhH2y0edBg2zGR6aL72NMgspv0gpnfwrpV4sVVJJsi9SA4ip
+vvKJTgfJSoRSv2lCKi9igZtlnQr66qmSjgfAx7rrHQuJTzNn/UWzEUR7fQocxmqw
+4GRoPBPIvSYLOXUxl13ebv5zyPqJevt6j/aFMBsKMe7kFTTeeXbh7V2iEqMhIFdO
+qxBanRmfX+Lde8RuiA8zZnF1W0bIPRoSJffBUI2X9fnLWF25T36dqMSlqdWRzyFD
+X4eYTEj3iTmgzV7YOXsLfziJndIwhYFSnNEdcZwthLkNFlJOWj0EZc090cfoQ0rT
+eenWDvsHVdMGtRkhcGAtdmCCegZ4wXkDiNchDLEeCPUojb3Tr2/7pzCxzvk5a5Yx
+MgMCEXu26QwJfhHI8r5yet28ae3zTIACkJInwGVg6Ex0ntnXV6dWNUrwr6xImdwX
+tN+e4yyOE7slyX6H/pljiFTEtlUOtV473Jp2THNJ0HDjy0/kwxxd1tyw1D6j2snf
+54sg4HViFflht9TQR4fJ
+=praf
+-----END PGP SIGNATURE-----
