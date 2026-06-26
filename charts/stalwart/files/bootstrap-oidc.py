@@ -60,7 +60,7 @@ class Jmap:
             {"using": USING, "methodCalls": [[method, params, req_id]]}
         ).encode()
         request = urllib.request.Request(
-            f"{self.base}/api",
+            f"{self.base}/jmap",
             data=body,
             headers={"Authorization": self.auth, "Content-Type": "application/json"},
             method="POST",
