@@ -153,6 +153,9 @@ def listing_map(result: dict) -> dict:
     if isinstance(listings, list):
         return {item["id"]: item for item in listings if "id" in item}
     return listings
+
+
+def oidc_directory(cfg: dict) -> dict:
     directory = {
         "@type": "Oidc",
         **{k: cfg[k] for k in OIDC_FIELDS if cfg.get(k) not in EMPTY},
@@ -239,7 +242,11 @@ def reconcile(
         auth_update["defaultUserRoleIds"] = {user_role: True}
 
     auth = jmap.call("x:Authentication/get", {"ids": ["singleton"]}, "gAuth")
-    current = auth.get("list", {}).get("singleton", {})
+    auth_list = auth.get("list", {})
+    if isinstance(auth_list, list):
+        current = auth_list[0] if auth_list else {}
+    else:
+        current = auth_list.get("singleton", {})
     if current.get("directoryId") != dir_id or (
         user_role and not current.get("defaultUserRoleIds")
     ):
