@@ -36,17 +36,25 @@ def basic_auth() -> str:
     return "Basic " + base64.b64encode(creds.encode()).decode()
 
 
-def roles_field(roles) -> dict:
+def roles_field(roles, role_ids: dict, *, for_group: bool = False) -> dict:
     if isinstance(roles, str):
         roles = [roles]
     if not roles:
         return {"@type": "User"}
+    if len(roles) == 1 and roles[0] == "Admin" and for_group:
+        admin_id = role_ids.get("Admin")
+        if not admin_id:
+            raise RuntimeError("System Administrator role not found")
+        return {"@type": "Custom", "roleIds": {admin_id: True}}
     if len(roles) == 1 and roles[0] in BUILTIN_ROLES:
         return {"@type": roles[0]}
     raise RuntimeError(f"unsupported roles value: {roles!r}")
 
 
-def account_object(kind: str, name: str, domain_id: str, roles) -> dict:
+def account_object(
+    kind: str, name: str, domain_id: str, roles, role_ids: dict
+) -> dict:
+    for_group = kind == "Group"
     return {
         "@type": kind,
         "name": name,
@@ -55,7 +63,7 @@ def account_object(kind: str, name: str, domain_id: str, roles) -> dict:
         "memberGroupIds": {},
         "permissions": {"@type": "Inherit"},
         "quotas": {},
-        "roles": roles_field(roles),
+        "roles": roles_field(roles, role_ids, for_group=for_group),
     }
 
 
@@ -119,11 +127,12 @@ class Jmap:
         return self.create(set_m, obj, f"c{tag}")
 
     def ensure_principal(
-        self, kind: str, name: str, domain_id: str, roles, tag: str
+        self, kind: str, name: str, domain_id: str, roles, role_ids: dict, tag: str
     ) -> str:
         filt = {"name": name, "domainId": domain_id}
         principal_id = self.first("x:Account/query", filt, f"q{tag}")
-        role_obj = roles_field(roles) if roles else None
+        for_group = kind == "Group"
+        role_obj = roles_field(roles, role_ids, for_group=for_group) if roles else None
         if principal_id:
             if role_obj:
                 self.call(
@@ -134,7 +143,7 @@ class Jmap:
             return principal_id
         return self.create(
             "x:Account/set",
-            account_object(kind, name, domain_id, roles or "User"),
+            account_object(kind, name, domain_id, roles or "User", role_ids),
             f"c{tag}",
         )
 
@@ -176,6 +185,8 @@ def reconcile(
         "Domain",
     )
 
+    role_ids = builtin_role_ids(jmap)
+
     for account in accounts:
         if not (name := account.get("name")):
             continue
@@ -184,6 +195,7 @@ def reconcile(
             name,
             domain_id,
             account.get("roles", "User"),
+            role_ids,
             f"Acct_{name}",
         )
 
@@ -195,6 +207,7 @@ def reconcile(
             name,
             domain_id,
             group.get("roles", "User"),
+            role_ids,
             f"Grp_{name}",
         )
 
@@ -220,7 +233,6 @@ def reconcile(
         dir_id = jmap.create("x:Directory/set", directory, "cDir")
 
     auth_update: dict = {"directoryId": dir_id}
-    role_ids = builtin_role_ids(jmap)
     if user_role := role_ids.get("User"):
         auth_update["defaultUserRoleIds"] = {user_role: True}
 
