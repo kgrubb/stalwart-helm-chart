@@ -2,7 +2,7 @@ apiVersion: v2
 name: stalwart
 description: Helm chart for the Stalwart mail and collaboration server
 type: application
-version: 0.3.0
+version: 0.4.0
 appVersion: "v0.16.10"
 home: https://stalw.art
 icon: https://kgrubb.github.io/stalwart-helm-chart/logo.svg
