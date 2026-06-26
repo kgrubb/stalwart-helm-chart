@@ -1,0 +1,11 @@
+{{- if include "stalwart.mailTls.enabled" . }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "stalwart.fullname" . }}-tls-sync
+  labels:
+    {{- include "stalwart.labels" . | nindent 4 }}
+data:
+  tls-sync.py: |
+{{ .Files.Get "files/tls-sync.py" | indent 4 }}
+{{- end }}

@@ -22,13 +22,13 @@ keywords:
   - stalwart
 annotations:
   artifacthub.io/category: integration-delivery
+  artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/license: Apache-2.0
   artifacthub.io/links: |
     - name: support
       url: https://github.com/kgrubb/stalwart-helm-chart/issues
     - name: source
       url: https://github.com/kgrubb/stalwart-helm-chart
-  artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/prerelease: "false"
   artifacthub.io/signKey: |
     fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD

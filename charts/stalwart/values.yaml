@@ -58,6 +58,19 @@ bootstrap:
     claimName: ""
     claimGroups: ""
 
+# Reuse a cert-manager TLS secret (typically the ingress certificate) for
+# IMAP/SMTP listeners. A sidecar watches the mounted files and reloads
+# Stalwart when cert-manager renews the secret.
+mailTls:
+  enabled: false
+  existingSecret: ""
+  certKey: tls.crt
+  privateKeyKey: tls.key
+  mountPath: /etc/stalwart/tls/ingress
+  hostname: ""
+  domain: ""
+  reloadIntervalSeconds: 300
+
 # config.json contents. Rendered verbatim into the ConfigMap.
 # Only the DataStore object belongs here.
 config:

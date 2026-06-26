@@ -133,6 +133,35 @@
       },
       "required": ["enabled", "apiUrl", "domain", "accounts", "groups", "oidc"]
     },
+    "mailTls": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "existingSecret": { "type": "string" },
+        "certKey": { "type": "string", "minLength": 1 },
+        "privateKeyKey": { "type": "string", "minLength": 1 },
+        "mountPath": { "type": "string", "minLength": 1 },
+        "hostname": { "type": "string" },
+        "domain": { "type": "string" },
+        "reloadIntervalSeconds": { "type": "integer", "minimum": 30 }
+      },
+      "required": [
+        "enabled",
+        "existingSecret",
+        "certKey",
+        "privateKeyKey",
+        "mountPath",
+        "hostname",
+        "domain",
+        "reloadIntervalSeconds"
+      ],
+      "if": { "properties": { "enabled": { "const": true } } },
+      "then": {
+        "properties": { "existingSecret": { "minLength": 1 } },
+        "required": ["existingSecret"]
+      }
+    },
     "config": {
       "type": "object",
       "additionalProperties": true,

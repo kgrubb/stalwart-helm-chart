@@ -16,6 +16,9 @@ spec:
         {{- include "stalwart.selectorLabels" . | nindent 8 }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- if include "stalwart.mailTls.enabled" . }}
+        checksum/tls-sync: {{ include (print $.Template.BasePath "/tls-sync-configmap.yaml") . | sha256sum }}
+        {{- end }}
         {{- if include "stalwart.needsChartEnvSecret" . }}
         checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
         {{- end }}
@@ -110,12 +113,70 @@ spec:
             - name: data
               mountPath: /var/lib/stalwart
             {{- end }}
+            {{- if include "stalwart.mailTls.enabled" . }}
+            - name: mail-tls
+              mountPath: {{ .Values.mailTls.mountPath }}
+              readOnly: true
+            {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+      {{- if include "stalwart.mailTls.enabled" . }}
+        - name: tls-sync
+          image: python:3.12-alpine
+          imagePullPolicy: IfNotPresent
+          command: ["python", "/scripts/tls-sync.py"]
+          env:
+            - name: STALWART_API_URL
+              value: "http://127.0.0.1:{{ .Values.service.ports.mgmt }}"
+            - name: TLS_MOUNT_PATH
+              value: {{ .Values.mailTls.mountPath | quote }}
+            - name: TLS_CERT_FILE
+              value: {{ .Values.mailTls.certKey | quote }}
+            - name: TLS_KEY_FILE
+              value: {{ .Values.mailTls.privateKeyKey | quote }}
+            - name: TLS_HOSTNAME
+              value: {{ include "stalwart.mailTls.hostname" . | quote }}
+            - name: TLS_DOMAIN
+              value: {{ default .Values.bootstrap.domain .Values.mailTls.domain | quote }}
+            - name: TLS_RELOAD_INTERVAL_SECONDS
+              value: {{ .Values.mailTls.reloadIntervalSeconds | quote }}
+            {{- include "stalwart.recoveryAdmin.env" . | nindent 12 }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 2000
+            runAsGroup: 2000
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - name: mail-tls
+              mountPath: {{ .Values.mailTls.mountPath }}
+              readOnly: true
+            - name: tls-sync-script
+              mountPath: /scripts
+              readOnly: true
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 64Mi
+      {{- end }}
       volumes:
         - name: config
           configMap:
             name: {{ include "stalwart.fullname" . }}-config
+        {{- if include "stalwart.mailTls.enabled" . }}
+        - name: mail-tls
+          secret:
+            secretName: {{ .Values.mailTls.existingSecret }}
+        - name: tls-sync-script
+          configMap:
+            name: {{ include "stalwart.fullname" . }}-tls-sync
+        {{- end }}
   {{- if .Values.persistence.enabled }}
   volumeClaimTemplates:
     - metadata:

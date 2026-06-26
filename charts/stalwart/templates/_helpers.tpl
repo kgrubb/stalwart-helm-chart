@@ -25,7 +25,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
 {{- define "stalwart.recoveryAdminOnPod" -}}
-{{- or .Values.recoveryAdmin.enabled (and .Values.bootstrap.enabled .Values.recoveryAdmin.existingSecret) -}}
+{{- or .Values.recoveryAdmin.enabled (and .Values.bootstrap.enabled .Values.recoveryAdmin.existingSecret) (include "stalwart.mailTls.enabled" .) -}}
 {{- end -}}
 
 {{- define "stalwart.needsChartEnvSecret" -}}
@@ -46,4 +46,12 @@ app.kubernetes.io/instance: {{ .Release.Name }}
       key: {{ .Values.recoveryAdmin.passwordKey }}
 - name: STALWART_RECOVERY_ADMIN
   value: "$(RECOVERY_USERNAME):$(RECOVERY_PASSWORD)"
+{{- end -}}
+
+{{- define "stalwart.mailTls.enabled" -}}
+{{- and .Values.mailTls.enabled .Values.mailTls.existingSecret -}}
+{{- end -}}
+
+{{- define "stalwart.mailTls.hostname" -}}
+{{- default (index .Values.ingress.hosts 0 "host") .Values.mailTls.hostname -}}
 {{- end -}}

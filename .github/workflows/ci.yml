@@ -19,6 +19,9 @@ jobs:
           pipx install yamllint
           yamllint .
 
+      - name: Shellcheck
+        run: shellcheck scripts/*.sh
+
       - name: Lint chart
         run: helm lint charts/stalwart --strict
 
@@ -34,6 +37,12 @@ jobs:
             --set bootstrap.enabled=true \
             --set bootstrap.domain=example.org \
             --set bootstrap.oidc.issuerUrl=https://sso.example.org/realms/mail
+          helm template test charts/stalwart \
+            --set recoveryAdmin.existingSecret=recovery-admin \
+            --set bootstrap.domain=example.org \
+            --set mailTls.enabled=true \
+            --set mailTls.existingSecret=stalwart-tls \
+            --set mailTls.hostname=mail.example.org
 
       - name: Lint manifests
         uses: stackrox/kube-linter-action@v1
