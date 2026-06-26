@@ -1,0 +1,58 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/kgrubb/stalwart-helm-chart/issues
+    - name: source
+      url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/signKey: |
+    fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
+    url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+apiVersion: v2
+appVersion: v0.16.10
+description: Helm chart for the Stalwart mail and collaboration server
+home: https://stalw.art
+icon: https://kgrubb.github.io/stalwart-helm-chart/logo.svg
+keywords:
+- - mail
+- - smtp
+- - imap
+- - jmap
+- - stalwart
+maintainers:
+- - email: 8471701+kgrubb@users.noreply.github.com
+  name: kgrubb
+  url: https://github.com/kgrubb
+name: stalwart
+sources:
+- - https://github.com/stalwartlabs/stalwart
+- - https://stalw.art/docs/cluster/orchestration/kubernetes/
+- - https://github.com/kgrubb/stalwart-helm-chart
+type: application
+version: 0.5.1
+
+...
+files:
+  stalwart-0.5.1.tgz: sha256:71f7fbeac5314b71fc648fc3eac26a5f1823e9e0cec9bb64bff7b90e0116b59e
+-----BEGIN PGP SIGNATURE-----
+
+wsFcBAEBCgAQBQJqPuyPCRDKmZpzOV9F/QAAfMoQAIqsbi/oN5bpIkojcRp0Q1HH
+KtEld6D0hfQsfTtpkWWCcE6AYV4GGMR2YPRv8mcrGZzGa0orecGuUiFsPbxyDY1Y
+vXkd5bki4v9/a0hfScXskvvDwjzwAHrSF0U+ZnEit8wo1yTxxK6s5nmY78z0DdQt
+yyrxjOyRchEFLBi9JkpjtDqsOyj0WyjfZSxjkS9oAWQuTJkwp5ORq7ecTyLHV/g1
+WlYa1od6W9c50GFUe3rM9L2ReYCeAhmwP0a7xK6tcIZH6/l+aGqZaIxhjl103RFS
+NbESvaV192Qyz6Z4OgJMqsb98Fzwe0I5YH97C8GgPSjZwHixx/i+ROTzdGQ7QTWQ
+9sQQZ1IBScrWGNany2c7nWN40/FXml9tiv8e0JOXXmK6ANdW02bfLbbwzw4OUYtt
+4xZNrmYRpN7avuFARAaWGZRhpFTbrZBiZbsPFKpHAxqqwBVsVpMDpdgo3I/TYek1
+lchjQdhoSXf3WptVbuq10SdYjg6kvWxsNKZWp6JhotH1c+UkPVPLMR5snBgecgyF
+4MssIF1pVB1Car6qwuwu+DpFsLgBhdodLmAxqQ7ki8Veu6EyN6rYXVGvE1sLOqVU
+ycfdM4jOspwsiQcWgCKx45fxdgYC4HPn9SZcAjHl8Sq6kronwaetVZmiFVYvTHOp
+1rH7tva7MXgzEtPDtxCB
+=NKnG
+-----END PGP SIGNATURE-----
