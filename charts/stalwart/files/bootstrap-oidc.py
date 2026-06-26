@@ -148,7 +148,11 @@ class Jmap:
         )
 
 
-def oidc_directory(cfg: dict) -> dict:
+def listing_map(result: dict) -> dict:
+    listings = result.get("list", {})
+    if isinstance(listings, list):
+        return {item["id"]: item for item in listings if "id" in item}
+    return listings
     directory = {
         "@type": "Oidc",
         **{k: cfg[k] for k in OIDC_FIELDS if cfg.get(k) not in EMPTY},
@@ -164,6 +168,8 @@ def builtin_role_ids(jmap: Jmap) -> dict[str, str]:
     if not ids:
         return {}
     listing = jmap.call("x:Role/get", {"ids": ids}, "gRoles").get("list", {})
+    if isinstance(listing, list):
+        listing = {item["id"]: item for item in listing if "id" in item}
     mapping: dict[str, str] = {}
     for role_id, role in listing.items():
         description = (role.get("description") or "").lower()
@@ -214,11 +220,7 @@ def reconcile(
     directory = oidc_directory(oidc_cfg)
     issuer = directory["issuerUrl"]
     dir_ids = jmap.call("x:Directory/query", {"filter": {}}, "qDir").get("ids", [])
-    listings = (
-        jmap.call("x:Directory/get", {"ids": dir_ids}, "gDir").get("list", {})
-        if dir_ids
-        else {}
-    )
+    listings = listing_map(jmap.call("x:Directory/get", {"ids": dir_ids}, "gDir")) if dir_ids else {}
     dir_id = next(
         (
             dir_id
