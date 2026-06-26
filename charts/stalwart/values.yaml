@@ -24,6 +24,9 @@ recoveryAdmin:
   enabled: false
   username: admin
   password: ""
+  existingSecret: ""
+  usernameKey: username
+  passwordKey: password
 
 # Starts the pods in recovery mode. Suspends mail services and
 # exposes only the management listener on the configured port.
@@ -37,6 +40,22 @@ extraEnv: {}
 
 # Extra environment variables injected from the managed Secret.
 extraSecretEnv: {}
+
+# Hook Job: domain, accounts, and OIDC directory via JMAP.
+bootstrap:
+  enabled: false
+  apiUrl: ""
+  domain: ""
+  accounts: []
+  oidc:
+    issuerUrl: ""
+    description: ""
+    requireAudience: ""
+    requireScopes: []
+    claimUsername: ""
+    usernameDomain: ""
+    claimName: ""
+    claimGroups: ""
 
 # config.json contents. Rendered verbatim into the ConfigMap.
 # Only the DataStore object belongs here.

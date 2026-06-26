@@ -25,11 +25,25 @@
       "properties": {
         "enabled": { "type": "boolean" },
         "username": { "type": "string", "minLength": 1 },
-        "password": { "type": "string" }
+        "password": { "type": "string" },
+        "existingSecret": { "type": "string" },
+        "usernameKey": { "type": "string", "minLength": 1 },
+        "passwordKey": { "type": "string", "minLength": 1 }
       },
-      "required": ["enabled", "username", "password"],
+      "required": ["enabled", "username", "password", "existingSecret", "usernameKey", "passwordKey"],
       "if": { "properties": { "enabled": { "const": true } } },
-      "then": { "properties": { "password": { "minLength": 1 } } }
+      "then": {
+        "oneOf": [
+          {
+            "properties": { "existingSecret": { "minLength": 1 } },
+            "required": ["existingSecret"]
+          },
+          {
+            "properties": { "password": { "minLength": 1 } },
+            "required": ["password"]
+          }
+        ]
+      }
     },
     "recoveryMode": {
       "type": "object",
@@ -51,6 +65,58 @@
     "extraSecretEnv": {
       "type": "object",
       "additionalProperties": { "type": "string" }
+    },
+    "bootstrap": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "apiUrl": { "type": "string" },
+        "domain": { "type": "string" },
+        "accounts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "roles": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "required": ["name"]
+          }
+        },
+        "oidc": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "issuerUrl": { "type": "string" },
+            "description": { "type": "string" },
+            "requireAudience": { "type": "string" },
+            "requireScopes": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "claimUsername": { "type": "string" },
+            "usernameDomain": { "type": "string" },
+            "claimName": { "type": "string" },
+            "claimGroups": { "type": "string" }
+          },
+          "required": [
+            "issuerUrl",
+            "description",
+            "requireAudience",
+            "requireScopes",
+            "claimUsername",
+            "usernameDomain",
+            "claimName",
+            "claimGroups"
+          ]
+        }
+      },
+      "required": ["enabled", "apiUrl", "domain", "accounts", "oidc"]
     },
     "config": {
       "type": "object",

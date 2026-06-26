@@ -2,6 +2,11 @@
 .cr-release-packages/
 charts/stalwart/RELEASE-NOTES.md
 
+# Python
+__pycache__/
+*.py[cod]
+.ruff_cache/
+
 # OS / editor
 .DS_Store
 .idea/
