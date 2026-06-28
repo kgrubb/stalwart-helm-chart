@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.2] - 2026-06-28
+
+### Fixed
+- use exec probes for management health checks ([#26](https://github.com/kgrubb/stalwart-helm-chart/pull/26))
+  - Replace kubelet `httpGet` liveness/readiness probes with `exec` probes that `curl` the management health endpoints on `127.0.0.1`.
+  - On k3s/Flannel, probes from the node bridge to the pod IP can fail with connection reset/EOF while Stalwart is healthy, causing CrashLoopBackOff.
+
+
+
 ### Fixed
 - Use exec probes against the management listener on localhost. On some CNIs (e.g. k3s/Flannel), kubelet `httpGet` checks to the pod IP can fail with connection reset while Stalwart is healthy.
 
