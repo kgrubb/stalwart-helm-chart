@@ -1,0 +1,58 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/kgrubb/stalwart-helm-chart/issues
+    - name: source
+      url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/signKey: |
+    fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
+    url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+apiVersion: v2
+appVersion: v0.16.10
+description: Helm chart for the Stalwart mail and collaboration server
+home: https://stalw.art
+icon: https://kgrubb.github.io/stalwart-helm-chart/logo.svg
+keywords:
+- - mail
+- - smtp
+- - imap
+- - jmap
+- - stalwart
+maintainers:
+- - email: 8471701+kgrubb@users.noreply.github.com
+  name: kgrubb
+  url: https://github.com/kgrubb
+name: stalwart
+sources:
+- - https://github.com/stalwartlabs/stalwart
+- - https://stalw.art/docs/cluster/orchestration/kubernetes/
+- - https://github.com/kgrubb/stalwart-helm-chart
+type: application
+version: 0.6.1
+
+...
+files:
+  stalwart-0.6.1.tgz: sha256:f6acab6cd71b0b7055e2c4caabcf3069bcd8f25d2b1feffded4b1ccfff38fa5a
+-----BEGIN PGP SIGNATURE-----
+
+wsFcBAEBCgAQBQJqQG8HCRDKmZpzOV9F/QAA3yAQACP3dot4ohzJ+1TqftiPPMkM
+iLQJgBlvT9OxWigT9YSsOlxIhejTQIeX9+WsM6+a0lfo3+z+6EKmLZr/avkDLyOL
+EGx8LHl52bEi3JhD2kwvWZDuFU40RF4FQZbYFzSbUxh1dH9evbpxRH+UHbqDv9uO
+UcY4OgJnj9VTrAHDMq9EyN/xXWCA9dM3FZbj2S9RKbSXDlKwRGvJhcsh84a0V90E
+5Tr9yYCM9v7aRqWeWwn1lwmjMYw4igVC2R7dkgHWOJ6Q0BW6MbhU4VdovWElnHMV
+Bz7egMtzcRXPpep2Km1OMnxNLkui0iKU/jgnjGHub+iZfX1UCJ3x9VFmB+26/TYc
+38+EyKwjRtnQ+lTiayzlicaZZRdwTB6b6pNCqkjGMIRxKz2GrBLC5QvZv+wa8sj4
+sxGaGAuY/7jSL6owDSSDp4Ruet6/0Mjg4AwJS3eBdqkr82yor3VXoNmIy9RoFyTJ
+M8SA/GiHD9/UScIDpw2/dlRjY9GalmdltAdDYBQuF9ivLCHnK/rXNsls47kQrBkb
+sFVaN4mwVvXrNKexbD1Jj0mFFFEsQ9rwmOd2escXXR5Edbbjykabfqdpet/YESNK
+qEJPNsF0tOMxLqMOPMkF5wsWAahCP1HkYHkPAxgCR7V2gijccn/+3TB60S8XCRLc
+48Wucj8lWoy2S2qQc09S
+=G0O7
+-----END PGP SIGNATURE-----
