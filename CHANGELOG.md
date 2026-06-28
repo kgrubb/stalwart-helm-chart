@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Use exec probes against the management listener on localhost. On some CNIs (e.g. k3s/Flannel), kubelet `httpGet` checks to the pod IP can fail with connection reset while Stalwart is healthy.
+
 ## [0.6.1] - 2026-06-28
 
 ### Changed

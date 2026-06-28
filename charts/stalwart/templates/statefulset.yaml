@@ -93,17 +93,25 @@ spec:
             - name: mgmt
               containerPort: 8080
           livenessProbe:
-            httpGet:
-              path: /healthz/live
-              port: mgmt
+            exec:
+              command:
+                - curl
+                - -sf
+                - http://127.0.0.1:{{ .Values.service.ports.mgmt }}/healthz/live
             initialDelaySeconds: 30
             periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
           readinessProbe:
-            httpGet:
-              path: /healthz/ready
-              port: mgmt
+            exec:
+              command:
+                - curl
+                - -sf
+                - http://127.0.0.1:{{ .Values.service.ports.mgmt }}/healthz/ready
             initialDelaySeconds: 5
             periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
           volumeMounts:
             - name: config
               mountPath: /etc/stalwart/config.json
