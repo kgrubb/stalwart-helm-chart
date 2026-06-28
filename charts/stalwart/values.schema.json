@@ -199,6 +199,23 @@
       },
       "required": ["type", "ports"]
     },
+    "mailService": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "type": {
+          "type": "string",
+          "enum": ["LoadBalancer", "NodePort"]
+        },
+        "loadBalancerIP": { "type": "string" },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      },
+      "required": ["enabled", "type", "loadBalancerIP", "annotations"]
+    },
     "ingress": {
       "type": "object",
       "additionalProperties": false,

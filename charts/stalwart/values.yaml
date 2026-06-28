@@ -77,8 +77,8 @@ config:
   "@type": RocksDb
   path: /var/lib/stalwart
 
-# Service definition. Change `type` to LoadBalancer when a cloud
-# load balancer should expose the mail ports directly.
+# Service definition. Keep ClusterIP when ingress exposes the management UI
+# and mailService exposes L4 mail ports on a separate LoadBalancer IP.
 service:
   type: ClusterIP
   ports:
@@ -93,6 +93,14 @@ service:
     http: 80
     https: 443
     mgmt: 8080
+
+# Optional LoadBalancer for SMTP/IMAP/POP3/Sieve only. Use when the main
+# service stays ClusterIP and ingress routes HTTP to the management listener.
+mailService:
+  enabled: false
+  type: LoadBalancer
+  loadBalancerIP: ""
+  annotations: {}
 
 # Ingress for the HTTP / HTTPS listeners only.
 ingress:
