@@ -17,7 +17,9 @@ Deploys [Stalwart Mail Server](https://stalw.art/) as a StatefulSet with persist
 | `bootstrap.domain` | `""` | Mail domain name for bootstrap |
 | `bootstrap.oidc.issuerUrl` | `""` | OIDC provider issuer URL |
 | `config` | RocksDB data store | Only DataStore belongs in `config.json` |
-| `service.type` | `ClusterIP` | Use `LoadBalancer` to expose mail ports |
+| `service.type` | `ClusterIP` | Main Service; use with ingress for management UI |
+| `mailService.enabled` | `false` | Separate LoadBalancer for SMTP/IMAP/POP3/Sieve |
+| `mailService.annotations` | `{}` | e.g. MetalLB `metallb.universe.tf/loadBalancerIPs` |
 | `ingress.enabled` | `false` | HTTP/S management only |
 | `persistence.enabled` | `true` | Disable for external DataStore backends |
 | `resources` | `{}` | Set CPU/memory requests and limits per environment |

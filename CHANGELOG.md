@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Optional `mailService` LoadBalancer for L4 mail ports while the main Service stays ClusterIP for ingress.
+
 ## [0.6.2] - 2026-06-28
 
 ### Fixed
