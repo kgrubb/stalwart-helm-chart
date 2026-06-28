@@ -1,0 +1,35 @@
+name: Upgrade Stalwart
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  upgrade:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main
+
+      - name: Upgrade Stalwart
+        id: upgrade
+        run: |
+          chmod +x scripts/upgrade-stalwart.sh
+          ./scripts/upgrade-stalwart.sh
+
+      - name: Commit and push
+        if: steps.upgrade.outputs.upgraded == 'true'
+        run: |
+          git add charts/stalwart/Chart.yaml charts/stalwart/values.yaml
+          git commit -m "${{ steps.upgrade.outputs.commit_prefix }}: bump Stalwart to ${{ steps.upgrade.outputs.stalwart_version }}"
+          git pull --rebase origin main
+          git push
