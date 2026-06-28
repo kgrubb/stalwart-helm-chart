@@ -1,0 +1,58 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/kgrubb/stalwart-helm-chart/issues
+    - name: source
+      url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/signKey: |
+    fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
+    url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+apiVersion: v2
+appVersion: v0.16.10
+description: Helm chart for the Stalwart mail and collaboration server
+home: https://stalw.art
+icon: https://kgrubb.github.io/stalwart-helm-chart/logo.svg
+keywords:
+- - mail
+- - smtp
+- - imap
+- - jmap
+- - stalwart
+maintainers:
+- - email: 8471701+kgrubb@users.noreply.github.com
+  name: kgrubb
+  url: https://github.com/kgrubb
+name: stalwart
+sources:
+- - https://github.com/stalwartlabs/stalwart
+- - https://stalw.art/docs/cluster/orchestration/kubernetes/
+- - https://github.com/kgrubb/stalwart-helm-chart
+type: application
+version: 0.7.0
+
+...
+files:
+  stalwart-0.7.0.tgz: sha256:0fe862314264e684a6d98af42e509d19fc555d0543c608d0c438f417cbaa04ab
+-----BEGIN PGP SIGNATURE-----
+
+wsFcBAEBCgAQBQJqQTbfCRDKmZpzOV9F/QAAx1kQAGFYDUoO6irKa5cUzRJCu2dS
+dlI3AuyyIt6srR9f4qZGp5sXLxdE+DiO30MvJwQyjH5f8uTueD/Fdddd0O57jgUU
+PwyXgzsTT5GDHEo+56ivLg6B3WbAd9lax2sKDac7ra00IiOXQFBh4QesRxBIyvik
+Mtj/epSxcS7znrI8M7bB8mjMkO8jrv/kTgklgzNcSa7gDWcizjBsAd74347EOYEz
+sWXbtfrDI/D3gEjRt/4xmNzXcWX/BdYcpsPw0uw7LC54AI79yruxv0QX/FS6R9xV
+kqFLuv72eOJarVCmF3QSubxZZCcIUPmMEVL4xxkn8fjDybXQRyumaNnCFi/MTcDV
+6VrmYlaf/qFfs6iYH+KwjsrOYWuTxkn9YqL//mw5ugd3k5lqCOpGq3VJI1LVzrgm
+Ole/Z6bsBbhOIpV9fYQUg1fo2inQ1EUsM9hlNrrF1ziFGO60Swx5ewrYGQLKW3oM
+p1HE5SEfLlk1+IG2nOyHpGxhFcicpeVoNzCuhCkKDvhYyOCVBAVpSdqEjBPO4Et0
+OMtg/FFxVopISSnLtbaFTpbVE3ZmE9GTzTLRe3YdjQc9mnCjurc8ajF6krAw9WZg
+tBP3XULRBsRtY5Rq/tOWNQ+8TkMWPIrMVzzNCYmFoF2ByFI5kcmP3CLzbz3nGVc2
+nKAUapC81aRy+ipyOipr
+=Qb32
+-----END PGP SIGNATURE-----
