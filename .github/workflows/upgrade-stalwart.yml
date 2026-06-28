@@ -28,8 +28,11 @@ jobs:
 
       - name: Commit and push
         if: steps.upgrade.outputs.upgraded == 'true'
+        env:
+          PREFIX: ${{ steps.upgrade.outputs.commit_prefix }}
+          VERSION: ${{ steps.upgrade.outputs.stalwart_version }}
         run: |
           git add charts/stalwart/Chart.yaml charts/stalwart/values.yaml
-          git commit -m "${{ steps.upgrade.outputs.commit_prefix }}: bump Stalwart to ${{ steps.upgrade.outputs.stalwart_version }}"
+          git commit -m "${PREFIX}: bump Stalwart to ${VERSION}"
           git pull --rebase origin main
           git push
