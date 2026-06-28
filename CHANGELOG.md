@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-06-28
+
+### Changed
+- auto-sync Stalwart releases ([#25](https://github.com/kgrubb/stalwart-helm-chart/pull/25))
+  - Add a daily workflow that checks [Stalwart releases](https://github.com/stalwartlabs/stalwart/releases) and bumps `image.tag` and `appVersion` when a newer version is published.
+  - Map upstream semver to conventional commit prefixes (`fix:` patch, `feat:` minor, `feat!:` major) so the existing release workflow publishes the chart.
+  - Document automatic release syncing in the README.
+
+
+
 ## [0.6.0] - 2026-06-26
 
 ### Changed
