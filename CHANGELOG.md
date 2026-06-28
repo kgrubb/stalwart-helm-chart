@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-06-28
+
+### Added
+- optional mailService LoadBalancer for L4 mail ports ([#27](https://github.com/kgrubb/stalwart-helm-chart/pull/27))
+  - Add `mailService` values block to expose SMTP/IMAP/POP3/Sieve on a dedicated LoadBalancer Service.
+  - Keeps the main `service` ClusterIP for ingress to the management listener (Traefik + cert-manager pattern).
+
+
+
 ### Added
 - Optional `mailService` LoadBalancer for L4 mail ports while the main Service stays ClusterIP for ingress.
 
