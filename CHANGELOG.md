@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-06-29
+
+### Fixed
+- set GH_TOKEN for upgrade-stalwart workflow ([#28](https://github.com/kgrubb/stalwart-helm-chart/pull/28))
+  - Fixes the Upgrade Stalwart workflow failing with exit code 4
+  - Adds `GH_TOKEN: ${{ github.token }}` to the upgrade step so `gh api` can fetch the latest Stalwart release
+
+
+
 ## [0.7.0] - 2026-06-28
 
 ### Added
