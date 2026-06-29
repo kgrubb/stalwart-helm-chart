@@ -92,13 +92,21 @@ spec:
               containerPort: 443
             - name: mgmt
               containerPort: 8080
+          startupProbe:
+            exec:
+              command:
+                - curl
+                - -sf
+                - http://127.0.0.1:{{ .Values.service.ports.mgmt }}/healthz/ready
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 30
           livenessProbe:
             exec:
               command:
                 - curl
                 - -sf
                 - http://127.0.0.1:{{ .Values.service.ports.mgmt }}/healthz/live
-            initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3

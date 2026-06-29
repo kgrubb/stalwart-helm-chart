@@ -10,6 +10,7 @@ import urllib.error
 import urllib.request
 
 USING = ["urn:ietf:params:jmap:core", "urn:stalwart:jmap"]
+POLL_FAST_SECONDS = 10
 
 
 def env(name: str, default: str = "") -> str:
@@ -62,6 +63,14 @@ def cert_paths() -> tuple[str, str]:
     cert = os.path.join(mount, require("TLS_CERT_FILE"))
     key = os.path.join(mount, require("TLS_KEY_FILE"))
     return cert, key
+
+
+def cert_files_ready() -> bool:
+    try:
+        cert_path, key_path = cert_paths()
+    except SystemExit:
+        return False
+    return all(os.path.isfile(path) for path in (cert_path, key_path))
 
 
 def file_hash(path: str) -> str:
@@ -175,13 +184,18 @@ def main() -> None:
     last_digest: str | None = None
 
     while True:
+        sync_failed = False
         try:
             configured, last_digest = sync_once(
                 jmap, hostname, domain, configured, last_digest
             )
         except (urllib.error.URLError, OSError, RuntimeError) as exc:
             print(f"tls-sync warning: {exc}", file=sys.stderr)
-        time.sleep(interval)
+            sync_failed = True
+        if sync_failed or not cert_files_ready():
+            time.sleep(POLL_FAST_SECONDS)
+        else:
+            time.sleep(interval)
 
 
 if __name__ == "__main__":

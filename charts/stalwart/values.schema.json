@@ -204,6 +204,7 @@
       "additionalProperties": false,
       "properties": {
         "enabled": { "type": "boolean" },
+        "name": { "type": "string" },
         "type": {
           "type": "string",
           "enum": ["LoadBalancer", "NodePort"]
@@ -214,7 +215,7 @@
           "additionalProperties": { "type": "string" }
         }
       },
-      "required": ["enabled", "type", "loadBalancerIP", "annotations"]
+      "required": ["enabled", "name", "type", "loadBalancerIP", "annotations"]
     },
     "ingress": {
       "type": "object",

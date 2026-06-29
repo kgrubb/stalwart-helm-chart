@@ -43,6 +43,9 @@ jobs:
             --set mailTls.enabled=true \
             --set mailTls.existingSecret=stalwart-tls \
             --set mailTls.hostname=mail.example.org
+          helm template test charts/stalwart \
+            --set mailService.enabled=true \
+            --set mailService.name=stalwart-mail
 
       - name: Lint manifests
         uses: stackrox/kube-linter-action@v1

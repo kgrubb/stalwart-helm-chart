@@ -98,6 +98,8 @@ service:
 # service stays ClusterIP and ingress routes HTTP to the management listener.
 mailService:
   enabled: false
+  # Optional fixed name (e.g. stalwart-mail) when adopting a hand-maintained LoadBalancer Service.
+  name: ""
   type: LoadBalancer
   loadBalancerIP: ""
   annotations: {}
