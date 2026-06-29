@@ -55,3 +55,11 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- define "stalwart.mailTls.hostname" -}}
 {{- default (index .Values.ingress.hosts 0 "host") .Values.mailTls.hostname -}}
 {{- end -}}
+
+{{- define "stalwart.mailServiceName" -}}
+{{- if .Values.mailService.name -}}
+{{- .Values.mailService.name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-mail" (include "stalwart.fullname" .) | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}

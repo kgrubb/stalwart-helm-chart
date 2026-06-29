@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **mailTls tls-sync**: poll every 10s while cert-manager files are missing or JMAP is unreachable, instead of sleeping for the full reload interval. Prevents implicit-TLS mail listeners from staying broken after pod restarts.
+- **mailService**: optional `mailService.name` for adopting a hand-maintained LoadBalancer Service name during GitOps migration.
+- **probes**: add a `startupProbe` so slow RocksDB recovery on restart does not trip liveness before the management listener is ready.
+
 ## [0.7.1] - 2026-06-29
 
 ### Fixed
