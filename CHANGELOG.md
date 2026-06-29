@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.2] - 2026-06-29
+
+### Fixed
+- mailService migration and tls-sync startup ([#29](https://github.com/kgrubb/stalwart-helm-chart/pull/29))
+  - **tls-sync**: poll every 10s while cert-manager TLS files are missing or JMAP is unreachable, instead of sleeping for the full `reloadIntervalSeconds`. Fixes implicit-TLS SMTP/IMAP listeners accepting TCP but resetting TLS handshakes until the next slow poll cycle after pod restarts.
+  - **mailService.name**: optional Service name override (e.g. `stalwart-mail`) so GitOps migrations can drop a hand-maintained LoadBalancer manifest and let Helm manage the same Service name + MetalLB IP without creating a second `*-mail` Service.
+  - **startupProbe**: give Stalwart up to ~5 minutes on RocksDB recovery before liveness/readiness failures during restarts.
+
+
+
 ### Fixed
 - **mailTls tls-sync**: poll every 10s while cert-manager files are missing or JMAP is unreachable, instead of sleeping for the full reload interval. Prevents implicit-TLS mail listeners from staying broken after pod restarts.
 - **mailService**: optional `mailService.name` for adopting a hand-maintained LoadBalancer Service name during GitOps migration.
