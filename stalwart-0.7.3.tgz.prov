@@ -1,0 +1,58 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/kgrubb/stalwart-helm-chart/issues
+    - name: source
+      url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/signKey: |
+    fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
+    url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+apiVersion: v2
+appVersion: v0.16.11
+description: Helm chart for the Stalwart mail and collaboration server
+home: https://stalw.art
+icon: https://kgrubb.github.io/stalwart-helm-chart/logo.svg
+keywords:
+- - mail
+- - smtp
+- - imap
+- - jmap
+- - stalwart
+maintainers:
+- - email: 8471701+kgrubb@users.noreply.github.com
+  name: kgrubb
+  url: https://github.com/kgrubb
+name: stalwart
+sources:
+- - https://github.com/stalwartlabs/stalwart
+- - https://stalw.art/docs/cluster/orchestration/kubernetes/
+- - https://github.com/kgrubb/stalwart-helm-chart
+type: application
+version: 0.7.3
+
+...
+files:
+  stalwart-0.7.3.tgz: sha256:ac1d7b659794b66baa5596a1818fe2f394e39ddb9f02381853f6b79e6a7c1dc4
+-----BEGIN PGP SIGNATURE-----
+
+wsFcBAEBCgAQBQJqQ9XtCRDKmZpzOV9F/QAAp4YQACbERcxGE6i4mzFwhu+ReR/8
+boKcQ/UVc5fGyG+H1IkTkSiOJo9I/ppxVJ7hXyoP8ivmyo0zztaYs7+sTFn5vTV5
+1K8efS4UuKNBCSLf0Mjf6/PpfbwuQgwva06Fe+lHVSwPrMDK6nlYESDP55uWYaUT
+Hf3NDJ4spzAHXers20EK+yz39s/sJNOUVYKe/1pjDJmkzRfeQQ56hezTei3be0pf
+GaQOvp9bUmSvL8Xvup9TcOHdiSio32P28vg5ffzee6gLfuhj1yVareKwZbSin70Y
+q7mMnLRqsJISs/kJOj4kXnlaQOPDRtmNmC9lXhIuC1XxALeClw/6xZ99KSNyCzhM
+mH+5kX9wNpFXB27w8dTum072N5wELJllZII1bsmf0LZMk7fNGv2Eb3yYgVvDSQ2P
+bnGkky1a77PL5kfbcuujevdImkvzt+5mG86PXUIe61zSXJTGTpL6iT4e8ICvzBa2
+cm4x3d/24U0sm/h268O6NjsiXkZeM/PS+U1JzeoErlfM5DgNRN7o30C6PK0MF21a
+j2se45hXZbMDitPSQOS6KWdBzND+EBJoNBczz0BtaVg4Ykagkb/r1fT7JgtzXwH+
+pmwRqf3pzM+XmxnCz/kJE43TpJuPVzhpuR3lPLb1n3c9MPIH2HPLEDq/zYEhqMAg
+312tBS58vW+VCtfeakLv
+=ZFey
+-----END PGP SIGNATURE-----
