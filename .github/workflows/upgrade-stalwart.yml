@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   upgrade:
@@ -31,6 +32,7 @@ jobs:
       - name: Commit and push
         if: steps.upgrade.outputs.upgraded == 'true'
         env:
+          GH_TOKEN: ${{ github.token }}
           PREFIX: ${{ steps.upgrade.outputs.commit_prefix }}
           VERSION: ${{ steps.upgrade.outputs.stalwart_version }}
         run: |
@@ -38,3 +40,4 @@ jobs:
           git commit -m "${PREFIX}: bump Stalwart to ${VERSION}"
           git pull --rebase origin main
           git push
+          gh workflow run release.yml --ref main

@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -30,10 +31,16 @@ jobs:
           AFTER="${{ github.sha }}"
           MSG='${{ github.event.head_commit.message }}'
 
-          [[ "$BEFORE" == "0000000000000000000000000000000000000000" ]] && exit 0
+          last_tag=$(git tag -l 'stalwart-*' --sort=-v:refname | head -1)
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            BEFORE="${last_tag}"
+            MSG=$(git log -1 --format=%s "$AFTER")
+          else
+            [[ "$BEFORE" == "0000000000000000000000000000000000000000" ]] && exit 0
+          fi
+
           [[ "$MSG" =~ ^chore\(release\): ]] && exit 0
 
-          last_tag=$(git tag -l 'stalwart-*' --sort=-v:refname | head -1)
           git diff --name-only "${last_tag:-$BEFORE}" "$AFTER" -- charts/ | grep -q . || exit 0
           echo "charts_changed=true" >> "$GITHUB_OUTPUT"
           echo "since_ref=${last_tag:-$BEFORE}" >> "$GITHUB_OUTPUT"
