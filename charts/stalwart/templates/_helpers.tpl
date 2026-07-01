@@ -24,6 +24,11 @@ app.kubernetes.io/name: {{ include "stalwart.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
+{{- define "stalwart.bootstrapLabels" -}}
+{{- include "stalwart.labels" . }}
+app.kubernetes.io/component: bootstrap
+{{- end -}}
+
 {{- define "stalwart.recoveryAdminOnPod" -}}
 {{- or .Values.recoveryAdmin.enabled (and .Values.bootstrap.enabled .Values.recoveryAdmin.existingSecret) (include "stalwart.mailTls.enabled" .) -}}
 {{- end -}}

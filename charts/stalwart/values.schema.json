@@ -71,6 +71,7 @@
       "additionalProperties": false,
       "properties": {
         "enabled": { "type": "boolean" },
+        "ttlSecondsAfterFinished": { "type": "integer", "minimum": 0 },
         "apiUrl": { "type": "string" },
         "domain": { "type": "string" },
         "accounts": {
@@ -131,7 +132,7 @@
           ]
         }
       },
-      "required": ["enabled", "apiUrl", "domain", "accounts", "groups", "oidc"]
+      "required": ["enabled", "ttlSecondsAfterFinished", "apiUrl", "domain", "accounts", "groups", "oidc"]
     },
     "mailTls": {
       "type": "object",

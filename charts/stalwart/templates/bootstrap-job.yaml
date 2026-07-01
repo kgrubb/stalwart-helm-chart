@@ -20,12 +20,12 @@ metadata:
     helm.sh/hook-delete-policy: before-hook-creation
 spec:
   backoffLimit: 3
-  ttlSecondsAfterFinished: 86400
+  ttlSecondsAfterFinished: {{ .Values.bootstrap.ttlSecondsAfterFinished }}
   activeDeadlineSeconds: 600
   template:
     metadata:
       labels:
-        {{- include "stalwart.selectorLabels" . | nindent 8 }}
+        {{- include "stalwart.bootstrapLabels" . | nindent 8 }}
     spec:
       restartPolicy: OnFailure
       securityContext:

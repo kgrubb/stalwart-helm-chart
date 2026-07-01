@@ -44,6 +44,8 @@ extraSecretEnv: {}
 # Hook Job: domain, accounts, and OIDC directory via JMAP.
 bootstrap:
   enabled: false
+  # How long completed bootstrap Jobs remain before garbage collection.
+  ttlSecondsAfterFinished: 300
   apiUrl: ""
   domain: ""
   accounts: []
