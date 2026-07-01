@@ -1,0 +1,58 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/kgrubb/stalwart-helm-chart/issues
+    - name: source
+      url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/signKey: |
+    fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
+    url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+apiVersion: v2
+appVersion: v0.16.11
+description: Helm chart for the Stalwart mail and collaboration server
+home: https://stalw.art
+icon: https://kgrubb.github.io/stalwart-helm-chart/logo.svg
+keywords:
+- - mail
+- - smtp
+- - imap
+- - jmap
+- - stalwart
+maintainers:
+- - email: 8471701+kgrubb@users.noreply.github.com
+  name: kgrubb
+  url: https://github.com/kgrubb
+name: stalwart
+sources:
+- - https://github.com/stalwartlabs/stalwart
+- - https://stalw.art/docs/cluster/orchestration/kubernetes/
+- - https://github.com/kgrubb/stalwart-helm-chart
+type: application
+version: 0.7.5
+
+...
+files:
+  stalwart-0.7.5.tgz: sha256:a0bcb65ecf597536acdd8c0a5103d4d601890a7b1c8de1a1024e751c4ce32cec
+-----BEGIN PGP SIGNATURE-----
+
+wsFcBAEBCgAQBQJqRHfjCRDKmZpzOV9F/QAAC4oQAD+4nxxaYY/rYAV72G9kFSxa
+NHe6PeKMEoLpC5wx1Tx4Lyni63faVRdQmnWY5xf+GaUUlbf0LtJtJHsKXbFxNG6B
+goz0RVPVgc/XyM4JbQ8T6lK7Hr3cNSovPhmdWQ3QsT2COPwxaKdr7PtZNvvriBuR
+Xk3l7ZC/e35c0QAGfpfha2/YbDfMcRtGUArQPhZnYcCHfXCOeZiOnjg/Wn4J0uw/
+zVUyifyyXoqQGtXZEf27L7PK5BneCinolbQ4aVFJjaFm4QSlEhGXKtZZMGCP/4ML
+PQfb6Z9D0wSaBDqGTpcvceSPsQVWSXR/rTczUrEx8QIoTEIyBVmJDghkwirGBnYb
+9U6vOUVWU5WIZyRMTX/akU3zO8fYQaG8/a4ZFll6y47zqBmMbucUxSPsFULT0fmN
+usspuyZTA9B+yKvq/lhrQ/F47n2V5lHvCpG2MM9yND+IqRPUEfN8pS9ZEdQy9IM8
+HzXJnUQqlJL2twMBMGHeXs5CYNQs6CJurz0xUiv7nDwqHmcdyrYMzorvXf8jyn9x
+0pNw5kcKTIkvEIntp+4NFjUSCN3y2I8LosWuUJcTjwx5dihCYRFM3Z3JUi9g/8nf
+JfGSROl+aTalksYuGi4TQ69V49Zz5Pqd3niVr73ANXiUjRCJf5FamCbN8TZZYMjU
+i+y5QSojo6dtOUmxkGwm
+=sXGw
+-----END PGP SIGNATURE-----
