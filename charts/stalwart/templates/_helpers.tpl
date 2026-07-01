@@ -24,9 +24,15 @@ app.kubernetes.io/name: {{ include "stalwart.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
+{{- define "stalwart.serverSelectorLabels" -}}
+{{- include "stalwart.selectorLabels" . }}
+app.kubernetes.io/component: server
+{{- end -}}
+
 {{- define "stalwart.bootstrapLabels" -}}
-{{- include "stalwart.labels" . }}
 app.kubernetes.io/component: bootstrap
+app.kubernetes.io/part-of: {{ include "stalwart.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
 {{- define "stalwart.recoveryAdminOnPod" -}}

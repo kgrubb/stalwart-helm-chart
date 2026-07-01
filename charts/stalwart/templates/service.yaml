@@ -9,7 +9,7 @@ metadata:
 spec:
   clusterIP: None
   selector:
-    {{- include "stalwart.selectorLabels" . | nindent 4 }}
+    {{- include "stalwart.serverSelectorLabels" . | nindent 4 }}
   ports:
     - name: mgmt
       port: 8080
@@ -26,7 +26,7 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   selector:
-    {{- include "stalwart.selectorLabels" . | nindent 4 }}
+    {{- include "stalwart.serverSelectorLabels" . | nindent 4 }}
   ports:
     - name: smtp
       port: {{ .Values.service.ports.smtp }}

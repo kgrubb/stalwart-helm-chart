@@ -15,7 +15,7 @@ spec:
   loadBalancerIP: {{ . | quote }}
   {{- end }}
   selector:
-    {{- include "stalwart.selectorLabels" . | nindent 4 }}
+    {{- include "stalwart.serverSelectorLabels" . | nindent 4 }}
   ports:
     - name: smtp
       port: {{ .Values.service.ports.smtp }}

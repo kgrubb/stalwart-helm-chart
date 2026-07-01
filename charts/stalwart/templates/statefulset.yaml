@@ -13,7 +13,7 @@ spec:
   template:
     metadata:
       labels:
-        {{- include "stalwart.selectorLabels" . | nindent 8 }}
+        {{- include "stalwart.serverSelectorLabels" . | nindent 8 }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         {{- if include "stalwart.mailTls.enabled" . }}
