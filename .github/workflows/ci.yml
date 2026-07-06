@@ -51,14 +51,7 @@ jobs:
           helm template test charts/stalwart \
             --set mailService.enabled=true \
             --set mailService.name=stalwart-mail
-          helm template test charts/stalwart \
-            --set replicaCount=2 \
-            --set podDisruptionBudget.enabled=true \
-            --set 'config={"@type":"PostgreSql","host":"postgres.example.svc","port":5432,"database":"stalwart","authUsername":"stalwart","authSecret":{"@type":"EnvironmentVariable","variableName":"STALWART_DB_PASSWORD"}}' \
-            --set persistence.enabled=false \
-            --set-json 'envFrom=[{"secretRef":{"name":"stalwart-db"}}]' \
-            --set metrics.serviceMonitor.enabled=true \
-            --set-json 'metrics.serviceMonitor.labels={"release":"prometheus"}'
+          helm template test charts/stalwart -f charts/stalwart/ci/ha-cluster-values.yaml
 
       - name: Lint manifests
         uses: stackrox/kube-linter-action@v1
