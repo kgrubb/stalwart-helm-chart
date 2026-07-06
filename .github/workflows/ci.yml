@@ -28,6 +28,11 @@ jobs:
       - name: Render chart
         run: |
           helm template test charts/stalwart
+          helm template test charts/stalwart | grep -q 'kind: StatefulSet'
+          if helm template test charts/stalwart | grep -qE 'kind: (PodDisruptionBudget|ServiceMonitor)'; then
+            echo "default render must not include PDB or ServiceMonitor"
+            exit 1
+          fi
           helm template test charts/stalwart --set recoveryAdmin.enabled=false
           helm template test charts/stalwart \
             --set recoveryAdmin.enabled=true \
@@ -46,6 +51,14 @@ jobs:
           helm template test charts/stalwart \
             --set mailService.enabled=true \
             --set mailService.name=stalwart-mail
+          helm template test charts/stalwart \
+            --set replicaCount=2 \
+            --set podDisruptionBudget.enabled=true \
+            --set 'config={"@type":"PostgreSql","host":"postgres.example.svc","port":5432,"database":"stalwart","authUsername":"stalwart","authSecret":{"@type":"EnvironmentVariable","variableName":"STALWART_DB_PASSWORD"}}' \
+            --set persistence.enabled=false \
+            --set-json 'envFrom=[{"secretRef":{"name":"stalwart-db"}}]' \
+            --set metrics.serviceMonitor.enabled=true \
+            --set-json 'metrics.serviceMonitor.labels={"release":"prometheus"}'
 
       - name: Lint manifests
         uses: stackrox/kube-linter-action@v1
