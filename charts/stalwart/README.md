@@ -53,87 +53,74 @@ You only need the steps below if you are moving to a **shared DataStore** (Postg
 
 ### RocksDB → PostgreSQL migration (one-off)
 
-Use the script in this repo — it creates short-lived Kubernetes Jobs to export from your existing RocksDB PVC and import into PostgreSQL. See [scripts/migrate-rocksdb-to-postgres.sh](../../scripts/migrate-rocksdb-to-postgres.sh).
+Prerequisites: PostgreSQL is reachable from the cluster, and a Secret named `stalwart-db` (with `STALWART_DB_PASSWORD`) exists in the Stalwart namespace. Snapshot the RocksDB PVC first.
 
-**Before you start**
-
-1. Provision PostgreSQL and a database user; create a Secret with `STALWART_DB_PASSWORD` (e.g. `stalwart-db`).
-2. Snapshot the RocksDB PVC (or take a Longhorn volume snapshot).
-3. Scale Stalwart to zero so RocksDB is not mounted read-write:
-
-   ```bash
-   kubectl scale statefulset/stalwart-stalwart -n stalwart --replicas=0
-   kubectl wait -n stalwart --for=delete pod -l app.kubernetes.io/name=stalwart --timeout=300s
-   ```
-
-**Run migration**
-
-Adjust environment variables if your namespace, PVC name, Postgres service, or secret differ from the defaults (`./scripts/migrate-rocksdb-to-postgres.sh --help`).
+The [migration script](../../scripts/migrate-rocksdb-to-postgres.sh) scales Stalwart to 0, applies a single in-cluster Job, streams logs, and exits. Requires `kubectl` and `envsubst` on the machine you run it from (your laptop, a CI runner, or a shell in the cluster).
 
 ```bash
 chmod +x scripts/migrate-rocksdb-to-postgres.sh
-
-export NAMESPACE=stalwart
-export DATA_CLAIM=data-stalwart-stalwart-0   # RocksDB PVC from the StatefulSet
-export DB_SECRET_NAME=stalwart-db
-export POSTGRES_HOST=postgres-rw.postgres.svc.cluster.local
-export POSTGRES_DATABASE=stalwart
-export POSTGRES_USER=stalwart
-
-./scripts/migrate-rocksdb-to-postgres.sh all
+./scripts/migrate-rocksdb-to-postgres.sh
 ```
 
-`all` runs export, then import, and prints Job logs. On failure, fix the issue and re-run the failed phase (`export` or `import` only).
+Another namespace, or only Postgres host differs:
 
-**After migration**
+```bash
+./scripts/migrate-rocksdb-to-postgres.sh mail
+POSTGRES_HOST=postgres.example.svc ./scripts/migrate-rocksdb-to-postgres.sh
+```
 
-1. Upgrade Helm values to PostgreSQL and disable local persistence:
+Manual apply (same manifest the script renders):
 
-   ```yaml
-   replicaCount: 1
-   config:
-     "@type": PostgreSql
-     host: postgres-rw.postgres.svc.cluster.local
-     port: 5432
-     database: stalwart
-     authUsername: stalwart
-     authSecret:
-       "@type": EnvironmentVariable
-       variableName: STALWART_DB_PASSWORD
-   persistence:
-     enabled: false
-   envFrom:
-     - secretRef:
-         name: stalwart-db
-   ```
+```bash
+export NAMESPACE=stalwart DATA_CLAIM=data-stalwart-stalwart-0 STALWART_IMAGE=stalwartlabs/stalwart:v0.16.11
+export STORAGE_CLASS=longhorn DB_SECRET_NAME=stalwart-db POSTGRES_HOST=postgres-rw.postgres.svc.cluster.local
+export POSTGRES_PORT=5432 POSTGRES_DATABASE=stalwart POSTGRES_USER=stalwart
+envsubst < scripts/migrate-rocksdb-to-postgres.yaml.tpl | kubectl apply -f -
+kubectl wait -n stalwart --for=condition=complete job/stalwart-migrate --timeout=1h
+kubectl logs -n stalwart job/stalwart-migrate
+```
 
-2. `helm upgrade` (or apply your GitOps manifest) and confirm mail, IMAP, and the admin UI.
-3. In the Stalwart WebUI, configure a **Coordinator** (peer-to-peer is fine to start).
-4. Scale to multiple replicas and enable guardrails:
+After a successful run, upgrade Helm values to PostgreSQL, redeploy, configure a **Coordinator** in the WebUI, then scale out.
 
-   ```yaml
-   replicaCount: 2
-   podDisruptionBudget:
-     enabled: true
-     minAvailable: 1
-   affinity:
-     podAntiAffinity:
-       preferredDuringSchedulingIgnoredDuringExecution:
-         - weight: 100
-           podAffinityTerm:
-             labelSelector:
-               matchLabels:
-                 app.kubernetes.io/name: stalwart
-             topologyKey: kubernetes.io/hostname
-   metrics:
-     serviceMonitor:
-       enabled: true
-       labels:
-         release: prometheus
-   ```
+**Helm values (PostgreSQL, single replica)**
 
-5. Remove migration scratch resources:
+```yaml
+replicaCount: 1
+config:
+  "@type": PostgreSql
+  host: postgres-rw.postgres.svc.cluster.local
+  port: 5432
+  database: stalwart
+  authUsername: stalwart
+  authSecret:
+    "@type": EnvironmentVariable
+    variableName: STALWART_DB_PASSWORD
+persistence:
+  enabled: false
+envFrom:
+  - secretRef:
+      name: stalwart-db
+```
 
-   ```bash
-   ./scripts/migrate-rocksdb-to-postgres.sh cleanup
-   ```
+**Scale to HA (after Coordinator is configured)**
+
+```yaml
+replicaCount: 2
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: stalwart
+          topologyKey: kubernetes.io/hostname
+metrics:
+  serviceMonitor:
+    enabled: true
+    labels:
+      release: prometheus
+```

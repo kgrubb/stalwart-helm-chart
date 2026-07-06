@@ -1,380 +1,130 @@
 #!/usr/bin/env bash
-# One-off RocksDB → PostgreSQL migration for Stalwart on Kubernetes.
+# One-off RocksDB → PostgreSQL migration (runs as a single in-cluster Job).
 # See charts/stalwart/README.md — "Upgrading from 0.7.x to 0.8.x".
 set -euo pipefail
 
+dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+tpl="${dir}/migrate-rocksdb-to-postgres.yaml.tpl"
+job=stalwart-migrate
+
 usage() {
-  cat <<'EOF'
-Usage: migrate-rocksdb-to-postgres.sh <export|import|all|cleanup>
+  cat <<EOF
+Usage: $(basename "$0") [namespace] [cleanup]
 
-  export   Run export Job (Stalwart must be scaled to 0 replicas).
-  import   Run import Job (requires export dump on shared PVC).
-  all      export, then import.
-  cleanup  Delete migration Jobs, ConfigMap, and dump PVC.
+  $(basename "$0")              migrate (default namespace: stalwart)
+  $(basename "$0") mail         migrate in another namespace
+  $(basename "$0") cleanup      delete migration Job, ConfigMap, and dump PVC
 
-Environment (defaults shown):
+Optional env (defaults are fine for most installs):
+  DATA_CLAIM, DB_SECRET_NAME, POSTGRES_HOST, POSTGRES_DATABASE, POSTGRES_USER
+  SKIP_SCALE_DOWN=1             do not scale Stalwart to 0 first
 
-  NAMESPACE=stalwart
-  DATA_CLAIM=data-stalwart-stalwart-0     # RocksDB PVC from the StatefulSet
-  STATEFULSET=stalwart-stalwart           # used only for preflight replica check
-  STALWART_IMAGE=stalwartlabs/stalwart:<chart appVersion>
-  DUMP_CLAIM=stalwart-migrate-dump
-  DUMP_SIZE=5Gi
-  STORAGE_CLASS=longhorn
-  DB_SECRET_NAME=stalwart-db              # must contain STALWART_DB_PASSWORD
-  POSTGRES_HOST=postgres-rw.postgres.svc.cluster.local
-  POSTGRES_PORT=5432
-  POSTGRES_DATABASE=stalwart
-  POSTGRES_USER=stalwart
-  JOB_TIMEOUT=1h
+Requires: kubectl, envsubst. Creates Job/${job} in the target namespace.
 EOF
 }
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CHART_YAML="${SCRIPT_DIR}/../charts/stalwart/Chart.yaml"
-
-NAMESPACE="${NAMESPACE:-stalwart}"
-DATA_CLAIM="${DATA_CLAIM:-data-stalwart-stalwart-0}"
-STATEFULSET="${STATEFULSET:-stalwart-stalwart}"
-DUMP_CLAIM="${DUMP_CLAIM:-stalwart-migrate-dump}"
-DUMP_SIZE="${DUMP_SIZE:-5Gi}"
-STORAGE_CLASS="${STORAGE_CLASS:-longhorn}"
-DB_SECRET_NAME="${DB_SECRET_NAME:-stalwart-db}"
-POSTGRES_HOST="${POSTGRES_HOST:-postgres-rw.postgres.svc.cluster.local}"
-POSTGRES_PORT="${POSTGRES_PORT:-5432}"
-POSTGRES_DATABASE="${POSTGRES_DATABASE:-stalwart}"
-POSTGRES_USER="${POSTGRES_USER:-stalwart}"
-JOB_TIMEOUT="${JOB_TIMEOUT:-1h}"
-
-if [[ -z "${STALWART_IMAGE:-}" ]]; then
-  if [[ -f "$CHART_YAML" ]]; then
-    tag="$(awk '/^appVersion:/ { gsub(/"/, "", $2); print $2 }' "$CHART_YAML")"
-    STALWART_IMAGE="stalwartlabs/stalwart:${tag}"
-  else
-    STALWART_IMAGE="stalwartlabs/stalwart:latest"
-  fi
-fi
-
-EXPORT_JOB=stalwart-migrate-export
-IMPORT_JOB=stalwart-migrate-import
-CONFIGMAP=stalwart-migrate-scripts
-
-require_kubectl() {
-  command -v kubectl >/dev/null 2>&1 || {
-    echo "error: kubectl not found in PATH" >&2
+need() {
+  command -v "$1" >/dev/null 2>&1 || {
+    echo "error: $1 not found" >&2
     exit 1
   }
 }
 
-preflight_export() {
-  if ! kubectl get namespace "$NAMESPACE" >/dev/null 2>&1; then
-    echo "error: namespace $NAMESPACE not found" >&2
+detect() {
+  local ns="$1"
+  if [[ -z "${DATA_CLAIM:-}" ]]; then
+    DATA_CLAIM="$(kubectl get pvc -n "$ns" -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' \
+      | grep -E '^data-.+-0$' | head -1 || true)"
+  fi
+  [[ -n "$DATA_CLAIM" ]] || {
+    echo "error: no RocksDB PVC (data-*-0) in $ns — set DATA_CLAIM" >&2
     exit 1
-  fi
-  if ! kubectl get pvc -n "$NAMESPACE" "$DATA_CLAIM" >/dev/null 2>&1; then
-    echo "error: PVC $DATA_CLAIM not found in $NAMESPACE" >&2
-    exit 1
-  fi
-  if kubectl get statefulset -n "$NAMESPACE" "$STATEFULSET" >/dev/null 2>&1; then
-    replicas="$(kubectl get statefulset -n "$NAMESPACE" "$STATEFULSET" -o jsonpath='{.spec.replicas}')"
-    ready="$(kubectl get statefulset -n "$NAMESPACE" "$STATEFULSET" -o jsonpath='{.status.readyReplicas}')"
-    if [[ "${replicas:-0}" -gt 0 || "${ready:-0}" -gt 0 ]]; then
-      echo "error: scale $STATEFULSET to 0 before export:" >&2
-      echo "  kubectl scale statefulset/$STATEFULSET -n $NAMESPACE --replicas=0" >&2
-      exit 1
-    fi
-  fi
-}
+  }
 
-preflight_import() {
-  if ! kubectl get secret -n "$NAMESPACE" "$DB_SECRET_NAME" >/dev/null 2>&1; then
-    echo "error: secret $DB_SECRET_NAME not found in $NAMESPACE" >&2
-    exit 1
+  if [[ -z "${STALWART_IMAGE:-}" ]]; then
+    STALWART_IMAGE="$(kubectl get sts -n "$ns" -l app.kubernetes.io/name=stalwart \
+      -o jsonpath='{.items[0].spec.template.spec.containers[0].image}' 2>/dev/null || true)"
+    if [[ -z "$STALWART_IMAGE" && -f "${dir}/../charts/stalwart/Chart.yaml" ]]; then
+      tag="$(awk '/^appVersion:/ { gsub(/"/, "", $2); print $2 }' "${dir}/../charts/stalwart/Chart.yaml")"
+      STALWART_IMAGE="stalwartlabs/stalwart:${tag}"
+    fi
+    STALWART_IMAGE="${STALWART_IMAGE:-stalwartlabs/stalwart:latest}"
   fi
-  if ! kubectl get pvc -n "$NAMESPACE" "$DUMP_CLAIM" >/dev/null 2>&1; then
-    echo "error: dump PVC $DUMP_CLAIM not found — run export first" >&2
-    exit 1
+
+  if [[ -z "${STORAGE_CLASS:-}" ]]; then
+    STORAGE_CLASS="$(kubectl get pvc -n "$ns" "$DATA_CLAIM" -o jsonpath='{.spec.storageClassName}')"
+    STORAGE_CLASS="${STORAGE_CLASS:-standard}"
   fi
 }
 
-apply_shared_resources() {
-  kubectl apply -f - <<EOF
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: ${CONFIGMAP}
-  namespace: ${NAMESPACE}
-data:
-  export.sh: |
-    #!/bin/sh
-    set -eu
-    DUMP_DIR="\${DUMP_DIR:-/export/dump}"
-    if [ ! -d /var/lib/stalwart ]; then
-      echo "error: /var/lib/stalwart missing — check DATA_CLAIM PVC mount"
-      exit 1
-    fi
-    rm -rf "\$DUMP_DIR"
-    mkdir -p "\$DUMP_DIR"
-    stalwart --config /etc/stalwart/config.json --export "\$DUMP_DIR"
-    files=\$(find "\$DUMP_DIR" -type f | wc -l)
-    if [ "\$files" -eq 0 ]; then
-      echo "error: export produced no files"
-      exit 1
-    fi
-    du -sh "\$DUMP_DIR"
-    echo "export ok (\$files files)"
-  import.sh: |
-    #!/bin/sh
-    set -eu
-    DUMP_DIR="\${DUMP_DIR:-/export/dump}"
-    if [ -z "\${STALWART_DB_PASSWORD:-}" ]; then
-      echo "error: STALWART_DB_PASSWORD not set (${DB_SECRET_NAME} secret)"
-      exit 1
-    fi
-    if [ ! -d "\$DUMP_DIR" ]; then
-      echo "error: dump directory missing — run export first"
-      exit 1
-    fi
-    files=\$(find "\$DUMP_DIR" -type f | wc -l)
-    if [ "\$files" -eq 0 ]; then
-      echo "error: dump is empty"
-      exit 1
-    fi
-    stalwart --config /etc/stalwart/config.json --import "\$DUMP_DIR"
-    echo "import ok (\$files files imported)"
-  rocksdb-config.json: |
-    {
-      "@type": "RocksDb",
-      "path": "/var/lib/stalwart"
-    }
-  postgres-config.json: |
-    {
-      "@type": "PostgreSql",
-      "host": "${POSTGRES_HOST}",
-      "port": ${POSTGRES_PORT},
-      "database": "${POSTGRES_DATABASE}",
-      "authUsername": "${POSTGRES_USER}",
-      "authSecret": {
-        "@type": "EnvironmentVariable",
-        "variableName": "STALWART_DB_PASSWORD"
-      }
-    }
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: ${DUMP_CLAIM}
-  namespace: ${NAMESPACE}
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: ${STORAGE_CLASS}
-  resources:
-    requests:
-      storage: ${DUMP_SIZE}
-EOF
+scale_down() {
+  local ns="$1" sts
+  sts="$(kubectl get sts -n "$ns" -l app.kubernetes.io/name=stalwart -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)"
+  [[ -n "$sts" ]] || return 0
+  replicas="$(kubectl get sts -n "$ns" "$sts" -o jsonpath='{.spec.replicas}')"
+  [[ "${replicas:-0}" -eq 0 ]] && return 0
+  echo "scaling $sts to 0..."
+  kubectl scale "sts/$sts" -n "$ns" --replicas=0
+  kubectl wait -n "$ns" --for=delete pod -l app.kubernetes.io/name=stalwart --timeout=300s
 }
 
-run_job() {
-  local job="$1"
-  local manifest="$2"
+run() {
+  local ns="$1"
+  need kubectl
+  need envsubst
 
-  kubectl delete job -n "$NAMESPACE" "$job" --ignore-not-found=true
-  kubectl apply -f - <<<"$manifest"
-  kubectl wait -n "$NAMESPACE" --for=condition=complete "job/$job" --timeout="$JOB_TIMEOUT"
-  kubectl logs -n "$NAMESPACE" "job/$job"
-}
+  NAMESPACE="$ns"
+  DB_SECRET_NAME="${DB_SECRET_NAME:-stalwart-db}"
+  POSTGRES_HOST="${POSTGRES_HOST:-postgres-rw.postgres.svc.cluster.local}"
+  POSTGRES_PORT="${POSTGRES_PORT:-5432}"
+  POSTGRES_DATABASE="${POSTGRES_DATABASE:-stalwart}"
+  POSTGRES_USER="${POSTGRES_USER:-stalwart}"
 
-run_export() {
-  preflight_export
-  apply_shared_resources
-  run_job "$EXPORT_JOB" "$(export_job_manifest)"
-}
+  kubectl get namespace "$ns" >/dev/null
+  kubectl get secret -n "$ns" "$DB_SECRET_NAME" >/dev/null
 
-run_import() {
-  preflight_import
-  apply_shared_resources
-  run_job "$IMPORT_JOB" "$(import_job_manifest)"
-}
+  detect "$ns"
+  if [[ "${SKIP_SCALE_DOWN:-0}" != 1 ]]; then
+    scale_down "$ns"
+  fi
 
-export_job_manifest() {
-  cat <<EOF
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: ${EXPORT_JOB}
-  namespace: ${NAMESPACE}
-spec:
-  backoffLimit: 0
-  activeDeadlineSeconds: 3600
-  ttlSecondsAfterFinished: 86400
-  template:
-    spec:
-      restartPolicy: Never
-      securityContext:
-        fsGroup: 2000
-        runAsUser: 2000
-        runAsGroup: 2000
-        runAsNonRoot: true
-      initContainers:
-        - name: verify-data-pvc
-          image: busybox:1.37
-          command:
-            - /bin/sh
-            - -ec
-            - |
-              test -d /var/lib/stalwart || exit 1
-              ls -la /var/lib/stalwart | head -20
-          volumeMounts:
-            - name: data
-              mountPath: /var/lib/stalwart
-              readOnly: true
-      containers:
-        - name: export
-          image: ${STALWART_IMAGE}
-          command: ["/bin/sh", "/scripts/export.sh"]
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
-          volumeMounts:
-            - name: data
-              mountPath: /var/lib/stalwart
-              readOnly: true
-            - name: config
-              mountPath: /etc/stalwart/config.json
-              subPath: rocksdb-config.json
-              readOnly: true
-            - name: scripts
-              mountPath: /scripts
-              readOnly: true
-            - name: export
-              mountPath: /export
-      volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: ${DATA_CLAIM}
-        - name: config
-          configMap:
-            name: ${CONFIGMAP}
-        - name: scripts
-          configMap:
-            name: ${CONFIGMAP}
-            defaultMode: 0555
-        - name: export
-          persistentVolumeClaim:
-            claimName: ${DUMP_CLAIM}
-EOF
-}
+  kubectl delete job -n "$ns" "$job" --ignore-not-found=true
+  export NAMESPACE DATA_CLAIM STALWART_IMAGE STORAGE_CLASS DB_SECRET_NAME
+  export POSTGRES_HOST POSTGRES_PORT POSTGRES_DATABASE POSTGRES_USER
+  envsubst <"$tpl" | kubectl apply -f -
 
-import_job_manifest() {
-  cat <<EOF
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: ${IMPORT_JOB}
-  namespace: ${NAMESPACE}
-spec:
-  backoffLimit: 0
-  activeDeadlineSeconds: 3600
-  ttlSecondsAfterFinished: 86400
-  template:
-    spec:
-      restartPolicy: Never
-      securityContext:
-        fsGroup: 2000
-        runAsUser: 2000
-        runAsGroup: 2000
-        runAsNonRoot: true
-      initContainers:
-        - name: verify-dump
-          image: busybox:1.37
-          command:
-            - /bin/sh
-            - -ec
-            - |
-              test -d /export/dump || exit 1
-              files=\$(find /export/dump -type f | wc -l)
-              test "\$files" -gt 0 || exit 1
-              echo "dump ok (\$files files)"
-          volumeMounts:
-            - name: export
-              mountPath: /export
-              readOnly: true
-      containers:
-        - name: import
-          image: ${STALWART_IMAGE}
-          command: ["/bin/sh", "/scripts/import.sh"]
-          envFrom:
-            - secretRef:
-                name: ${DB_SECRET_NAME}
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
-          volumeMounts:
-            - name: config
-              mountPath: /etc/stalwart/config.json
-              subPath: postgres-config.json
-              readOnly: true
-            - name: scripts
-              mountPath: /scripts
-              readOnly: true
-            - name: export
-              mountPath: /export
-              readOnly: true
-      volumes:
-        - name: config
-          configMap:
-            name: ${CONFIGMAP}
-        - name: scripts
-          configMap:
-            name: ${CONFIGMAP}
-            defaultMode: 0555
-        - name: export
-          persistentVolumeClaim:
-            claimName: ${DUMP_CLAIM}
-EOF
+  echo "waiting for Job/${job}..."
+  kubectl wait -n "$ns" --for=condition=complete "job/$job" --timeout=1h
+  kubectl logs -n "$ns" "job/$job"
+  echo "done — upgrade Helm values to PostgreSql, redeploy, then: $(basename "$0") cleanup $ns"
 }
 
 cleanup() {
-  kubectl delete job -n "$NAMESPACE" "$EXPORT_JOB" "$IMPORT_JOB" --ignore-not-found=true
-  kubectl delete configmap -n "$NAMESPACE" "$CONFIGMAP" --ignore-not-found=true
-  kubectl delete pvc -n "$NAMESPACE" "$DUMP_CLAIM" --ignore-not-found=true
+  local ns="$1"
+  need kubectl
+  kubectl delete job -n "$ns" "$job" --ignore-not-found=true
+  kubectl delete configmap -n "$ns" stalwart-migrate --ignore-not-found=true
+  kubectl delete pvc -n "$ns" stalwart-migrate-dump --ignore-not-found=true
   echo "cleanup ok"
 }
 
 main() {
-  local cmd="${1:-}"
-  case "$cmd" in
-    export)
-      require_kubectl
-      run_export
-      ;;
-    import)
-      require_kubectl
-      run_import
-      ;;
-    all)
-      require_kubectl
-      run_export
-      run_import
-      echo "migration complete — update Helm values to PostgreSql, redeploy, then run: $0 cleanup"
+  local ns="${NAMESPACE:-stalwart}"
+  case "${1:-}" in
+    -h | --help | help)
+      usage
       ;;
     cleanup)
-      require_kubectl
-      cleanup
+      cleanup "${2:-$ns}"
       ;;
-    -h | --help | help | "")
-      usage
-      [[ -n "$cmd" ]] || exit 0
+    "")
+      run "$ns"
       ;;
     *)
-      echo "error: unknown command: $cmd" >&2
-      usage >&2
-      exit 1
+      case "${2:-}" in
+        cleanup) cleanup "$1" ;;
+        *) run "$1" ;;
+      esac
       ;;
   esac
 }
