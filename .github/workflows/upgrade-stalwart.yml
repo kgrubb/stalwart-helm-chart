@@ -33,11 +33,10 @@ jobs:
         if: steps.upgrade.outputs.upgraded == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
-          PREFIX: ${{ steps.upgrade.outputs.commit_prefix }}
-          VERSION: ${{ steps.upgrade.outputs.stalwart_version }}
+          SUBJECT: ${{ steps.upgrade.outputs.commit_subject }}
         run: |
           git add charts/stalwart/Chart.yaml charts/stalwart/values.yaml
-          git commit -m "${PREFIX}: bump Stalwart to ${VERSION}"
+          git commit -m "${SUBJECT}"
           git pull --rebase origin main
           git push
           gh workflow run release.yml --ref main

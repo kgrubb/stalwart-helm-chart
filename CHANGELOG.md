@@ -9,36 +9,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.7.7] - 2026-07-07
 
-### Changed
-- Chart update
+### Added
+- Add mailService.externalTrafficPolicy for MetalLB L2 ([#32](https://github.com/kgrubb/stalwart-helm-chart/pull/32))
+  - Adds optional `mailService.externalTrafficPolicy` to the mail LoadBalancer Service template.
+  - Some networks hit TLS handshake resets, for example on `192.168.1.7:993`, when MetalLB announces the IP on a node without a working kube-proxy path to the Stalwart pod; `Local` keeps L2 ARP on the node running the mail pod.
 
 
 
 ## [0.7.6] - 2026-07-07
 
-### Changed
-- Chart update
+### Fixed
+- bump Stalwart to v0.16.12
 
 
 
 ## [0.7.5] - 2026-07-01
 
-### Changed
-- Chart update
+### Fixed
+- require component=server on mail Service selectors.
 
 
 
 ## [0.7.4] - 2026-07-01
 
-### Changed
-- Chart update
+### Fixed
+- keep bootstrap hook Job out of mail Service endpoints.
 
 
 
 ## [0.7.3] - 2026-06-30
 
-### Changed
-- Chart update
+### Fixed
+- dispatch release after Stalwart auto-upgrade ([#30](https://github.com/kgrubb/stalwart-helm-chart/pull/30))
+  - Dispatch `release.yml` after the upgrade workflow pushes a Stalwart bump (`workflow_dispatch` works with `GITHUB_TOKEN`; `push` does not).
+  - Teach Release to handle `workflow_dispatch` by diffing from the last `stalwart-*` tag.
+- bump Stalwart to v0.16.11
 
 
 
