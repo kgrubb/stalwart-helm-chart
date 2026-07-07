@@ -1,0 +1,58 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/kgrubb/stalwart-helm-chart/issues
+    - name: source
+      url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/signKey: |
+    fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
+    url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+apiVersion: v2
+appVersion: v0.16.12
+description: Helm chart for the Stalwart mail and collaboration server
+home: https://stalw.art
+icon: https://kgrubb.github.io/stalwart-helm-chart/logo.svg
+keywords:
+- - mail
+- - smtp
+- - imap
+- - jmap
+- - stalwart
+maintainers:
+- - email: 8471701+kgrubb@users.noreply.github.com
+  name: kgrubb
+  url: https://github.com/kgrubb
+name: stalwart
+sources:
+- - https://github.com/stalwartlabs/stalwart
+- - https://stalw.art/docs/cluster/orchestration/kubernetes/
+- - https://github.com/kgrubb/stalwart-helm-chart
+type: application
+version: 0.7.8
+
+...
+files:
+  stalwart-0.7.8.tgz: sha256:e234965431844b3851d25629f1228cc0f8e212b89aaef8db2f2798b0a9943447
+-----BEGIN PGP SIGNATURE-----
+
+wsFcBAEBCgAQBQJqTQczCRDKmZpzOV9F/QAAki8QADKRjCN7kL8S8zcnYAhJ/JW6
+MHoAe7Fi4fSUIQgcrvnnNr4bZTkgt+Wgtj3qMybg/QI1xtiDdfotn+rIYcqBIuMY
+2P+Sqs40LV1B6QKZLuENSdm9UQ/Eq+VwCfxeN54+YFNIfqRdGo1kUOS/A1seR8uI
+zsHmExyHtnIHaHTsc9VrnPP1dO4RTvgEEAHQWww5zpBb/NEvHAIJv76wVRkKY94u
+FLufZgbbgIGliMw07GnJrK2UC2+N1QL/k6g7VQfhYhFoEXDGb1SyDCCaYkz/gcQH
+SDa0FUfIGtwVQtY58NiUpJBF+yCegGF/+/vVI0ZMkJNhsCVT4hCcQ+RvufqgeqoP
+HBA6/OA0e/vJB29mmRktD5S2zZ3WZ79VT8mRJyRevPnWySqa6XnhnfzfkAj/rKMo
+vJR5zjoZ1QlwS0asqbcDBMapYZ9x63uE+HYuvWjfuM6DhradJ8Jj4soAAnwkyYuy
+4yyziNXk551AqgCedlApc9gR8xrLxr7Wqy0wsCBiP2bq2fu5r4kBIb6jVkZaiLmP
+BI6XVtmSEqU6jRKw+D7HQPNPPM5pCj/nQTFAODlZjLdIiEV8/qLaU8Mc3bdbrj5Z
+8gys7A861fMiahzFvmgN2SXtWj21UIUDrCC0U+4hhAnv26cmhc27H/VMjp03Qyo3
+O2W1Q58fb/IDjudFvbFY
+=LA5b
+-----END PGP SIGNATURE-----
