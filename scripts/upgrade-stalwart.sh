@@ -18,14 +18,15 @@ IFS='.' read -r cur_maj cur_min _ <<< "$current"
 IFS='.' read -r new_maj new_min _ <<< "$latest"
 
 if (( new_maj > cur_maj )); then
-  prefix="feat!"
+  prefix="feat!(image)"
 elif (( new_min > cur_min )); then
-  prefix="feat"
+  prefix="feat(image)"
 else
-  prefix="fix"
+  prefix="fix(image)"
 fi
 
 tag="v${latest}"
+subject="${prefix}: bump Stalwart app image to ${tag}"
 sed -i "s/^appVersion: .*/appVersion: \"${tag}\"/" "$chart"
 sed -i "s|^  tag: .*|  tag: \"${tag}\"|" "$values"
 
@@ -33,6 +34,6 @@ if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
   {
     echo "upgraded=true"
     echo "stalwart_version=${tag}"
-    echo "commit_prefix=${prefix}"
+    echo "commit_subject=${subject}"
   } >> "$GITHUB_OUTPUT"
 fi

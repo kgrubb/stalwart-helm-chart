@@ -11,27 +11,58 @@ if [[ -z "$REPO" ]]; then
 fi
 CHANGELOG="CHANGELOG.md"
 NOTES="charts/stalwart/RELEASE-NOTES.md"
-DATE=$(date -u +%Y-%m-%d)
+DATE="${CHANGELOG_DATE:-$(date -u +%Y-%m-%d)}"
 
 added=()
 fixed=()
 changed=()
 
 section_for() {
-  case "$1" in
-    feat!*|*!:*|*BREAKING*) echo changed ;;
-    feat:*) echo added ;;
-    fix:*) echo fixed ;;
-    perf:*|refactor:*|chore:*|docs:*|ci:*) echo changed ;;
-  esac
+  local title="$1"
+  local breaking_regex='(^|[[:space:]])BREAKING([[:space:]]|$)'
+  local breaking_type_regex='^[a-z]+(\([^)]*\))?!:'
+  local feat_regex='^feat(\([^)]*\))?:'
+  local fix_regex='^fix(\([^)]*\))?:'
+  local changed_regex='^(perf|refactor|chore|docs|ci)(\([^)]*\))?:'
+
+  if [[ "$title" =~ $breaking_regex ]] || [[ "$title" =~ $breaking_type_regex ]]; then
+    echo changed
+  elif [[ "$title" =~ $feat_regex ]]; then
+    echo added
+  elif [[ "$title" =~ $fix_regex ]]; then
+    echo fixed
+  elif [[ "$title" =~ $changed_regex ]]; then
+    echo changed
+  elif [[ "$title" =~ ^[Aa]dd[[:space:]] ]]; then
+    echo added
+  fi
 }
 
 pr_numbers_since() {
   git log "${SINCE}..${UNTIL}" --pretty=format:'%s' \
-    | grep -v '^chore(release):' \
-    | grep -oE '#[0-9]+' \
-    | tr -d '#' \
+    | awk '
+        !/^chore\(release\):/ {
+          while (match($0, /#[0-9]+/)) {
+            print substr($0, RSTART + 1, RLENGTH - 1)
+            $0 = substr($0, RSTART + RLENGTH)
+          }
+        }
+      ' \
     | sort -nu
+}
+
+commit_subjects_without_pr() {
+  git log "${SINCE}..${UNTIL}" --pretty=format:'%s' \
+    | awk '!/^chore\(release\):/ && $0 !~ /#[0-9]+/ { print }'
+}
+
+display_text() {
+  local subject="$1"
+  if [[ "$subject" == *": "* ]]; then
+    echo "${subject#*: }"
+  else
+    echo "$subject"
+  fi
 }
 
 append() {
@@ -70,6 +101,14 @@ while read -r num; do
     done
   fi
 done < <(pr_numbers_since)
+
+while read -r subject; do
+  [[ -z "$subject" ]] && continue
+  section=$(section_for "$subject")
+  [[ -n "$section" ]] || continue
+
+  append "$section" "- $(display_text "$subject")"
+done < <(commit_subjects_without_pr)
 
 if [[ ${#added[@]} -eq 0 && ${#fixed[@]} -eq 0 && ${#changed[@]} -eq 0 ]]; then
   changed=("- Chart update")
