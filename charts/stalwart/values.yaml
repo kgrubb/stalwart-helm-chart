@@ -1,7 +1,7 @@
 # Container image.
 image:
   repository: stalwartlabs/stalwart
-  tag: "v0.16.11"
+  tag: "v0.16.12"
   pullPolicy: IfNotPresent
 
 # Number of pods in the StatefulSet.
