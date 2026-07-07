@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.8] - 2026-07-07
+
+### Fixed
+- harden changelog generation and CI upgrade commit messages ([#33](https://github.com/kgrubb/stalwart-helm-chart/pull/33))
+  - Fix changelog generation to recognize scoped conventional commits (`fix(ci):`, `fix(image):`), `Add`-style PR titles, and direct main commits that have no linked PR number.
+  - Backfill `CHANGELOG.md` entries for chart releases `0.7.3` through `0.7.7` (GitHub release bodies were already updated separately).
+  - Standardize the Upgrade Stalwart workflow on scoped conventional commit subjects such as `fix(image): bump Stalwart app image to vX.Y.Z` so future automated releases produce clean changelog lines without falling back to "Chart update".
+
+
+
 ## [0.7.7] - 2026-07-07
 
 ### Added
