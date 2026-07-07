@@ -103,6 +103,8 @@ mailService:
   # Optional fixed name (e.g. stalwart-mail) when adopting a hand-maintained LoadBalancer Service.
   name: ""
   type: LoadBalancer
+  # Local keeps MetalLB L2 ARP on nodes with mail pods (avoids broken cross-node kube-proxy paths).
+  externalTrafficPolicy: ""
   loadBalancerIP: ""
   annotations: {}
 

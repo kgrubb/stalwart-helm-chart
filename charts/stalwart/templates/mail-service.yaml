@@ -11,6 +11,9 @@ metadata:
   {{- end }}
 spec:
   type: {{ .Values.mailService.type }}
+  {{- with .Values.mailService.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ . | quote }}
+  {{- end }}
   {{- with .Values.mailService.loadBalancerIP }}
   loadBalancerIP: {{ . | quote }}
   {{- end }}

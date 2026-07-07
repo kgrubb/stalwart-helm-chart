@@ -211,6 +211,10 @@
           "enum": ["LoadBalancer", "NodePort"]
         },
         "loadBalancerIP": { "type": "string" },
+        "externalTrafficPolicy": {
+          "type": "string",
+          "enum": ["", "Cluster", "Local"]
+        },
         "annotations": {
           "type": "object",
           "additionalProperties": { "type": "string" }
