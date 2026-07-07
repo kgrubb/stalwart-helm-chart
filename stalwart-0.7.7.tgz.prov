@@ -1,0 +1,58 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/kgrubb/stalwart-helm-chart/issues
+    - name: source
+      url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/signKey: |
+    fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
+    url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+apiVersion: v2
+appVersion: v0.16.12
+description: Helm chart for the Stalwart mail and collaboration server
+home: https://stalw.art
+icon: https://kgrubb.github.io/stalwart-helm-chart/logo.svg
+keywords:
+- - mail
+- - smtp
+- - imap
+- - jmap
+- - stalwart
+maintainers:
+- - email: 8471701+kgrubb@users.noreply.github.com
+  name: kgrubb
+  url: https://github.com/kgrubb
+name: stalwart
+sources:
+- - https://github.com/stalwartlabs/stalwart
+- - https://stalw.art/docs/cluster/orchestration/kubernetes/
+- - https://github.com/kgrubb/stalwart-helm-chart
+type: application
+version: 0.7.7
+
+...
+files:
+  stalwart-0.7.7.tgz: sha256:c30b7e25383b1154e40849f985703ae3ea4b8f5c67055484b4c91e08274d2398
+-----BEGIN PGP SIGNATURE-----
+
+wsFcBAEBCgAQBQJqTQOMCRDKmZpzOV9F/QAA/fIQAKC+P0ODsSlnk4EpOmaMctdG
+rgxFvui7rrlUFs8aIGBz2o2A8ewuYu/3pr2vDboDcyho7WiW0Xi0ZD0y5sAuEXcx
+mzSqpwr/Tr4rrwrzNE0rBw0kMf5j9OWMzDz1s4eLl3WULeP8usWRrIVCdiVpStuo
+y5PG1cufcMcxvw+8CkXQWeB5rcptvqhrfgu1W5avNmd0vNneNK6t6u8e+BY1kvp0
+FQdhOHT7gE6fL7Yoeli/nLS2Q+auRdwGmeW3RPoTNcTdn2G3sG/QS7E16tcG+sjh
+3fEueXPLPNDr2mVXpT5jnNwoQNf8JFFwYTx60S1LqGsMPpqbcOo80yb7QQJ1w9oU
+dzPRtg0PbMz5KNT/BQt1HBqzE7CP2q71Y0Dt90/qLSFn3fSscHzQ4fTxb21CwJ4t
+lEBsHbEh+ggB5oTqgUTRNnEP1LUe1Kgr6WLq8DlYCCztV8jNs+Lutp+5bCEUbLYL
+KcSKs29BGxzxT8F8p1t4DHKTmJ494k7sHbHBkrKLWuuhcm5M6+u9BMQtFG0IzYjN
+dj2cNZokmTgD4keldPaUKzne6Z0tMTVaLhFQ/svpCS6kM8na1Vyp2ciHviVM2gGw
+a6vrGbkunJ/1dQhuhFhePQNY5IK3qEorLvr9Xdk43Z5I7nMp2MO6867G9Nvgi4c4
+GsKFjDLG+WeIR/qk2KXy
+=yLcO
+-----END PGP SIGNATURE-----
