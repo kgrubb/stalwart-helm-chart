@@ -27,6 +27,14 @@ spec:
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: stalwart
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -64,10 +72,16 @@ spec:
             {{- include "stalwart.recoveryAdmin.env" . | nindent 12 }}
             {{- end }}
           {{- end }}
-          {{- if or (not (empty .Values.extraSecretEnv)) (and (include "stalwart.recoveryAdminOnPod" .) (not .Values.recoveryAdmin.existingSecret) .Values.recoveryAdmin.password) }}
+          {{- $chartEnvFrom := or (not (empty .Values.extraSecretEnv)) (and (include "stalwart.recoveryAdminOnPod" .) (not .Values.recoveryAdmin.existingSecret) .Values.recoveryAdmin.password) }}
+          {{- if or $chartEnvFrom .Values.envFrom }}
           envFrom:
+            {{- if $chartEnvFrom }}
             - secretRef:
                 name: {{ include "stalwart.fullname" . }}-env
+            {{- end }}
+            {{- with .Values.envFrom }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           {{- end }}
           ports:
             - name: smtp
