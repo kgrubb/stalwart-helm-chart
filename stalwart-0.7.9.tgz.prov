@@ -1,0 +1,58 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/kgrubb/stalwart-helm-chart/issues
+    - name: source
+      url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/signKey: |
+    fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
+    url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+apiVersion: v2
+appVersion: v0.16.13
+description: Helm chart for the Stalwart mail and collaboration server
+home: https://stalw.art
+icon: https://kgrubb.github.io/stalwart-helm-chart/logo.svg
+keywords:
+- - mail
+- - smtp
+- - imap
+- - jmap
+- - stalwart
+maintainers:
+- - email: 8471701+kgrubb@users.noreply.github.com
+  name: kgrubb
+  url: https://github.com/kgrubb
+name: stalwart
+sources:
+- - https://github.com/stalwartlabs/stalwart
+- - https://stalw.art/docs/cluster/orchestration/kubernetes/
+- - https://github.com/kgrubb/stalwart-helm-chart
+type: application
+version: 0.7.9
+
+...
+files:
+  stalwart-0.7.9.tgz: sha256:ffc804438451d61198f12d3d990efd9ca011e7b10549c7546f7dec5d1b0d5377
+-----BEGIN PGP SIGNATURE-----
+
+wsFcBAEBCgAQBQJqVF5ZCRDKmZpzOV9F/QAArisQAGkGBpITym3hdp2SLdDMEd8q
+Io2IppPozZW8F2HwSq/X5i9EMjtwVID81KtTwtb/vpSTx2hG2pzUrnDzGIjmX+IT
+Y0/b4fsqHMGA4caD8514nNNu8zGvb1uuyjHM+aGw0jl0q22SJH4+HTbXC/2xUr5i
++mBJbVN1pFCnSkBDbUNDkSAyB3i+I7wbCHSErGb9lgpGnbUDyYa2YaS9TKStZ7vY
+2DDS+U+ikaOWgV+DbGGa38arU8KbXJidNx7R2xxo9ggZoQbmkVO/3gdAKCoC9cxV
+RdLCrUbP1Suo4fmkGyVXR7weRe7HNd945PYaQ3kkGR5H1MqS5HWlXJPbwZMkH/kN
+/3LfREN6RZfR7nnHhpGxWcwPv2cnQMs+kTARdu+6lg1GizsclPham6kvf/UBXOFZ
+Ukpvw2Ob9qVgh7EjfJCzb14I0FVJwQZZRtlHSD8nj5v2gZ81TgYloRezfDB5ro1k
+TryIyyot1B95t/ZyY9/xxZmR7C/TjoejHOGf4/Tjh5LD9o9KGPG2HtGF8ajyXNQh
+7na5LUFO+2GNgm3fYAs0wGoWq4ztyb6SClrKxOY8z7iIbFAGvvjFMvk4otglLTnn
+PzONEF5rrAlTSOAHnP5saj5YlcWV+RfeCvXHgXFeCCLTCHS34fpMxmZw7k0CosJ8
+gsuMXYEB9a6HYFV3Q6+m
+=LDl3
+-----END PGP SIGNATURE-----
