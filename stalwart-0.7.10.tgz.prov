@@ -1,0 +1,58 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/kgrubb/stalwart-helm-chart/issues
+    - name: source
+      url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/signKey: |
+    fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
+    url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+apiVersion: v2
+appVersion: v0.16.14
+description: Helm chart for the Stalwart mail and collaboration server
+home: https://stalw.art
+icon: https://kgrubb.github.io/stalwart-helm-chart/logo.svg
+keywords:
+- - mail
+- - smtp
+- - imap
+- - jmap
+- - stalwart
+maintainers:
+- - email: 8471701+kgrubb@users.noreply.github.com
+  name: kgrubb
+  url: https://github.com/kgrubb
+name: stalwart
+sources:
+- - https://github.com/stalwartlabs/stalwart
+- - https://stalw.art/docs/cluster/orchestration/kubernetes/
+- - https://github.com/kgrubb/stalwart-helm-chart
+type: application
+version: 0.7.10
+
+...
+files:
+  stalwart-0.7.10.tgz: sha256:6b3f830b9e146b53968036ef5675171d1c3d3a163ea58cbc26886dde9d7dc823
+-----BEGIN PGP SIGNATURE-----
+
+wsFcBAEBCgAQBQJqXueqCRDKmZpzOV9F/QAAtuIQACeKF77cyxnmr2D/a7rkImNB
+FKmLiaV5cQeH7RHz4YrMAtnFTLSRffK7Vwi8Q2pd9IS/VPv3gAMFGOc/OcjGDWiv
+cfXpwpqj2LUaYJbhX60iELXAJ1Mwp84ra4eu2/SADiR3rGvlvH6OciHRgMXJD+GO
+XnNY/9WHYdMny4bP+mjZfsIc8x79b/S8jE7XJH858/+5hr/J4Ec/iUljOrpeiTam
+Eeg31XqTKpVMQi5591UGQbrTVxTDfJmGC3nvRg0Xaou2Likf4pANE9/cXsvQPFBo
++TRvZ1VYGm29GTO77pLuvesn0Zhn5YXlWebqNjh1b1mtpQoh3fN/mvyYBY6tf4hQ
+e/YJnfcWOztowx3P+vMUj4Nak5A6tv122njhqUzd4ksJtM9jmNX0Hv40CiZtwkVc
+Rn9tKBPKMtJNMWi7bg1rp7VHyUZAz22jFdmJTyrOEuTv1QeRa9cRK6ULBZiRkbLR
+PY9yk0qX63B2Y/VmvsTFec85srncACd9jW4Ykw0pSabh7BcjXwmbQXGUgab5cxIm
+Pn1jloP7hkXBZnIO2DwcieIly5QdzKOI5edsK7wwwtrCYDF1wRtAEU0IOezCHnR6
+ZZGOSpSzqxdICHFaFB72zDaTgbstYv446UfB95rFHghamNYbtnwvB6ODh1iLAbTU
+D2iXA5vK+HNDr2A4GRNc
+=UMUI
+-----END PGP SIGNATURE-----
