@@ -1,0 +1,58 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/kgrubb/stalwart-helm-chart/issues
+    - name: source
+      url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/signKey: |
+    fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
+    url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+apiVersion: v2
+appVersion: v0.16.17
+description: Helm chart for the Stalwart mail and collaboration server
+home: https://stalw.art
+icon: https://kgrubb.github.io/stalwart-helm-chart/logo.svg
+keywords:
+- - mail
+- - smtp
+- - imap
+- - jmap
+- - stalwart
+maintainers:
+- - email: 8471701+kgrubb@users.noreply.github.com
+  name: kgrubb
+  url: https://github.com/kgrubb
+name: stalwart
+sources:
+- - https://github.com/stalwartlabs/stalwart
+- - https://stalw.art/docs/cluster/orchestration/kubernetes/
+- - https://github.com/kgrubb/stalwart-helm-chart
+type: application
+version: 0.7.13
+
+...
+files:
+  stalwart-0.7.13.tgz: sha256:05f1d607ec3b3ed0f8f7ccf1921630440e77fa99357d73cfb249216c5d95c97f
+-----BEGIN PGP SIGNATURE-----
+
+wsFcBAEBCgAQBQJqeoVRCRDKmZpzOV9F/QAAHQ0QAJkmKw4IvH2RRHWhhqQwTnJA
+HZhIg/k3juISVHtXL0UUrTWD5tc1TdtBlIwlrlv7xvnoO9afBR4EmAYfXy3RXyLo
+C3Qtky+BFOSglQV3tbNjTePjJ5dpU0poTdEJ+ag8LNVjt9ofva7tejLr3kb2Y/3+
+v5swdp7zfcKsBNzfvn1OarqQxgT04OyiZAA0WBgTnMtY63nYYl9IPIcDOn9zBN4X
+syD8+HrlvtC0SN+N5BHHjYE1Nu1w+W9tzv6qpQJYpSp8ll4Cyqg0y7EeLuG0nIca
+PIsS8N0TdJpc3eeAV+v9v08aXNaYOMwChgzo3fpQhZcTVqp6p3uvQs7MW9HRCpxT
+p3kpNNeybTXA4UK7xerEpR++1jn3PzOKwhm6EsaQaYX0pILtJ1s/ze9B2oDWFfjD
+ObKuvmCjw8Cr4UEzavPzgNuZvH3xVGuu9ujThnrElvWaZcoHNerRf9SMwqpJlZbc
+U8wzJc+hyhanigrV0VmHMj+gmPLJK8mts+GsPaho8sirgUUhE83+p47tBbUnBfFb
+nUvU3OzJx59DRAsSpRPl1Ete3kA/nOPs2/irzZvgXnqZqkfZ+5LPl5sSiwl9plu3
+44piegNr1E4ofX7UYFbFCNudOhPJZapL+qOl9SskP8SRFBXIPQowH4OcZm92tcWD
+0LtKL/O4xT59VF5f/ZNt
+=CAaZ
+-----END PGP SIGNATURE-----
