@@ -1,0 +1,58 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/kgrubb/stalwart-helm-chart/issues
+    - name: source
+      url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/signKey: |
+    fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
+    url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+apiVersion: v2
+appVersion: v0.16.19
+description: Helm chart for the Stalwart mail and collaboration server
+home: https://stalw.art
+icon: https://kgrubb.github.io/stalwart-helm-chart/logo.svg
+keywords:
+- - mail
+- - smtp
+- - imap
+- - jmap
+- - stalwart
+maintainers:
+- - email: 8471701+kgrubb@users.noreply.github.com
+  name: kgrubb
+  url: https://github.com/kgrubb
+name: stalwart
+sources:
+- - https://github.com/stalwartlabs/stalwart
+- - https://stalw.art/docs/cluster/orchestration/kubernetes/
+- - https://github.com/kgrubb/stalwart-helm-chart
+type: application
+version: 0.7.15
+
+...
+files:
+  stalwart-0.7.15.tgz: sha256:b714092a46ed313547f15039f324dfdc8cff7fafe236e78853febe74b2c41659
+-----BEGIN PGP SIGNATURE-----
+
+wsFcBAEBCgAQBQJqjPLzCRDKmZpzOV9F/QAAgZIQADrXebe6k4Uzi+CFyAfBxsCG
+iyUAtuofl3O+zcXRdlrf2b9m0+baQS9dAWqw+GGj4eQ9KQhJx5pGL95nJaleIonK
+dUIi3UXLqY1nNJrh125Lg521BY1yr3oaM9J8PJtNWrdI/ViqL1MpbTcwqB0JDYAh
+P1EQNqDccv5Bsd+lT2q9+BNBbArPHRPP97xXFZN/g58m+FBSTCoMvVihIO4jQcYY
+W+XBPFkW/8UhrxhspfxeThIU8SwW/lXhEltTVxtRQO6Gs0++V7NdakRz0rioYcH6
+ywiOT6Wtc5HTJIvKHHlr31E5b3aO3plmEJZ/kAObPMZRhX5Lm1sMP0hPQdeecKXq
+3MJJGnKiG2YwqN4zHUe0IoZcD3SFMszcJLSlLmS5Z7bQ3F4GpyH55B03w+zi4z0b
+Mt3u6TFZp34vrSwU3Qe7oa4pu/+gmlCq9NeY7DS7KdEAkkAR8Z1cAUnXUdcPSxkU
+ylWurRw0mmrPkU+kzsxSAcue4v9WGb2Bz729q/kkGR/AVtEWY8TXZ9fMLcnjrK4o
+uKE/wHgrUcNttk/zZucNGZaQViojXbzXf6aqRCorDy5VlkzjOD+ToZF0DLJmvWKh
+iULT6cH/pnN+WVqafndkxeFG4PLII509VSNA2tweah0KHecC3B4gq8CTjRC5FM+J
+5x2pHQ+dKduZesUmXo+x
+=MO//
+-----END PGP SIGNATURE-----
