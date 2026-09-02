@@ -41,6 +41,26 @@ extraEnv: {}
 # Extra environment variables injected from the managed Secret.
 extraSecretEnv: {}
 
+# Additional envFrom entries (ExternalSecret refs, etc.). Default: none.
+envFrom: []
+
+affinity: {}
+topologySpreadConstraints: []
+
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1
+
+metrics:
+  serviceMonitor:
+    enabled: false
+    namespace: ""
+    interval: 30s
+    scrapeTimeout: 10s
+    portName: mgmt
+    path: /metrics
+    labels: {}
+
 # Hook Job: domain, accounts, and OIDC directory via JMAP.
 bootstrap:
   enabled: false
