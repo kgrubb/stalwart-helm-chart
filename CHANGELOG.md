@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.18] - 2026-09-14
+
+### Fixed
+- bump Stalwart app image to v0.16.22
+
+
+
 ## [0.7.17] - 2026-09-07
 
 ### Fixed
