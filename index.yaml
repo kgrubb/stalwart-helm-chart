@@ -16,6 +16,45 @@ entries:
         url: https://kgrubb.github.io/stalwart-helm-chart/public.key
     apiVersion: v2
     appVersion: v0.16.24
+    created: "2026-09-30T17:34:01.586782156Z"
+    description: Helm chart for the Stalwart mail and collaboration server
+    digest: 178c3c047d02b61ca98b503ee09f202e4f106959ea5f8ef96ece2faf1cc77cc2
+    home: https://stalw.art
+    icon: https://kgrubb.github.io/stalwart-helm-chart/logo.svg
+    keywords:
+    - mail
+    - smtp
+    - imap
+    - jmap
+    - stalwart
+    maintainers:
+    - email: 8471701+kgrubb@users.noreply.github.com
+      name: kgrubb
+      url: https://github.com/kgrubb
+    name: stalwart
+    sources:
+    - https://github.com/stalwartlabs/stalwart
+    - https://stalw.art/docs/cluster/orchestration/kubernetes/
+    - https://github.com/kgrubb/stalwart-helm-chart
+    type: application
+    urls:
+    - stalwart-0.7.21.tgz
+    version: 0.7.21
+  - annotations:
+      artifacthub.io/category: integration-delivery
+      artifacthub.io/containsSecurityUpdates: "false"
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: support
+          url: https://github.com/kgrubb/stalwart-helm-chart/issues
+        - name: source
+          url: https://github.com/kgrubb/stalwart-helm-chart
+      artifacthub.io/prerelease: "false"
+      artifacthub.io/signKey: |
+        fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
+        url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+    apiVersion: v2
+    appVersion: v0.16.24
     created: "2026-09-28T05:02:46.2511536Z"
     description: Helm chart for the Stalwart mail and collaboration server
     digest: ae5764147e492e35404cb5697a76e242860102ee695e41f265309635a316cd70
@@ -1550,4 +1589,4 @@ entries:
     urls:
     - https://kgrubb.github.io/stalwart-helm-chart/stalwart-0.1.0.tgz
     version: 0.1.0
-generated: "2026-09-28T05:02:46.251314631Z"
+generated: "2026-09-30T17:34:01.587076217Z"
