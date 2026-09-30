@@ -1,0 +1,58 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/kgrubb/stalwart-helm-chart/issues
+    - name: source
+      url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/signKey: |
+    fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
+    url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+apiVersion: v2
+appVersion: v0.16.24
+description: Helm chart for the Stalwart mail and collaboration server
+home: https://stalw.art
+icon: https://kgrubb.github.io/stalwart-helm-chart/logo.svg
+keywords:
+- - mail
+- - smtp
+- - imap
+- - jmap
+- - stalwart
+maintainers:
+- - email: 8471701+kgrubb@users.noreply.github.com
+  name: kgrubb
+  url: https://github.com/kgrubb
+name: stalwart
+sources:
+- - https://github.com/stalwartlabs/stalwart
+- - https://stalw.art/docs/cluster/orchestration/kubernetes/
+- - https://github.com/kgrubb/stalwart-helm-chart
+type: application
+version: 0.7.21
+
+...
+files:
+  stalwart-0.7.21.tgz: sha256:178c3c047d02b61ca98b503ee09f202e4f106959ea5f8ef96ece2faf1cc77cc2
+-----BEGIN PGP SIGNATURE-----
+
+wsFcBAEBCgAQBQJqvUgFCRDKmZpzOV9F/QAApQsQADBZ9tgxhOGApK2/Vioi99W/
+L9Iq4ns7ax34v0bnfSwEcy9G+DDY5FSB6n8gDqDVWIPkNIT0iPuVjW6mVy7+jvWa
+2ttdM7D7uGl8khOWt55JyTCtJCJVZX2IfA0mfm3X/bZUchA+y508st4ecVwfWq5K
+f/0+CWjyEryw+F96EC+E7KOq+dGiFlRdi4zKmdt0kK7pOmS96VwbPKeYWOIwRkbh
+Z2NpIQynCBQM/gMAImw8HpCUTEdHKdQ1s1BXxML8VAJg9CH4ashbKGppbUPOLli9
+vEckBf9b0Uf3dDpJxhsUo+HshV1iEPOWNGTlwwvXAeTxAMdW1NPsBAGKY3/CqmU9
+d8ruI5RV2X8Sw2J11c3psKeLF/RJt/55m2moUm1Qi/sUl8AWR5ndilqO0IwoB5yi
+e/TWVjSj433FaKilPCIwZ3q29cVPDHPtJYFOu8bAAifgjUq2d3w2cT74Rw8NrEMw
+y0FHu6KnW7XiJgG7hCO/NwJp7sX4ru9uXS3q70qyc1wM0O8A5dFQnkTaJ1t1IsjZ
+0Z9ZG5bxlMYWo6YkUdVlsrKmf1WC/ygS492GlWM03tSJ0FgILfkV5UfKbdNVyPLP
+zXyN4j1bdlCE7QuNILRg4ghZyF0d2flYaroaFCcbhLBiK3Y4uWQI6O67ZU+XzBeE
+yS08v1tdfr8zih/F2rts
+=dx42
+-----END PGP SIGNATURE-----
