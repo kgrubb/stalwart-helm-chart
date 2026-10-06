@@ -26,7 +26,101 @@ Deploys [Stalwart Mail Server](https://stalw.art/) as a StatefulSet with persist
 | `resources` | `{}` | Set CPU/memory requests and limits per environment |
 | `podSecurityContext` | non-root, `RuntimeDefault` seccomp | Runs as UID/GID 2000 |
 | `containerSecurityContext` | drops all caps, keeps `NET_BIND_SERVICE` | Needed for privileged mail ports |
+| `envFrom` | `[]` | Optional extra `envFrom` entries (e.g. DB password secrets) |
+| `affinity` | `{}` | Optional pod affinity/anti-affinity |
+| `topologySpreadConstraints` | `[]` | Optional topology spread |
+| `podDisruptionBudget.enabled` | `false` | Enable PDB for multi-replica installs |
+| `metrics.serviceMonitor.enabled` | `false` | Prometheus Operator ServiceMonitor |
 
 `bootstrap` provisions domain, accounts, and an external OIDC directory. Register the IdP app and Secrets outside the chart. Set `STALWART_PUBLIC_URL` and route ingress to `mgmt` for WebUI login.
 
-See [values.yaml](values.yaml) and the [Stalwart Kubernetes docs](https://stalw.art/docs/cluster/orchestration/kubernetes/) for clustering, external stores, and restricted Pod Security Standards.
+See [values.yaml](values.yaml) and the [Stalwart Kubernetes docs](https://stalw.art/docs/cluster/orchestration/kubernetes/) for clustering and external stores.
+
+## Upgrading from 0.7.x to 0.8.x
+
+### Breaking changes
+
+Chart **0.8.x** adds optional HA-related values (`envFrom`, `affinity`, `topologySpreadConstraints`, `podDisruptionBudget`, `metrics.serviceMonitor`). **Defaults are unchanged** — a straight `helm upgrade` on a single-replica RocksDB install needs no config changes.
+
+You only need the steps below if you are moving to a **shared DataStore** (PostgreSQL, FoundationDB, etc.) for multi-replica HA. That is a **one-time data migration**, not a chart toggle. See Stalwart’s [data store](https://stalw.art/docs/storage/data/) and [migration](https://stalw.art/docs/management/maintenance/migration/) docs for background.
+
+| Key | Default | When enabling HA |
+| --- | --- | --- |
+| `envFrom` | `[]` | Mount secrets (e.g. `STALWART_DB_PASSWORD`) |
+| `affinity` / `topologySpreadConstraints` | empty | Spread pods across nodes |
+| `podDisruptionBudget.enabled` | `false` | `true` with multiple replicas |
+| `metrics.serviceMonitor.enabled` | `false` | Prometheus Operator scrape |
+
+### RocksDB → PostgreSQL migration (one-off)
+
+Prerequisites: PostgreSQL is reachable from the cluster, and a Secret named `stalwart-db` (with `STALWART_DB_PASSWORD`) exists in the Stalwart namespace. Snapshot the RocksDB PVC first.
+
+The [migration script](../../scripts/migrate-rocksdb-to-postgres.sh) scales Stalwart to 0, applies a single in-cluster Job, streams logs, and exits. Requires `kubectl` and `envsubst` on the machine you run it from (your laptop, a CI runner, or a shell in the cluster).
+
+```bash
+chmod +x scripts/migrate-rocksdb-to-postgres.sh
+./scripts/migrate-rocksdb-to-postgres.sh
+```
+
+Another namespace, or only Postgres host differs:
+
+```bash
+./scripts/migrate-rocksdb-to-postgres.sh mail
+POSTGRES_HOST=postgres.example.svc ./scripts/migrate-rocksdb-to-postgres.sh
+```
+
+Manual apply (same manifest the script renders):
+
+```bash
+export NAMESPACE=stalwart DATA_CLAIM=data-stalwart-stalwart-0 STALWART_IMAGE=stalwartlabs/stalwart:v0.16.11
+export STORAGE_CLASS=longhorn DB_SECRET_NAME=stalwart-db POSTGRES_HOST=postgres-rw.postgres.svc.cluster.local
+export POSTGRES_PORT=5432 POSTGRES_DATABASE=stalwart POSTGRES_USER=stalwart
+envsubst < scripts/migrate-rocksdb-to-postgres.yaml.tpl | kubectl apply -f -
+kubectl wait -n stalwart --for=condition=complete job/stalwart-migrate --timeout=1h
+kubectl logs -n stalwart job/stalwart-migrate
+```
+
+After a successful run, upgrade Helm values to PostgreSQL, redeploy, configure a **Coordinator** in the WebUI, then scale out.
+
+**Helm values (PostgreSQL, single replica)**
+
+```yaml
+replicaCount: 1
+config:
+  "@type": PostgreSql
+  host: postgres-rw.postgres.svc.cluster.local
+  port: 5432
+  database: stalwart
+  authUsername: stalwart
+  authSecret:
+    "@type": EnvironmentVariable
+    variableName: STALWART_DB_PASSWORD
+persistence:
+  enabled: false
+envFrom:
+  - secretRef:
+      name: stalwart-db
+```
+
+**Scale to HA (after Coordinator is configured)**
+
+```yaml
+replicaCount: 2
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: stalwart
+          topologyKey: kubernetes.io/hostname
+metrics:
+  serviceMonitor:
+    enabled: true
+    labels:
+      release: prometheus
+```

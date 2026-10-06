@@ -1,0 +1,23 @@
+# CI fixture: multi-replica install with PostgreSQL and observability.
+replicaCount: 2
+podDisruptionBudget:
+  enabled: true
+config:
+  "@type": PostgreSql
+  host: postgres.example.svc
+  port: 5432
+  database: stalwart
+  authUsername: stalwart
+  authSecret:
+    "@type": EnvironmentVariable
+    variableName: STALWART_DB_PASSWORD
+persistence:
+  enabled: false
+envFrom:
+  - secretRef:
+      name: stalwart-db
+metrics:
+  serviceMonitor:
+    enabled: true
+    labels:
+      release: prometheus
