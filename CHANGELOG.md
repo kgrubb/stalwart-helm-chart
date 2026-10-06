@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.21] - 2026-10-06
+
+### Changed
+- Removes the temporary `copy-gpg-secret.yml` workflow after a successful copy to `kgrubb/nostalgiatv-helm-chart` ([#35](https://github.com/kgrubb/stalwart-helm-chart/pull/35))
+- remove one-shot GPG copy workflow
+
+### Fixed
+- bump Stalwart app image to v0.16.25
+
+
+
 ## [0.7.20] - 2026-09-28
 
 ### Fixed
