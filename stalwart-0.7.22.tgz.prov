@@ -1,0 +1,58 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/kgrubb/stalwart-helm-chart/issues
+    - name: source
+      url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/signKey: |
+    fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
+    url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+apiVersion: v2
+appVersion: v0.16.26
+description: Helm chart for the Stalwart mail and collaboration server
+home: https://stalw.art
+icon: https://kgrubb.github.io/stalwart-helm-chart/logo.svg
+keywords:
+- - mail
+- - smtp
+- - imap
+- - jmap
+- - stalwart
+maintainers:
+- - email: 8471701+kgrubb@users.noreply.github.com
+  name: kgrubb
+  url: https://github.com/kgrubb
+name: stalwart
+sources:
+- - https://github.com/stalwartlabs/stalwart
+- - https://stalw.art/docs/cluster/orchestration/kubernetes/
+- - https://github.com/kgrubb/stalwart-helm-chart
+type: application
+version: 0.7.22
+
+...
+files:
+  stalwart-0.7.22.tgz: sha256:2ab64b2def9f3f779de74d6f374751b05652530aadebbe138c36b0b62ad7c285
+-----BEGIN PGP SIGNATURE-----
+
+wsFcBAEBCgAQBQJqzHIsCRDKmZpzOV9F/QAALx4QAFF4Xv8ROaWn7U6YtfXVUBgz
+V19fb5oFqQWBQ5zFieh8hwZ8gTJwHa6MEA75mRYh7ieAxjN5wpUzNgtmjJo68kWk
+t1qTpBo+cwhbYG+MCzxIMBwdKYfPEfYi7BXIlG2+V2qqtmhL23U+XwCgsfADVxwf
+Ck18bOhDfAvfN4O0XLRvhEFyFG7PBqBdIpkeXNJfr7DN91t/M/qQLVUei/IrbqqN
+aOR/WFkUei6MAvikp4pE6EpWw8ZZEOtiLBrZwwiAZ3HIf3/TDwLFbJsdErH+uGKm
+0GY1Pq5NtyUl9ANqp7ZlcDqLMrNMQyQtIGLNIzC7ry7oSQ6O0BAezsSl5oegY2Ob
+FgNqVca6wvBs0eIlEG0DvDHA3ZXKZflASUDhIuX96U36Lyr6ZdfZF3LUEEjZnq/E
+SSHo9AlWRIsfgrzfbrv7XSls9UkGG79/c2mPZ2suWK8NdYeBP3qJFbw18iRBH9cg
+5EjexJb0lFbBy+s7sh9JCqwyxYlQMXLajhQY//LpOO1tsO8Aq9KwEoRhzTjo6i5a
+6Nm5p2cOU4jHkRyn97VyVn3EBjgGpbO96x3XObbs8ZMPdKEqHUSlUoRouPC/Ny7Z
+i1K0+E8OVlhfBnxYsDIbB2XH5Ln48FeLpoEGTTVybkTxp/+h16eaDkBWGZ1i4DUX
+tMe09H+7Z90v4gQBNlst
+=OZHr
+-----END PGP SIGNATURE-----
