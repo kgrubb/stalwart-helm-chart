@@ -66,6 +66,7 @@ jobs:
             -f charts/stalwart/ci/migrate-values.yaml \
             > /tmp/migrate-render.yaml
           grep -q 'component: migrate' /tmp/migrate-render.yaml
+          grep -q 'app.kubernetes.io/component=server' /tmp/migrate-render.yaml
           if helm template test charts/stalwart \
             -f charts/stalwart/ci/ha-cluster-values.yaml \
             --set config.@type=RocksDb 2>/dev/null; then

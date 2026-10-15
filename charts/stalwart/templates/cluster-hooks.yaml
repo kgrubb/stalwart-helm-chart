@@ -35,13 +35,15 @@ metadata:
 rules:
   - apiGroups: ["apps"]
     resources: ["statefulsets"]
-    verbs: ["get", "list", "watch", "update", "patch", "delete"]
+    verbs: ["get", "list", "watch", "update", "patch"{{- if $doMigrate }}, "delete"{{- end }}]
   - apiGroups: [""]
     resources: ["pods"]
-    verbs: ["get", "list", "watch", "delete"]
+    verbs: ["get", "list", "watch"{{- if $doMigrate }}, "delete"{{- end }}]
+  {{- if $doMigrate }}
   - apiGroups: [""]
     resources: ["configmaps"]
     verbs: ["get", "list", "create", "update", "patch"]
+  {{- end }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -119,8 +121,8 @@ spec:
               kubectl get sts -n "$ns" "$sts" >/dev/null 2>&1 || exit 0
               kubectl scale sts -n "$ns" "$sts" --replicas=0
               kubectl wait -n "$ns" --for=delete pod \
-                -l "app.kubernetes.io/name=stalwart,app.kubernetes.io/instance=$STALWART_INSTANCE" \
-                --timeout=300s || true
+                -l "app.kubernetes.io/name=$STALWART_NAME,app.kubernetes.io/instance=$STALWART_INSTANCE,app.kubernetes.io/component=server" \
+                --timeout=300s
               vct="$(kubectl get sts -n "$ns" "$sts" -o jsonpath='{.spec.volumeClaimTemplates}' 2>/dev/null || true)"
               if [ -n "$vct" ] && [ "$vct" != "null" ] && [ "$vct" != "[]" ]; then
                 kubectl delete sts -n "$ns" "$sts" --cascade=orphan
@@ -131,6 +133,8 @@ spec:
               value: {{ .Release.Namespace | quote }}
             - name: STALWART_STS_NAME
               value: {{ $name | quote }}
+            - name: STALWART_NAME
+              value: {{ include "stalwart.name" . | quote }}
             - name: STALWART_INSTANCE
               value: {{ .Release.Name | quote }}
         - name: migrate
