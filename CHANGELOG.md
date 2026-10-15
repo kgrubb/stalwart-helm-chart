@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-10-15
+
+### Added
+- flip-values clustering (apply + opt-in migrate) ([#31](https://github.com/kgrubb/stalwart-helm-chart/pull/31))
+  - Clustering knobs: `envFrom`, affinity, topology spread, PDB, ServiceMonitor.
+  - When `coordinator` is set: wait for ready, `stalwart-cli apply`, roll StatefulSet (single-upgrade greenfield with `replicaCount >= 2`).
+  - Opt-in `migration.enabled` + `migration.dataClaim` one-shot pre-upgrade Job for RocksDB → shared store.
+  - Pinned `stalwartlabs/cli:1.0.13`. Fail-closed when `replicaCount > 1` without shared store / coordinator / recovery admin.
+- flip-values clustering via apply and opt-in migrate
+
+### Changed
+- wait for ready with curl instead of python
+
+### Fixed
+- migrate wait selects server pods only
+
+
+
 ## [0.7.22] - 2026-10-12
 
 ### Changed
