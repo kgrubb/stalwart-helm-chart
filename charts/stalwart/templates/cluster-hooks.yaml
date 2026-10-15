@@ -1,0 +1,284 @@
+{{- include "stalwart.cluster.validate" . }}
+{{- $apply := not (empty .Values.coordinator) }}
+{{- if and .Values.migration.enabled (not .Values.migration.dataClaim) }}
+{{- fail "migration.enabled requires migration.dataClaim" }}
+{{- end }}
+{{- if and .Values.migration.enabled (eq (index .Values.config "@type" | toString) "RocksDb") }}
+{{- fail "migration.enabled requires a shared DataStore (config.@type must not be RocksDb)" }}
+{{- end }}
+{{- $name := include "stalwart.fullname" . }}
+{{- $marker := printf "%s-migrated" $name }}
+{{- $doMigrate := and .Values.migration.enabled .Values.migration.dataClaim (not (lookup "v1" "ConfigMap" .Release.Namespace $marker)) }}
+{{- $url := default (printf "http://%s:%v" $name .Values.service.ports.mgmt) .Values.apply.apiUrl }}
+{{- if or $apply $doMigrate }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ $name }}-hooks
+  labels:
+    {{- include "stalwart.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: pre-upgrade,post-install,post-upgrade
+    helm.sh/hook-weight: "-20"
+    helm.sh/hook-delete-policy: before-hook-creation
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ $name }}-hooks
+  labels:
+    {{- include "stalwart.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: pre-upgrade,post-install,post-upgrade
+    helm.sh/hook-weight: "-20"
+    helm.sh/hook-delete-policy: before-hook-creation
+rules:
+  - apiGroups: ["apps"]
+    resources: ["statefulsets"]
+    verbs: ["get", "list", "watch", "update", "patch"{{- if $doMigrate }}, "delete"{{- end }}]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"{{- if $doMigrate }}, "delete"{{- end }}]
+  {{- if $doMigrate }}
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "create", "update", "patch"]
+  {{- end }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ $name }}-hooks
+  labels:
+    {{- include "stalwart.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: pre-upgrade,post-install,post-upgrade
+    helm.sh/hook-weight: "-19"
+    helm.sh/hook-delete-policy: before-hook-creation
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ $name }}-hooks
+subjects:
+  - kind: ServiceAccount
+    name: {{ $name }}-hooks
+{{- end }}
+{{- if $doMigrate }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $name }}-migrate
+  labels:
+    {{- include "stalwart.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: pre-upgrade
+    helm.sh/hook-weight: "-18"
+    helm.sh/hook-delete-policy: before-hook-creation
+data:
+  migrate.sh: |
+{{ .Files.Get "files/migrate.sh" | indent 4 }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $name }}-migrate
+  labels:
+    {{- include "stalwart.labels" . | nindent 4 }}
+    app.kubernetes.io/component: migrate
+  annotations:
+    helm.sh/hook: pre-upgrade
+    helm.sh/hook-weight: "-5"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 3600
+  ttlSecondsAfterFinished: {{ .Values.migration.ttlSecondsAfterFinished }}
+  template:
+    metadata:
+      labels:
+        {{- include "stalwart.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: migrate
+    spec:
+      restartPolicy: Never
+      serviceAccountName: {{ $name }}-hooks
+      securityContext:
+        fsGroup: 2000
+        runAsUser: 2000
+        runAsGroup: 2000
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: prepare
+          image: {{ .Values.apply.kubectlImage | quote }}
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              ns="$STALWART_NAMESPACE" sts="$STALWART_STS_NAME"
+              kubectl get sts -n "$ns" "$sts" >/dev/null 2>&1 || exit 0
+              kubectl scale sts -n "$ns" "$sts" --replicas=0
+              kubectl wait -n "$ns" --for=delete pod \
+                -l "app.kubernetes.io/name=$STALWART_NAME,app.kubernetes.io/instance=$STALWART_INSTANCE,app.kubernetes.io/component=server" \
+                --timeout=300s
+              vct="$(kubectl get sts -n "$ns" "$sts" -o jsonpath='{.spec.volumeClaimTemplates}' 2>/dev/null || true)"
+              if [ -n "$vct" ] && [ "$vct" != "null" ] && [ "$vct" != "[]" ]; then
+                kubectl delete sts -n "$ns" "$sts" --cascade=orphan
+              fi
+          {{- include "stalwart.hooks.containerSecurity" (dict "uid" 65534) | nindent 10 }}
+          env:
+            - name: STALWART_NAMESPACE
+              value: {{ .Release.Namespace | quote }}
+            - name: STALWART_STS_NAME
+              value: {{ $name | quote }}
+            - name: STALWART_NAME
+              value: {{ include "stalwart.name" . | quote }}
+            - name: STALWART_INSTANCE
+              value: {{ .Release.Name | quote }}
+        - name: migrate
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/bin/sh", "/scripts/migrate.sh"]
+          {{- include "stalwart.hooks.containerSecurity" dict | nindent 10 }}
+          {{- with .Values.envFrom }}
+          envFrom:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            - name: STORE_JSON
+              value: {{ .Values.config | toJson | quote }}
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/stalwart
+            - name: scripts
+              mountPath: /scripts
+              readOnly: true
+            - name: export
+              mountPath: /export
+      containers:
+        - name: mark
+          image: {{ .Values.apply.kubectlImage | quote }}
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              kubectl create configmap -n "$STALWART_NAMESPACE" "$MIGRATION_MARKER" \
+                --from-literal=status=migrated --from-literal=claim="$DATA_CLAIM" \
+                --dry-run=client -o yaml | kubectl apply -f -
+          {{- include "stalwart.hooks.containerSecurity" (dict "uid" 65534) | nindent 10 }}
+          env:
+            - name: STALWART_NAMESPACE
+              value: {{ .Release.Namespace | quote }}
+            - name: MIGRATION_MARKER
+              value: {{ $marker | quote }}
+            - name: DATA_CLAIM
+              value: {{ .Values.migration.dataClaim | quote }}
+      volumes:
+        - name: scripts
+          configMap:
+            name: {{ $name }}-migrate
+            defaultMode: 0555
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ .Values.migration.dataClaim | quote }}
+        - name: export
+          emptyDir: {}
+{{- end }}
+{{- if $apply }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $name }}-apply
+  labels:
+    {{- include "stalwart.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-weight: "-3"
+    helm.sh/hook-delete-policy: before-hook-creation
+data:
+  plan.ndjson: |
+    {"@type":"update","object":"Coordinator","value":{{ .Values.coordinator | toJson }}}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $name }}-apply
+  labels:
+    {{- include "stalwart.labels" . | nindent 4 }}
+    app.kubernetes.io/component: apply
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-weight: "10"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: {{ .Values.apply.ttlSecondsAfterFinished }}
+  activeDeadlineSeconds: 900
+  template:
+    metadata:
+      labels:
+        {{- include "stalwart.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: apply
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: {{ $name }}-hooks
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: wait
+          image: curlimages/curl:8.12.1
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              curl -fsS --connect-timeout 5 --retry 60 --retry-delay 5 --retry-all-errors \
+                -u "${STALWART_USER}:${STALWART_PASSWORD}" \
+                "${STALWART_URL%/}/healthz/ready"
+          {{- include "stalwart.hooks.containerSecurity" dict | nindent 10 }}
+          env:
+            - name: STALWART_URL
+              value: {{ $url | quote }}
+            {{- include "stalwart.apply.authEnv" . | nindent 12 }}
+        - name: apply
+          image: {{ .Values.apply.image | quote }}
+          imagePullPolicy: IfNotPresent
+          args: ["apply", "--file", "/plan/plan.ndjson"]
+          {{- include "stalwart.hooks.containerSecurity" dict | nindent 10 }}
+          env:
+            - name: STALWART_URL
+              value: {{ $url | quote }}
+            {{- include "stalwart.apply.authEnv" . | nindent 12 }}
+          volumeMounts:
+            - name: plan
+              mountPath: /plan
+              readOnly: true
+      containers:
+        - name: restart
+          image: {{ .Values.apply.kubectlImage | quote }}
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              kubectl rollout restart "sts/$STALWART_STS_NAME" -n "$STALWART_NAMESPACE"
+              kubectl rollout status "sts/$STALWART_STS_NAME" -n "$STALWART_NAMESPACE" --timeout=600s
+          {{- include "stalwart.hooks.containerSecurity" dict | nindent 10 }}
+          env:
+            - name: STALWART_NAMESPACE
+              value: {{ .Release.Namespace | quote }}
+            - name: STALWART_STS_NAME
+              value: {{ $name | quote }}
+      volumes:
+        - name: plan
+          configMap:
+            name: {{ $name }}-apply
+{{- end }}

@@ -1,0 +1,4 @@
+# Overlay on ha-cluster-values.yaml to render the migrate Job.
+migration:
+  enabled: true
+  dataClaim: data-test-stalwart-0
