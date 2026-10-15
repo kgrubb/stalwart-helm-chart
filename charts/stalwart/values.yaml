@@ -41,6 +41,47 @@ extraEnv: {}
 # Extra environment variables injected from the managed Secret.
 extraSecretEnv: {}
 
+# Additional envFrom entries (ExternalSecret refs, etc.). Default: none.
+envFrom: []
+
+affinity: {}
+topologySpreadConstraints: []
+
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1
+
+metrics:
+  serviceMonitor:
+    enabled: false
+    namespace: ""
+    interval: 30s
+    scrapeTimeout: 10s
+    portName: mgmt
+    path: /metrics
+    labels: {}
+
+# Coordinator singleton. When set, a post-install/upgrade Job waits for
+# ready, runs `stalwart-cli apply`, then rolls the StatefulSet.
+# Required for replicaCount > 1. https://stalw.art/docs/management/cli/apply/
+coordinator: {}
+# coordinator:
+#   "@type": Redis
+#   url: redis://redis.redis.svc.cluster.local:6379
+
+apply:
+  image: stalwartlabs/cli:1.0.13
+  kubectlImage: rancher/kubectl:v1.32.2
+  apiUrl: ""
+  ttlSecondsAfterFinished: 300
+
+# One-shot RocksDB PVC -> shared store (pre-upgrade). Set once, then disable.
+# https://stalw.art/docs/management/maintenance/migration/
+migration:
+  enabled: false
+  dataClaim: ""
+  ttlSecondsAfterFinished: 86400
+
 # Hook Job: domain, accounts, and OIDC directory via JMAP.
 bootstrap:
   enabled: false

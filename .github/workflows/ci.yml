@@ -28,6 +28,11 @@ jobs:
       - name: Render chart
         run: |
           helm template test charts/stalwart
+          helm template test charts/stalwart | grep -q 'kind: StatefulSet'
+          if helm template test charts/stalwart | grep -qE 'kind: (PodDisruptionBudget|ServiceMonitor)'; then
+            echo "default render must not include PDB or ServiceMonitor"
+            exit 1
+          fi
           helm template test charts/stalwart --set recoveryAdmin.enabled=false
           helm template test charts/stalwart \
             --set recoveryAdmin.enabled=true \
@@ -46,6 +51,27 @@ jobs:
           helm template test charts/stalwart \
             --set mailService.enabled=true \
             --set mailService.name=stalwart-mail
+          helm template test charts/stalwart -f charts/stalwart/ci/ha-cluster-values.yaml \
+            > /tmp/ha-render.yaml
+          grep -q 'component: apply' /tmp/ha-render.yaml
+          grep -q 'plan.ndjson' /tmp/ha-render.yaml
+          grep -q '"object":"Coordinator"' /tmp/ha-render.yaml
+          grep -q 'wait-ready.py' /tmp/ha-render.yaml
+          grep -q 'rollout restart' /tmp/ha-render.yaml
+          grep -q 'kind: PodDisruptionBudget' /tmp/ha-render.yaml
+          grep -A20 'kind: PodDisruptionBudget' /tmp/ha-render.yaml | grep -q 'component: server'
+          grep -q 'stalwartlabs/cli:1.0.13' /tmp/ha-render.yaml
+          helm template test charts/stalwart \
+            -f charts/stalwart/ci/ha-cluster-values.yaml \
+            -f charts/stalwart/ci/migrate-values.yaml \
+            > /tmp/migrate-render.yaml
+          grep -q 'component: migrate' /tmp/migrate-render.yaml
+          if helm template test charts/stalwart \
+            -f charts/stalwart/ci/ha-cluster-values.yaml \
+            --set config.@type=RocksDb 2>/dev/null; then
+            echo "replicaCount > 1 with RocksDb must fail"
+            exit 1
+          fi
 
       - name: Lint manifests
         uses: stackrox/kube-linter-action@v1

@@ -36,12 +36,29 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
 {{- define "stalwart.recoveryAdminOnPod" -}}
-{{- or .Values.recoveryAdmin.enabled (and .Values.bootstrap.enabled .Values.recoveryAdmin.existingSecret) (include "stalwart.mailTls.enabled" .) -}}
+{{- or .Values.recoveryAdmin.enabled (and .Values.bootstrap.enabled .Values.recoveryAdmin.existingSecret) (and (not (empty .Values.coordinator)) .Values.recoveryAdmin.existingSecret) (include "stalwart.mailTls.enabled" .) -}}
+{{- end -}}
+
+{{- define "stalwart.cluster.validate" -}}
+{{- if gt (.Values.replicaCount | int) 1 -}}
+{{- if eq (index .Values.config "@type" | toString) "RocksDb" -}}
+{{- fail "replicaCount > 1 requires a shared DataStore (config.@type must not be RocksDb)" -}}
+{{- end -}}
+{{- if .Values.persistence.enabled -}}
+{{- fail "replicaCount > 1 requires persistence.enabled=false" -}}
+{{- end -}}
+{{- if empty .Values.coordinator -}}
+{{- fail "replicaCount > 1 requires coordinator (applied via stalwart-cli)" -}}
+{{- end -}}
+{{- if and (not .Values.recoveryAdmin.existingSecret) (not .Values.recoveryAdmin.password) -}}
+{{- fail "replicaCount > 1 requires recoveryAdmin credentials for the coordinator apply Job" -}}
+{{- end -}}
+{{- end -}}
 {{- end -}}
 
 {{- define "stalwart.needsChartEnvSecret" -}}
 {{- $inline := and (not .Values.recoveryAdmin.existingSecret) .Values.recoveryAdmin.password -}}
-{{- if or (not (empty .Values.extraSecretEnv)) (and (include "stalwart.recoveryAdminOnPod" .) (not .Values.recoveryAdmin.existingSecret) $inline) -}}true{{- end -}}
+{{- if or (not (empty .Values.extraSecretEnv)) (and (include "stalwart.recoveryAdminOnPod" .) (not .Values.recoveryAdmin.existingSecret) $inline) (and (not (empty .Values.coordinator)) $inline) -}}true{{- end -}}
 {{- end -}}
 
 {{- define "stalwart.recoveryAdmin.env" -}}
@@ -57,6 +74,41 @@ app.kubernetes.io/instance: {{ .Release.Name }}
       key: {{ .Values.recoveryAdmin.passwordKey }}
 - name: STALWART_RECOVERY_ADMIN
   value: "$(RECOVERY_USERNAME):$(RECOVERY_PASSWORD)"
+{{- end -}}
+
+{{- define "stalwart.apply.authEnv" -}}
+{{- if .Values.recoveryAdmin.existingSecret }}
+- name: STALWART_USER
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.recoveryAdmin.existingSecret }}
+      key: {{ .Values.recoveryAdmin.usernameKey }}
+- name: STALWART_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.recoveryAdmin.existingSecret }}
+      key: {{ .Values.recoveryAdmin.passwordKey }}
+{{- else }}
+- name: STALWART_USER
+  value: {{ .Values.recoveryAdmin.username | quote }}
+- name: STALWART_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "stalwart.fullname" . }}-env
+      key: STALWART_RECOVERY_PASSWORD
+{{- end }}
+{{- end -}}
+
+{{- define "stalwart.hooks.containerSecurity" -}}
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop: ["ALL"]
+  {{- with .uid }}
+  runAsUser: {{ . }}
+  runAsGroup: {{ . }}
+  runAsNonRoot: true
+  {{- end }}
 {{- end -}}
 
 {{- define "stalwart.mailTls.enabled" -}}

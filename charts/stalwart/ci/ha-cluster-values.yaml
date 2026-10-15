@@ -1,0 +1,37 @@
+# CI fixture: multi-replica install with PostgreSQL + Redis coordinator.
+replicaCount: 2
+recoveryAdmin:
+  password: ci-only
+config:
+  "@type": PostgreSql
+  host: postgres.example.svc
+  port: 5432
+  database: stalwart
+  authUsername: stalwart
+  authSecret:
+    "@type": EnvironmentVariable
+    variableName: STALWART_DB_PASSWORD
+persistence:
+  enabled: false
+envFrom:
+  - secretRef:
+      name: stalwart-db
+coordinator:
+  "@type": Redis
+  url: redis://redis.example.svc:6379
+podDisruptionBudget:
+  enabled: true
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: stalwart
+          topologyKey: kubernetes.io/hostname
+metrics:
+  serviceMonitor:
+    enabled: true
+    labels:
+      release: prometheus
