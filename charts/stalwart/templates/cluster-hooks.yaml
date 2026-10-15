@@ -198,8 +198,6 @@ metadata:
 data:
   plan.ndjson: |
     {"@type":"update","object":"Coordinator","value":{{ .Values.coordinator | toJson }}}
-  wait-ready.py: |
-{{ .Files.Get "files/wait-ready.py" | indent 4 }}
 ---
 apiVersion: batch/v1
 kind: Job
@@ -232,30 +230,32 @@ spec:
           type: RuntimeDefault
       initContainers:
         - name: wait
-          image: python:3.12-alpine
+          image: curlimages/curl:8.12.1
           imagePullPolicy: IfNotPresent
-          command: ["python3", "/apply/wait-ready.py"]
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              curl -fsS --connect-timeout 5 --retry 60 --retry-delay 5 --retry-all-errors \
+                -u "${STALWART_USER}:${STALWART_PASSWORD}" \
+                "${STALWART_URL%/}/healthz/ready"
           {{- include "stalwart.hooks.containerSecurity" dict | nindent 10 }}
           env:
             - name: STALWART_URL
               value: {{ $url | quote }}
             {{- include "stalwart.apply.authEnv" . | nindent 12 }}
-          volumeMounts:
-            - name: apply
-              mountPath: /apply
-              readOnly: true
         - name: apply
           image: {{ .Values.apply.image | quote }}
           imagePullPolicy: IfNotPresent
-          args: ["apply", "--file", "/apply/plan.ndjson"]
+          args: ["apply", "--file", "/plan/plan.ndjson"]
           {{- include "stalwart.hooks.containerSecurity" dict | nindent 10 }}
           env:
             - name: STALWART_URL
               value: {{ $url | quote }}
             {{- include "stalwart.apply.authEnv" . | nindent 12 }}
           volumeMounts:
-            - name: apply
-              mountPath: /apply
+            - name: plan
+              mountPath: /plan
               readOnly: true
       containers:
         - name: restart
@@ -274,8 +274,7 @@ spec:
             - name: STALWART_STS_NAME
               value: {{ $name | quote }}
       volumes:
-        - name: apply
+        - name: plan
           configMap:
             name: {{ $name }}-apply
-            defaultMode: 0555
 {{- end }}

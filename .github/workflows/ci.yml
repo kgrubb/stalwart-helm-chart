@@ -56,7 +56,7 @@ jobs:
           grep -q 'component: apply' /tmp/ha-render.yaml
           grep -q 'plan.ndjson' /tmp/ha-render.yaml
           grep -q '"object":"Coordinator"' /tmp/ha-render.yaml
-          grep -q 'wait-ready.py' /tmp/ha-render.yaml
+          grep -q 'healthz/ready' /tmp/ha-render.yaml
           grep -q 'rollout restart' /tmp/ha-render.yaml
           grep -q 'kind: PodDisruptionBudget' /tmp/ha-render.yaml
           grep -A20 'kind: PodDisruptionBudget' /tmp/ha-render.yaml | grep -q 'component: server'
