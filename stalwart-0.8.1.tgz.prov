@@ -1,0 +1,58 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/kgrubb/stalwart-helm-chart/issues
+    - name: source
+      url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/signKey: |
+    fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
+    url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+apiVersion: v2
+appVersion: v0.16.27
+description: Helm chart for the Stalwart mail and collaboration server
+home: https://stalw.art
+icon: https://kgrubb.github.io/stalwart-helm-chart/logo.svg
+keywords:
+- - mail
+- - smtp
+- - imap
+- - jmap
+- - stalwart
+maintainers:
+- - email: 8471701+kgrubb@users.noreply.github.com
+  name: kgrubb
+  url: https://github.com/kgrubb
+name: stalwart
+sources:
+- - https://github.com/stalwartlabs/stalwart
+- - https://stalw.art/docs/cluster/orchestration/kubernetes/
+- - https://github.com/kgrubb/stalwart-helm-chart
+type: application
+version: 0.8.1
+
+...
+files:
+  stalwart-0.8.1.tgz: sha256:6918d0e467a8fa985a58c8c434949e1daa4d9d636a22a365d021854b0803c49a
+-----BEGIN PGP SIGNATURE-----
+
+wsFcBAEBCgAQBQJq1Zp3CRDKmZpzOV9F/QAAbugQAGR1EA4Z4FX8vUXskK7Q5s5T
+MSGwGIklJqPvRbP21CRqZHdac5NX1zo0RsuLKDU0qNq8iNBY2JpwDz4KYbQv16QZ
+JSoalowCaOyiUgZs5FXdFWK6TmdKsv2LYzPqlt3vGCYjS+Jp7U/bPBj6C4co32bE
+ctXOlRG2/2wReXmqTBtmpocSGFSVXlYpLCtbpnc/iN+Di17kjTMFppzzmyPB819/
+lp0fpt4oEQT8OnF88jvPG3zOrmjbopJb2lT8NjPKqbphkJ936LJJaMDZOftN7maN
+eAttWBfql6RMDucRV7WkBB3vkF7a/ZK5phKrQ/xJXhXUBtoivknIOM1Goijqz5kh
+mkucZsMrLGwPLDKhEYQwnxAgUXZWwrkLVyy9pPfdiJDxypZisUIYMNBIQDlw1YX1
+sVu0/W4YLEB3Hk32q+De9m145n8ZmhVAFQJqxp4+owv6GfcnGZn5qsKAujHZJ9CP
+0nus5Ftz747nu0HMPjjshJYptxlEywMNS9qgeO0wpQ7+aQUJfteXlHF67YAQRIFz
+pilJSvPEviNMMbKtmnQoDV9j6icFXoXcykhDKQdy/LH53k3WCfRQGtCfB//Y261p
+0TAH7SZCWK49HUYWAxJDf58Aq7d86Z1QuP2o56Kd7O0nyvDHwcdzLPvwb+C/U4if
+cm6eOFopBREBHkUJqfPo
+=BlzM
+-----END PGP SIGNATURE-----
