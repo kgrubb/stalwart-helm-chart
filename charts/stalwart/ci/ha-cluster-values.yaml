@@ -16,9 +16,8 @@ persistence:
 envFrom:
   - secretRef:
       name: stalwart-db
-coordinator:
-  "@type": Redis
-  url: redis://redis.example.svc:6379
+valkey:
+  enabled: true
 podDisruptionBudget:
   enabled: true
 affinity:

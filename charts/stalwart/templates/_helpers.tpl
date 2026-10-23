@@ -35,8 +35,26 @@ app.kubernetes.io/part-of: {{ include "stalwart.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
+{{- define "stalwart.hasCoordinator" -}}
+{{- if or (not (empty .Values.coordinator)) .Values.valkey.enabled -}}true{{- end -}}
+{{- end -}}
+
+{{- define "stalwart.valkey.url" -}}
+redis://{{ printf "%s-valkey" .Release.Name }}.{{ .Release.Namespace }}.svc:6379
+{{- end -}}
+
+{{- define "stalwart.coordinatorObject" -}}
+{{- if not (empty .Values.coordinator) -}}
+{{- .Values.coordinator | toJson -}}
+{{- else if .Values.valkey.enabled -}}
+{{- dict "@type" "Redis" "url" (include "stalwart.valkey.url" .) | toJson -}}
+{{- else -}}
+{}
+{{- end -}}
+{{- end -}}
+
 {{- define "stalwart.recoveryAdminOnPod" -}}
-{{- or .Values.recoveryAdmin.enabled (and .Values.bootstrap.enabled .Values.recoveryAdmin.existingSecret) (and (not (empty .Values.coordinator)) .Values.recoveryAdmin.existingSecret) (include "stalwart.mailTls.enabled" .) -}}
+{{- or .Values.recoveryAdmin.enabled (and .Values.bootstrap.enabled .Values.recoveryAdmin.existingSecret) (and (include "stalwart.hasCoordinator" .) .Values.recoveryAdmin.existingSecret) (include "stalwart.mailTls.enabled" .) -}}
 {{- end -}}
 
 {{- define "stalwart.cluster.validate" -}}
@@ -47,8 +65,8 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- if .Values.persistence.enabled -}}
 {{- fail "replicaCount > 1 requires persistence.enabled=false" -}}
 {{- end -}}
-{{- if empty .Values.coordinator -}}
-{{- fail "replicaCount > 1 requires coordinator (applied via stalwart-cli)" -}}
+{{- if not (include "stalwart.hasCoordinator" .) -}}
+{{- fail "replicaCount > 1 requires coordinator or valkey.enabled" -}}
 {{- end -}}
 {{- if and (not .Values.recoveryAdmin.existingSecret) (not .Values.recoveryAdmin.password) -}}
 {{- fail "replicaCount > 1 requires recoveryAdmin credentials for the coordinator apply Job" -}}
@@ -58,7 +76,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 
 {{- define "stalwart.needsChartEnvSecret" -}}
 {{- $inline := and (not .Values.recoveryAdmin.existingSecret) .Values.recoveryAdmin.password -}}
-{{- if or (not (empty .Values.extraSecretEnv)) (and (include "stalwart.recoveryAdminOnPod" .) (not .Values.recoveryAdmin.existingSecret) $inline) (and (not (empty .Values.coordinator)) $inline) -}}true{{- end -}}
+{{- if or (not (empty .Values.extraSecretEnv)) (and (include "stalwart.recoveryAdminOnPod" .) (not .Values.recoveryAdmin.existingSecret) $inline) (and (include "stalwart.hasCoordinator" .) $inline) -}}true{{- end -}}
 {{- end -}}
 
 {{- define "stalwart.recoveryAdmin.env" -}}

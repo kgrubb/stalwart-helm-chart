@@ -1,5 +1,5 @@
 {{- include "stalwart.cluster.validate" . }}
-{{- $apply := not (empty .Values.coordinator) }}
+{{- $apply := include "stalwart.hasCoordinator" . }}
 {{- if and .Values.migration.enabled (not .Values.migration.dataClaim) }}
 {{- fail "migration.enabled requires migration.dataClaim" }}
 {{- end }}
@@ -201,7 +201,7 @@ metadata:
     helm.sh/hook-delete-policy: before-hook-creation
 data:
   plan.ndjson: |
-    {"@type":"update","object":"Coordinator","value":{{ .Values.coordinator | toJson }}}
+    {"@type":"update","object":"Coordinator","value":{{ include "stalwart.coordinatorObject" . }}}
 ---
 apiVersion: batch/v1
 kind: Job

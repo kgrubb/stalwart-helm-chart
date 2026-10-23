@@ -17,6 +17,7 @@ Deploys [Stalwart Mail Server](https://stalw.art/) as a StatefulSet with persist
 | `bootstrap.domain` | `""` | Mail domain name for bootstrap |
 | `bootstrap.oidc.issuerUrl` | `""` | OIDC provider issuer URL |
 | `config` | RocksDB data store | Only DataStore belongs in `config.json` |
+| `valkey.enabled` | `false` | Optional Valkey dependency for coordination |
 | `coordinator` | `{}` | Coordinator singleton (`stalwart-cli apply` when set) |
 | `apply.image` | `stalwartlabs/cli:1.0.13` | Pinned official CLI |
 | `apply.kubectlImage` | `rancher/kubectl:v1.32.2` | Rollout / migrate prepare |
@@ -43,9 +44,9 @@ See [values.yaml](values.yaml) and the [Stalwart Kubernetes docs](https://stalw.
 
 ## Clustering
 
-Upstream model: `config.json` is only the DataStore. Coordinator is applied with [`stalwart-cli apply`](https://stalw.art/docs/management/cli/apply/). Postgres/Redis (or NATS/Kafka) and the DB Secret stay outside the chart.
+Upstream model: `config.json` is only the DataStore. Coordinator is applied with [`stalwart-cli apply`](https://stalw.art/docs/management/cli/apply/). Postgres and the DB Secret stay outside the chart. Set `valkey.enabled: true` for the official Valkey dependency, or point `coordinator` at an external Redis/Valkey/NATS/Kafka.
 
-When `coordinator` is set, a hook waits for `/healthz/ready`, applies the Coordinator, then rolls the StatefulSet. `replicaCount > 1` fail-closes without a shared store, `persistence.enabled=false`, `coordinator`, and recovery-admin credentials.
+When `coordinator` is set (or Valkey is enabled with an empty `coordinator`), a hook waits for `/healthz/ready`, applies the Coordinator, then rolls the StatefulSet. `replicaCount > 1` fail-closes without a shared store, `persistence.enabled=false`, `coordinator` or `valkey.enabled`, and recovery-admin credentials.
 
 ```yaml
 replicaCount: 2
@@ -65,9 +66,8 @@ persistence:
 envFrom:
   - secretRef:
       name: stalwart-db
-coordinator:
-  "@type": Redis
-  url: redis://redis.redis.svc.cluster.local:6379
+valkey:
+  enabled: true
 podDisruptionBudget:
   enabled: true
 ```

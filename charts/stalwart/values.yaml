@@ -61,9 +61,15 @@ metrics:
     path: /metrics
     labels: {}
 
+# Optional Valkey dependency for cluster coordination (official chart).
+# When enabled and coordinator is empty, the apply Job wires Redis protocol
+# to <release>-valkey. Override any Valkey chart values under this key.
+valkey:
+  enabled: false
+
 # Coordinator singleton. When set, a post-install/upgrade Job waits for
 # ready, runs `stalwart-cli apply`, then rolls the StatefulSet.
-# Required for replicaCount > 1. https://stalw.art/docs/management/cli/apply/
+# Required for replicaCount > 1 unless valkey.enabled. https://stalw.art/docs/management/cli/apply/
 coordinator: {}
 # coordinator:
 #   "@type": Redis
