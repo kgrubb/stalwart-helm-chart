@@ -69,6 +69,18 @@ jobs:
             -f charts/stalwart/ci/ha-cluster-values.yaml \
             --set valkey.fullnameOverride=myvk \
             | grep -q 'redis://myvk.default.svc:6379'
+          helm template test charts/stalwart \
+            -f charts/stalwart/ci/ha-cluster-values.yaml \
+            --set valkey.service.port=6380 \
+            | grep -q 'redis://test-valkey.default.svc:6380'
+          if helm template test charts/stalwart \
+            -f charts/stalwart/ci/ha-cluster-values.yaml \
+            --set valkey.auth.enabled=true \
+            --set-json 'valkey.auth.aclUsers={"default":{"permissions":"~* &* +@all","password":"x"}}' \
+            2>/dev/null; then
+            echo "valkey.auth.enabled without coordinator must fail"
+            exit 1
+          fi
           grep -q 'healthz/ready' /tmp/ha-render.yaml
           grep -q 'rollout restart' /tmp/ha-render.yaml
           grep -q 'kind: PodDisruptionBudget' /tmp/ha-render.yaml
