@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-10-23
+
+### Added
+- optional Valkey dependency ([#36](https://github.com/kgrubb/stalwart-helm-chart/pull/36))
+  - optional official Valkey chart dependency (`valkey.enabled`, oci://ghcr.io/valkey-io/valkey-helm)
+  - empty `coordinator` + valkey enabled wires apply to the Valkey Service over redis (honors name/port overrides)
+  - `valkey.auth.enabled` without an explicit `coordinator` url fails closed
+- optional Valkey dependency for coordination
+
+### Fixed
+- wire Valkey port and fail closed on auth
+- honor Valkey name overrides and build deps on release
+
+
+
 ## [0.8.1] - 2026-10-19
 
 ### Fixed
