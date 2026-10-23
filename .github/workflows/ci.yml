@@ -65,6 +65,10 @@ jobs:
           grep -q 'test-valkey' /tmp/ha-render.yaml
           grep -q 'app.kubernetes.io/name: valkey' /tmp/ha-render.yaml
           grep -q 'redis://test-valkey.default.svc:6379' /tmp/ha-render.yaml
+          helm template test charts/stalwart \
+            -f charts/stalwart/ci/ha-cluster-values.yaml \
+            --set valkey.fullnameOverride=myvk \
+            | grep -q 'redis://myvk.default.svc:6379'
           grep -q 'healthz/ready' /tmp/ha-render.yaml
           grep -q 'rollout restart' /tmp/ha-render.yaml
           grep -q 'kind: PodDisruptionBudget' /tmp/ha-render.yaml

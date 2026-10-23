@@ -39,8 +39,21 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- if or (not (empty .Values.coordinator)) .Values.valkey.enabled -}}true{{- end -}}
 {{- end -}}
 
+{{- define "stalwart.valkey.fullname" -}}
+{{- if .Values.valkey.fullnameOverride -}}
+{{- .Values.valkey.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default "valkey" .Values.valkey.nameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
 {{- define "stalwart.valkey.url" -}}
-redis://{{ printf "%s-valkey" .Release.Name }}.{{ .Release.Namespace }}.svc:6379
+redis://{{ include "stalwart.valkey.fullname" . }}.{{ .Release.Namespace }}.svc:6379
 {{- end -}}
 
 {{- define "stalwart.coordinatorObject" -}}

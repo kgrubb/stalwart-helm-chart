@@ -1,7 +1,6 @@
 # Chart-releaser artifacts
 .cr-release-packages/
 charts/stalwart/RELEASE-NOTES.md
-# Fetched by `helm dependency build` from Chart.lock
 charts/stalwart/charts/*.tgz
 
 # Python

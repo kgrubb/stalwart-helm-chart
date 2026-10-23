@@ -61,9 +61,7 @@ metrics:
     path: /metrics
     labels: {}
 
-# Optional Valkey dependency for cluster coordination (official chart).
-# When enabled and coordinator is empty, the apply Job wires Redis protocol
-# to <release>-valkey. Override any Valkey chart values under this key.
+# Official Valkey chart. Empty coordinator + enabled wires apply to this Service.
 valkey:
   enabled: false
 
