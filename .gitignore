@@ -1,6 +1,7 @@
 # Chart-releaser artifacts
 .cr-release-packages/
 charts/stalwart/RELEASE-NOTES.md
+charts/stalwart/charts/*.tgz
 
 # Python
 __pycache__/

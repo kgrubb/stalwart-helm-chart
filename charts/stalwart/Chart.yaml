@@ -20,6 +20,11 @@ keywords:
   - imap
   - jmap
   - stalwart
+dependencies:
+  - name: valkey
+    version: 0.12.0
+    repository: oci://ghcr.io/valkey-io/valkey-helm
+    condition: valkey.enabled
 annotations:
   artifacthub.io/category: integration-delivery
   artifacthub.io/containsSecurityUpdates: "false"

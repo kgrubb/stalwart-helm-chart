@@ -61,9 +61,13 @@ metrics:
     path: /metrics
     labels: {}
 
+# Official Valkey chart. Empty coordinator + enabled wires apply to this Service.
+valkey:
+  enabled: false
+
 # Coordinator singleton. When set, a post-install/upgrade Job waits for
 # ready, runs `stalwart-cli apply`, then rolls the StatefulSet.
-# Required for replicaCount > 1. https://stalw.art/docs/management/cli/apply/
+# Required for replicaCount > 1 unless valkey.enabled. https://stalw.art/docs/management/cli/apply/
 coordinator: {}
 # coordinator:
 #   "@type": Redis

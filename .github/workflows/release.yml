@@ -62,6 +62,10 @@ jobs:
       - uses: azure/setup-helm@v5
         if: steps.bump.outputs.charts_changed == 'true'
 
+      - name: Build chart dependencies
+        if: steps.bump.outputs.charts_changed == 'true'
+        run: helm dependency build charts/stalwart
+
       - name: Import GPG key
         if: steps.bump.outputs.charts_changed == 'true'
         env:
