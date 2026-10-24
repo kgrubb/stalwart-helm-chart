@@ -79,6 +79,68 @@ data:
   migrate.sh: |
 {{ .Files.Get "files/migrate.sh" | indent 4 }}
 ---
+# Scale down / orphan STS before the migrate Job mounts the RWO PVC (same-pod prepare deadlocks).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $name }}-migrate-prepare
+  labels:
+    {{- include "stalwart.labels" . | nindent 4 }}
+    app.kubernetes.io/component: migrate
+  annotations:
+    helm.sh/hook: pre-upgrade
+    helm.sh/hook-weight: "-6"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 600
+  ttlSecondsAfterFinished: {{ .Values.migration.ttlSecondsAfterFinished }}
+  template:
+    metadata:
+      labels:
+        {{- include "stalwart.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: migrate
+    spec:
+      restartPolicy: Never
+      serviceAccountName: {{ $name }}-hooks
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: prepare
+          image: {{ .Values.apply.kubectlImage | quote }}
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              ns="$STALWART_NAMESPACE" sts="$STALWART_STS_NAME"
+              kubectl get sts -n "$ns" "$sts" >/dev/null 2>&1 || exit 0
+              kubectl scale sts -n "$ns" "$sts" --replicas=0
+              kubectl wait -n "$ns" --for=delete pod \
+                -l "app.kubernetes.io/name=$STALWART_NAME,app.kubernetes.io/instance=$STALWART_INSTANCE,app.kubernetes.io/component=server" \
+                --timeout=300s
+              vct="$(kubectl get sts -n "$ns" "$sts" -o jsonpath='{.spec.volumeClaimTemplates}' 2>/dev/null || true)"
+              if [ -n "$vct" ] && [ "$vct" != "null" ] && [ "$vct" != "[]" ]; then
+                kubectl delete sts -n "$ns" "$sts" --cascade=orphan
+              fi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            runAsUser: 1001
+            runAsGroup: 1001
+          env:
+            - name: STALWART_NAMESPACE
+              value: {{ .Release.Namespace | quote }}
+            - name: STALWART_STS_NAME
+              value: {{ $name | quote }}
+            - name: STALWART_NAME
+              value: {{ include "stalwart.name" . | quote }}
+            - name: STALWART_INSTANCE
+              value: {{ .Release.Name | quote }}
+---
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -104,44 +166,19 @@ spec:
       serviceAccountName: {{ $name }}-hooks
       securityContext:
         fsGroup: 2000
-        runAsUser: 2000
-        runAsGroup: 2000
-        runAsNonRoot: true
         seccompProfile:
           type: RuntimeDefault
       initContainers:
-        - name: prepare
-          image: {{ .Values.apply.kubectlImage | quote }}
-          imagePullPolicy: IfNotPresent
-          command: ["/bin/sh", "-c"]
-          args:
-            - |
-              set -eu
-              ns="$STALWART_NAMESPACE" sts="$STALWART_STS_NAME"
-              kubectl get sts -n "$ns" "$sts" >/dev/null 2>&1 || exit 0
-              kubectl scale sts -n "$ns" "$sts" --replicas=0
-              kubectl wait -n "$ns" --for=delete pod \
-                -l "app.kubernetes.io/name=$STALWART_NAME,app.kubernetes.io/instance=$STALWART_INSTANCE,app.kubernetes.io/component=server" \
-                --timeout=300s
-              vct="$(kubectl get sts -n "$ns" "$sts" -o jsonpath='{.spec.volumeClaimTemplates}' 2>/dev/null || true)"
-              if [ -n "$vct" ] && [ "$vct" != "null" ] && [ "$vct" != "[]" ]; then
-                kubectl delete sts -n "$ns" "$sts" --cascade=orphan
-              fi
-          {{- include "stalwart.hooks.containerSecurity" (dict "uid" 65534) | nindent 10 }}
-          env:
-            - name: STALWART_NAMESPACE
-              value: {{ .Release.Namespace | quote }}
-            - name: STALWART_STS_NAME
-              value: {{ $name | quote }}
-            - name: STALWART_NAME
-              value: {{ include "stalwart.name" . | quote }}
-            - name: STALWART_INSTANCE
-              value: {{ .Release.Name | quote }}
         - name: migrate
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/bin/sh", "/scripts/migrate.sh"]
-          {{- include "stalwart.hooks.containerSecurity" dict | nindent 10 }}
+          # Image user 2000; drop-all can EPERM the binary.
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 2000
+            runAsGroup: 2000
           {{- with .Values.envFrom }}
           envFrom:
             {{- toYaml . | nindent 12 }}
@@ -157,6 +194,8 @@ spec:
               readOnly: true
             - name: export
               mountPath: /export
+            - name: tmp
+              mountPath: /tmp
       containers:
         - name: mark
           image: {{ .Values.apply.kubectlImage | quote }}
@@ -168,7 +207,13 @@ spec:
               kubectl create configmap -n "$STALWART_NAMESPACE" "$MIGRATION_MARKER" \
                 --from-literal=status=migrated --from-literal=claim="$DATA_CLAIM" \
                 --dry-run=client -o yaml | kubectl apply -f -
-          {{- include "stalwart.hooks.containerSecurity" (dict "uid" 65534) | nindent 10 }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            runAsUser: 1001
+            runAsGroup: 1001
           env:
             - name: STALWART_NAMESPACE
               value: {{ .Release.Namespace | quote }}
@@ -185,6 +230,8 @@ spec:
           persistentVolumeClaim:
             claimName: {{ .Values.migration.dataClaim | quote }}
         - name: export
+          emptyDir: {}
+        - name: tmp
           emptyDir: {}
 {{- end }}
 {{- if $apply }}
@@ -227,9 +274,6 @@ spec:
       restartPolicy: OnFailure
       serviceAccountName: {{ $name }}-hooks
       securityContext:
-        runAsNonRoot: true
-        runAsUser: 65534
-        runAsGroup: 65534
         seccompProfile:
           type: RuntimeDefault
       initContainers:
@@ -243,7 +287,13 @@ spec:
               curl -fsS --connect-timeout 5 --retry 60 --retry-delay 5 --retry-all-errors \
                 -u "${STALWART_USER}:${STALWART_PASSWORD}" \
                 "${STALWART_URL%/}/healthz/ready"
-          {{- include "stalwart.hooks.containerSecurity" dict | nindent 10 }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            runAsUser: 100
+            runAsGroup: 101
           env:
             - name: STALWART_URL
               value: {{ $url | quote }}
@@ -252,7 +302,10 @@ spec:
           image: {{ .Values.apply.image | quote }}
           imagePullPolicy: IfNotPresent
           args: ["apply", "--file", "/plan/plan.ndjson"]
-          {{- include "stalwart.hooks.containerSecurity" dict | nindent 10 }}
+          # CLI image user; drop-all + nobody breaks the binary (EPERM).
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
           env:
             - name: STALWART_URL
               value: {{ $url | quote }}
@@ -271,7 +324,13 @@ spec:
               set -eu
               kubectl rollout restart "sts/$STALWART_STS_NAME" -n "$STALWART_NAMESPACE"
               kubectl rollout status "sts/$STALWART_STS_NAME" -n "$STALWART_NAMESPACE" --timeout=600s
-          {{- include "stalwart.hooks.containerSecurity" dict | nindent 10 }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            runAsUser: 1001
+            runAsGroup: 1001
           env:
             - name: STALWART_NAMESPACE
               value: {{ .Release.Namespace | quote }}
