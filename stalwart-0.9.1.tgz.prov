@@ -1,0 +1,63 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/kgrubb/stalwart-helm-chart/issues
+    - name: source
+      url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/signKey: |
+    fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
+    url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+apiVersion: v2
+appVersion: v0.16.27
+dependencies:
+- - condition: valkey.enabled
+  name: valkey
+  repository: oci://ghcr.io/valkey-io/valkey-helm
+  version: 0.12.0
+description: Helm chart for the Stalwart mail and collaboration server
+home: https://stalw.art
+icon: https://kgrubb.github.io/stalwart-helm-chart/logo.svg
+keywords:
+- - mail
+- - smtp
+- - imap
+- - jmap
+- - stalwart
+maintainers:
+- - email: 8471701+kgrubb@users.noreply.github.com
+  name: kgrubb
+  url: https://github.com/kgrubb
+name: stalwart
+sources:
+- - https://github.com/stalwartlabs/stalwart
+- - https://stalw.art/docs/cluster/orchestration/kubernetes/
+- - https://github.com/kgrubb/stalwart-helm-chart
+type: application
+version: 0.9.1
+
+...
+files:
+  stalwart-0.9.1.tgz: sha256:0c8d7c27fa4ff67b774ac23bf873b0a798247cc7c6d830abdd9e64f4f8f3dcb0
+-----BEGIN PGP SIGNATURE-----
+
+wsFcBAEBCgAQBQJq3AGtCRDKmZpzOV9F/QAAjzwQAB0q6S2JdcVpRC9nuKelNWAl
+tqgKq7JMzjVHVZzaHHNZSze+pjWUOE2Kb3a8aefOXKO6S1aXF0BQLTTmXOi8N17S
+SGqRM93McM/ITm5NMn+gK8CLxpNU+pQ/tSuchgxQyNaT9j+8/xTmmNBdB7+9WKEa
+sw2BcXcx8sCokNy1HrlGGK1ZP2BzGE3r7wn42+DOWO+MuxzR3YWRE8OpugpX7Yl8
+4WV8EUBdNTs61IZb6QbAcSAB971Xkd+CCG7klDqhLgiqZHH4qJdKRyl6pCKbKRzi
+j5ApQbpoVp8NdslvB3/kb8pkMmjqGbVzqzuba4+6qTEwh2RFORVv2IGC/leQ4hzY
+BcYzTrwvR15Z+aN14Ub7d3wwGRT08V4djQ+Qm/YIIOQkn/AqJjD8hShIM7FDtRG2
+kb87Dt7nJIYFFhBkBRyePTRsluMC04RcaKRbviRm4c+OpoAkyOg4PCV0hszAoZzd
+rcRc0GOhJkBRqHVN/eDmD2yPoHrNPHZEkz8zaGXtzjJig+uRJWm0K1QdMfLmNzmR
+a4cmcK9AHs7EvWimMvu0+fZumFC+GFfi1Tdp7gzzTWhzIUZmUZ8RBiQZmGRSok5a
+LMiEkh3PcSUBb7BQ1EQr9o6IWKPQZOK2Ey9Ypd3+mF/GaEF+DMrKBWEJYI1XRz4e
+F2oSuWOoA6jY+8a2R4Up
+=F8EH
+-----END PGP SIGNATURE-----
