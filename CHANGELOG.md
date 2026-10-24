@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.2] - 2026-10-24
+
+### Fixed
+- slim hook security helper and current kubectl image ([#38](https://github.com/kgrubb/stalwart-helm-chart/pull/38))
+  - swap default `apply.kubectlImage` to `alpine/kubectl:1.37.1` (shell + current kubectl) instead of dead `bitnami/kubectl:1.32.3`
+  - put hook `securityContext` back through `stalwart.hooks.containerSecurity` with `gid` / `noDrop`, so we stop pasting the same block five times
+  - drop the narrating comments from #37. keep one note on the separate migrate-prepare Job and one on `noDrop`
+- slim hook security helper and current kubectl image
+
+
+
 ## [0.9.1] - 2026-10-24
 
 ### Fixed
