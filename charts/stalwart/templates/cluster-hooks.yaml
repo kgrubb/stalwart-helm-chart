@@ -296,8 +296,12 @@ spec:
           args:
             - |
               set -eu
+              {{- if .Values.apply.rolloutRestart }}
               kubectl rollout restart "sts/$STALWART_STS_NAME" -n "$STALWART_NAMESPACE"
               kubectl rollout status "sts/$STALWART_STS_NAME" -n "$STALWART_NAMESPACE" --timeout=600s
+              {{- else }}
+              echo "apply.rolloutRestart=false, skip STS bounce"
+              {{- end }}
           {{- include "stalwart.hooks.containerSecurity" (dict "uid" 65534) | nindent 10 }}
           env:
             - name: STALWART_NAMESPACE

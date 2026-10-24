@@ -127,9 +127,10 @@
         "image": { "type": "string", "minLength": 1 },
         "kubectlImage": { "type": "string", "minLength": 1 },
         "apiUrl": { "type": "string" },
-        "ttlSecondsAfterFinished": { "type": "integer", "minimum": 0 }
+        "ttlSecondsAfterFinished": { "type": "integer", "minimum": 0 },
+        "rolloutRestart": { "type": "boolean" }
       },
-      "required": ["image", "kubectlImage", "apiUrl", "ttlSecondsAfterFinished"]
+      "required": ["image", "kubectlImage", "apiUrl", "ttlSecondsAfterFinished", "rolloutRestart"]
     },
     "migration": {
       "type": "object",

@@ -21,6 +21,7 @@ Deploys [Stalwart Mail Server](https://stalw.art/) as a StatefulSet with persist
 | `coordinator` | `{}` | Coordinator singleton (`stalwart-cli apply` when set) |
 | `apply.image` | `stalwartlabs/cli:1.0.13` | Pinned official CLI |
 | `apply.kubectlImage` | `alpine/kubectl:1.37.1` | Rollout / migrate prepare |
+| `apply.rolloutRestart` | `true` | Bounce STS after coordinator apply (set `false` once HA is live) |
 | `migration.enabled` | `false` | One-shot RocksDB PVC → shared store |
 | `migration.dataClaim` | `""` | Required when migrating (e.g. `data-…-0`) |
 | `service.type` | `ClusterIP` | Main Service; ingress for management UI |
@@ -46,7 +47,7 @@ See [values.yaml](values.yaml) and the [Stalwart Kubernetes docs](https://stalw.
 
 Upstream model: `config.json` is only the DataStore. Coordinator is applied with [`stalwart-cli apply`](https://stalw.art/docs/management/cli/apply/). Postgres and the DB Secret stay outside the chart. Set `valkey.enabled: true` for the official Valkey dependency, or point `coordinator` at an external Redis/Valkey/NATS/Kafka.
 
-When `coordinator` is set (or Valkey is enabled with an empty `coordinator`), a hook waits for `/healthz/ready`, applies the Coordinator, then rolls the StatefulSet. `replicaCount > 1` fail-closes without a shared store, `persistence.enabled=false`, `coordinator` or `valkey.enabled`, and recovery-admin credentials.
+When `coordinator` is set (or Valkey is enabled with an empty `coordinator`), a hook waits for `/healthz/ready` and applies the Coordinator. With `apply.rolloutRestart: true` (default) it then rolls the StatefulSet. Turn that off after the first HA cutover so routine chart upgrades do not bounce mail. `replicaCount > 1` fail-closes without a shared store, `persistence.enabled=false`, `coordinator` or `valkey.enabled`, and recovery-admin credentials.
 
 ```yaml
 replicaCount: 2
