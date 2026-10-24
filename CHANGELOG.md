@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-10-24
+
+### Fixed
+- make migrate/apply hooks runnable ([#37](https://github.com/kgrubb/stalwart-helm-chart/pull/37))
+  - default `apply.kubectlImage` to `bitnami/kubectl:1.32.3` (shell required)
+  - migrate prepare is a separate pre-upgrade Job so RWO PVC attach cannot block scale-down
+  - apply/migrate containers no longer run the CLI as nobody with drop-all (was EPERM)
+- make migrate/apply hooks runnable
+
+
+
 ## [0.9.0] - 2026-10-23
 
 ### Added
