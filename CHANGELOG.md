@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.4] - 2026-10-24
+
+### Changed
+- keep HA upgrade guide LB/ingress agnostic
+- add single-replica to HA upgrade guide
+
+### Fixed
+- bounce STS only when coordinator plan changes ([#40](https://github.com/kgrubb/stalwart-helm-chart/pull/40))
+  - remove the `apply.rolloutRestart` footgun
+  - after coordinator apply, hash the mounted plan file and compare to `stalwart.io/coordinator-plan-hash` on the StatefulSet (same idea as a config checksum annotation)
+  - restart only when the plan is new or changed, then record the hash on the STS
+  - CI asserts the skip path so a regression cannot silently bring back always-bounce
+- bounce STS only when coordinator plan changes
+
+
+
 ## [0.9.3] - 2026-10-24
 
 ### Fixed
