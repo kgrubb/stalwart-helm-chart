@@ -75,8 +75,7 @@ coordinator: {}
 
 apply:
   image: stalwartlabs/cli:1.0.13
-  # Needs a shell (rancher/kubectl is distroless and breaks hook scripts).
-  kubectlImage: bitnami/kubectl:1.32.3
+  kubectlImage: alpine/kubectl:1.37.1
   apiUrl: ""
   ttlSecondsAfterFinished: 300
 

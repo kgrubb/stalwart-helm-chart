@@ -121,15 +121,18 @@ redis://{{ include "valkey.fullname" $vk }}.{{ .Release.Namespace }}.svc:{{ dig 
 {{- end }}
 {{- end -}}
 
+{{/* noDrop skips capability drop. Stalwart binaries EPERM under drop-all. */}}
 {{- define "stalwart.hooks.containerSecurity" -}}
 securityContext:
   allowPrivilegeEscalation: false
+  {{- if not .noDrop }}
   capabilities:
     drop: ["ALL"]
-  {{- with .uid }}
-  runAsUser: {{ . }}
-  runAsGroup: {{ . }}
+  {{- end }}
   runAsNonRoot: true
+  {{- if .uid }}
+  runAsUser: {{ .uid }}
+  runAsGroup: {{ .gid | default .uid }}
   {{- end }}
 {{- end -}}
 

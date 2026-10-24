@@ -86,7 +86,7 @@ jobs:
           grep -q 'kind: PodDisruptionBudget' /tmp/ha-render.yaml
           grep -A20 'kind: PodDisruptionBudget' /tmp/ha-render.yaml | grep -q 'component: server'
           grep -q 'stalwartlabs/cli:1.0.13' /tmp/ha-render.yaml
-          grep -q 'bitnami/kubectl:1.32.3' /tmp/ha-render.yaml
+          grep -q 'alpine/kubectl:1.37.1' /tmp/ha-render.yaml
           helm template test charts/stalwart \
             -f charts/stalwart/ci/ha-cluster-values.yaml \
             -f charts/stalwart/ci/migrate-values.yaml \

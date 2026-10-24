@@ -79,7 +79,7 @@ data:
   migrate.sh: |
 {{ .Files.Get "files/migrate.sh" | indent 4 }}
 ---
-# Scale down / orphan STS before the migrate Job mounts the RWO PVC (same-pod prepare deadlocks).
+# Separate Job so RWO PVC attach does not deadlock scale-down.
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -124,13 +124,7 @@ spec:
               if [ -n "$vct" ] && [ "$vct" != "null" ] && [ "$vct" != "[]" ]; then
                 kubectl delete sts -n "$ns" "$sts" --cascade=orphan
               fi
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop: ["ALL"]
-            runAsNonRoot: true
-            runAsUser: 1001
-            runAsGroup: 1001
+          {{- include "stalwart.hooks.containerSecurity" (dict "uid" 65534) | nindent 10 }}
           env:
             - name: STALWART_NAMESPACE
               value: {{ .Release.Namespace | quote }}
@@ -173,12 +167,7 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/bin/sh", "/scripts/migrate.sh"]
-          # Image user 2000; drop-all can EPERM the binary.
-          securityContext:
-            allowPrivilegeEscalation: false
-            runAsNonRoot: true
-            runAsUser: 2000
-            runAsGroup: 2000
+          {{- include "stalwart.hooks.containerSecurity" (dict "uid" 2000 "noDrop" true) | nindent 10 }}
           {{- with .Values.envFrom }}
           envFrom:
             {{- toYaml . | nindent 12 }}
@@ -207,13 +196,7 @@ spec:
               kubectl create configmap -n "$STALWART_NAMESPACE" "$MIGRATION_MARKER" \
                 --from-literal=status=migrated --from-literal=claim="$DATA_CLAIM" \
                 --dry-run=client -o yaml | kubectl apply -f -
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop: ["ALL"]
-            runAsNonRoot: true
-            runAsUser: 1001
-            runAsGroup: 1001
+          {{- include "stalwart.hooks.containerSecurity" (dict "uid" 65534) | nindent 10 }}
           env:
             - name: STALWART_NAMESPACE
               value: {{ .Release.Namespace | quote }}
@@ -287,13 +270,7 @@ spec:
               curl -fsS --connect-timeout 5 --retry 60 --retry-delay 5 --retry-all-errors \
                 -u "${STALWART_USER}:${STALWART_PASSWORD}" \
                 "${STALWART_URL%/}/healthz/ready"
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop: ["ALL"]
-            runAsNonRoot: true
-            runAsUser: 100
-            runAsGroup: 101
+          {{- include "stalwart.hooks.containerSecurity" (dict "uid" 100 "gid" 101) | nindent 10 }}
           env:
             - name: STALWART_URL
               value: {{ $url | quote }}
@@ -302,10 +279,7 @@ spec:
           image: {{ .Values.apply.image | quote }}
           imagePullPolicy: IfNotPresent
           args: ["apply", "--file", "/plan/plan.ndjson"]
-          # CLI image user; drop-all + nobody breaks the binary (EPERM).
-          securityContext:
-            allowPrivilegeEscalation: false
-            runAsNonRoot: true
+          {{- include "stalwart.hooks.containerSecurity" (dict "noDrop" true) | nindent 10 }}
           env:
             - name: STALWART_URL
               value: {{ $url | quote }}
@@ -324,13 +298,7 @@ spec:
               set -eu
               kubectl rollout restart "sts/$STALWART_STS_NAME" -n "$STALWART_NAMESPACE"
               kubectl rollout status "sts/$STALWART_STS_NAME" -n "$STALWART_NAMESPACE" --timeout=600s
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop: ["ALL"]
-            runAsNonRoot: true
-            runAsUser: 1001
-            runAsGroup: 1001
+          {{- include "stalwart.hooks.containerSecurity" (dict "uid" 65534) | nindent 10 }}
           env:
             - name: STALWART_NAMESPACE
               value: {{ .Release.Namespace | quote }}
