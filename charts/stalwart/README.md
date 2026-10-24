@@ -26,7 +26,7 @@ Deploys [Stalwart Mail Server](https://stalw.art/) as a StatefulSet with persist
 | `service.type` | `ClusterIP` | Main Service (use ingress for the management UI) |
 | `mailService.enabled` | `false` | Separate LoadBalancer for mail ports |
 | `mailService.name` | `""` | Optional fixed Service name |
-| `mailService.annotations` | `{}` | e.g. MetalLB annotations |
+| `mailService.annotations` | `{}` | LoadBalancer annotations (IP pools, etc.) |
 | `ingress.enabled` | `false` | HTTP/S management only |
 | `persistence.enabled` | `true` | Disable for external DataStore |
 | `resources` | `{}` | Requests/limits per environment |
@@ -131,7 +131,7 @@ podDisruptionBudget:
 
 Add pod anti-affinity if you want the replicas on different nodes.
 
-On MetalLB L2, set `mailService.externalTrafficPolicy: Local` so the VIP is announced from nodes that run mail pods. With `Cluster`, the VIP can stick to a node that does not host a pod and break IMAP or SMTP.
+If `mailService` is a LoadBalancer, set `mailService.externalTrafficPolicy: Local` so traffic lands on nodes that run mail pods. With `Cluster`, some L2 or node-proxy setups send clients to a node with no ready pod and IMAP or SMTP fails.
 
 ### 4. Afterward
 
