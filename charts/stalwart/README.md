@@ -20,7 +20,7 @@ Deploys [Stalwart Mail Server](https://stalw.art/) as a StatefulSet with persist
 | `valkey.enabled` | `false` | Optional Valkey dependency for coordination |
 | `coordinator` | `{}` | Coordinator singleton (`stalwart-cli apply` when set) |
 | `apply.image` | `stalwartlabs/cli:1.0.13` | Pinned official CLI |
-| `apply.kubectlImage` | `rancher/kubectl:v1.32.2` | Rollout / migrate prepare |
+| `apply.kubectlImage` | `bitnami/kubectl:1.32.3` | Rollout / migrate prepare (needs shell) |
 | `migration.enabled` | `false` | One-shot RocksDB PVC → shared store |
 | `migration.dataClaim` | `""` | Required when migrating (e.g. `data-…-0`) |
 | `service.type` | `ClusterIP` | Main Service; ingress for management UI |
