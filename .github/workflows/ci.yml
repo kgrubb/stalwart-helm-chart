@@ -83,6 +83,9 @@ jobs:
           fi
           grep -q 'healthz/ready' /tmp/ha-render.yaml
           grep -q 'rollout restart' /tmp/ha-render.yaml
+          grep -q 'coordinator-plan-hash' /tmp/ha-render.yaml
+          grep -q 'plan unchanged, skip STS bounce' /tmp/ha-render.yaml
+          grep -q 'sha256sum /plan/plan.ndjson' /tmp/ha-render.yaml
           grep -q 'kind: PodDisruptionBudget' /tmp/ha-render.yaml
           grep -A20 'kind: PodDisruptionBudget' /tmp/ha-render.yaml | grep -q 'component: server'
           grep -q 'stalwartlabs/cli:1.0.13' /tmp/ha-render.yaml

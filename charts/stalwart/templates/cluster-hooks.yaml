@@ -296,18 +296,28 @@ spec:
           args:
             - |
               set -eu
-              {{- if .Values.apply.rolloutRestart }}
-              kubectl rollout restart "sts/$STALWART_STS_NAME" -n "$STALWART_NAMESPACE"
-              kubectl rollout status "sts/$STALWART_STS_NAME" -n "$STALWART_NAMESPACE" --timeout=600s
-              {{- else }}
-              echo "apply.rolloutRestart=false, skip STS bounce"
-              {{- end }}
+              ns="$STALWART_NAMESPACE"
+              sts="$STALWART_STS_NAME"
+              ann="stalwart.io/coordinator-plan-hash"
+              hash="$(sha256sum /plan/plan.ndjson | awk '{print $1}')"
+              prev="$(kubectl -n "$ns" get sts "$sts" -o jsonpath="{.metadata.annotations.stalwart\.io/coordinator-plan-hash}" 2>/dev/null || true)"
+              if [ -n "$prev" ] && [ "$hash" = "$prev" ]; then
+                echo "coordinator plan unchanged, skip STS bounce"
+                exit 0
+              fi
+              kubectl -n "$ns" rollout restart "sts/$sts"
+              kubectl -n "$ns" rollout status "sts/$sts" --timeout=600s
+              kubectl -n "$ns" annotate sts "$sts" "$ann=$hash" --overwrite
           {{- include "stalwart.hooks.containerSecurity" (dict "uid" 65534) | nindent 10 }}
           env:
             - name: STALWART_NAMESPACE
               value: {{ .Release.Namespace | quote }}
             - name: STALWART_STS_NAME
               value: {{ $name | quote }}
+          volumeMounts:
+            - name: plan
+              mountPath: /plan
+              readOnly: true
       volumes:
         - name: plan
           configMap:

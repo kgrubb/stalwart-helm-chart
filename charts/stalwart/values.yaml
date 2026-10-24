@@ -78,8 +78,6 @@ apply:
   kubectlImage: alpine/kubectl:1.37.1
   apiUrl: ""
   ttlSecondsAfterFinished: 300
-  # After the first coordinator apply, set false so chart upgrades do not bounce mail pods.
-  rolloutRestart: true
 
 # One-shot RocksDB PVC -> shared store (pre-upgrade). Set once, then disable.
 # https://stalw.art/docs/management/maintenance/migration/
