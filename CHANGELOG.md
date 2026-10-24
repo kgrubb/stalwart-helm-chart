@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.3] - 2026-10-24
+
+### Fixed
+- gate apply STS bounce behind apply.rolloutRestart ([#39](https://github.com/kgrubb/stalwart-helm-chart/pull/39))
+  - post-upgrade apply was always running `kubectl rollout restart`, so chart bumps bounced both mail pods even when the coordinator plan was a no-op
+  - add `apply.rolloutRestart` (default `true` for first HA cutover). set `false` once coordination is live so upgrades stay online
+- gate apply STS bounce behind apply.rolloutRestart
+
+
+
 ## [0.9.2] - 2026-10-24
 
 ### Fixed
