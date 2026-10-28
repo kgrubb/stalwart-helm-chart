@@ -100,6 +100,8 @@ migration:
 # https://stalw.art/docs/migration/upgrade-0-16/
 v1Migrate:
   enabled: false
+  # Set when this release already runs Stalwart 1.0 (greenfield or manual migrate).
+  alreadyDone: false
   image: stalwartlabs/stalwart-migrate:1.0.0
   sourceConfig: {}
   # Optional answers.toml appended after chart defaults (OIDC directory ids, etc.).

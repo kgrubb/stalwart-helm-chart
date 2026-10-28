@@ -8,12 +8,14 @@
 {{- end }}
 {{- $name := include "stalwart.fullname" . }}
 {{- $rocksMarker := printf "%s-migrated" $name }}
-{{- $v1Marker := printf "%s-v1-migrated" $name }}
+{{- $v1Marker := include "stalwart.v1MarkerName" . }}
+{{- $hasV1Marker := lookup "v1" "ConfigMap" .Release.Namespace $v1Marker }}
 {{- $doRocksMigrate := and .Values.migration.enabled .Values.migration.dataClaim (not (lookup "v1" "ConfigMap" .Release.Namespace $rocksMarker)) }}
-{{- $doV1Migrate := and .Values.v1Migrate.enabled (not (empty .Values.v1Migrate.sourceConfig)) (not (lookup "v1" "ConfigMap" .Release.Namespace $v1Marker)) }}
+{{- $doV1Migrate := and .Values.v1Migrate.enabled (not (empty .Values.v1Migrate.sourceConfig)) (not $hasV1Marker) }}
+{{- $doV1Mark := or $doV1Migrate (and .Release.IsInstall (not .Values.v1Migrate.enabled)) (and .Values.v1Migrate.alreadyDone (not $hasV1Marker)) }}
 {{- $doMigrate := or $doRocksMigrate $doV1Migrate }}
 {{- $url := default (printf "http://%s:%v" $name .Values.service.ports.mgmt) .Values.apply.apiUrl }}
-{{- if or $apply $doMigrate }}
+{{- if or $apply $doMigrate $doV1Mark }}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -42,7 +44,7 @@ rules:
   - apiGroups: [""]
     resources: ["pods"]
     verbs: ["get", "list", "watch"{{- if $doMigrate }}, "delete"{{- end }}]
-  {{- if $doMigrate }}
+  {{- if or $doMigrate $doV1Mark }}
   - apiGroups: [""]
     resources: ["configmaps"]
     verbs: ["get", "list", "create", "update", "patch"]
@@ -240,6 +242,8 @@ data:
   answers.toml: |
 {{ include "stalwart.v1Migrate.answers" . | indent 4 }}
 ---
+# Job success is migrate success only. Marker is a separate Job so a ConfigMap
+# blip cannot force a remigrate into a non-empty target.
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -267,7 +271,7 @@ spec:
         fsGroup: 2000
         seccompProfile:
           type: RuntimeDefault
-      initContainers:
+      containers:
         - name: migrate
           image: {{ .Values.v1Migrate.image | quote }}
           imagePullPolicy: IfNotPresent
@@ -293,23 +297,6 @@ spec:
               mountPath: /var/lib/stalwart-migrate
             - name: tmp
               mountPath: /tmp
-      containers:
-        - name: mark
-          image: {{ .Values.apply.kubectlImage | quote }}
-          imagePullPolicy: IfNotPresent
-          command: ["/bin/sh", "-c"]
-          args:
-            - |
-              set -eu
-              kubectl create configmap -n "$STALWART_NAMESPACE" "$MIGRATION_MARKER" \
-                --from-literal=status=migrated \
-                --dry-run=client -o yaml | kubectl apply -f -
-          {{- include "stalwart.hooks.containerSecurity" (dict "uid" 65534) | nindent 10 }}
-          env:
-            - name: STALWART_NAMESPACE
-              value: {{ .Release.Namespace | quote }}
-            - name: MIGRATION_MARKER
-              value: {{ $v1Marker | quote }}
       volumes:
         - name: scripts
           configMap:
@@ -328,6 +315,52 @@ spec:
           emptyDir: {}
         - name: tmp
           emptyDir: {}
+{{- end }}
+{{- if $doV1Mark }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $name }}-v1-mark
+  labels:
+    {{- include "stalwart.labels" . | nindent 4 }}
+    app.kubernetes.io/component: v1-mark
+  annotations:
+    helm.sh/hook: pre-upgrade,post-install
+    helm.sh/hook-weight: "-4"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 3
+  activeDeadlineSeconds: 120
+  ttlSecondsAfterFinished: {{ .Values.v1Migrate.ttlSecondsAfterFinished }}
+  template:
+    metadata:
+      labels:
+        {{- include "stalwart.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: v1-mark
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: {{ $name }}-hooks
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: mark
+          image: {{ .Values.apply.kubectlImage | quote }}
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              kubectl create configmap -n "$STALWART_NAMESPACE" "$MIGRATION_MARKER" \
+                --from-literal=status=migrated \
+                --dry-run=client -o yaml | kubectl apply -f -
+          {{- include "stalwart.hooks.containerSecurity" (dict "uid" 65534) | nindent 10 }}
+          env:
+            - name: STALWART_NAMESPACE
+              value: {{ .Release.Namespace | quote }}
+            - name: MIGRATION_MARKER
+              value: {{ $v1Marker | quote }}
 {{- end }}
 {{- if $apply }}
 ---

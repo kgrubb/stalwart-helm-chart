@@ -39,7 +39,13 @@ jobs:
             echo "default render must not include valkey subchart"
             exit 1
           fi
-          helm template test charts/stalwart --is-upgrade | grep -q 'kind: StatefulSet'
+          if helm template test charts/stalwart --is-upgrade 2>/dev/null; then
+            echo "upgrade without v1 migrate marker or alreadyDone must fail"
+            exit 1
+          fi
+          helm template test charts/stalwart --is-upgrade --set v1Migrate.alreadyDone=true \
+            | grep -q 'kind: StatefulSet'
+          helm template test charts/stalwart | grep -q 'component: v1-mark'
           helm template test charts/stalwart --set recoveryAdmin.enabled=false
           helm template test charts/stalwart \
             --set recoveryAdmin.enabled=true \
@@ -116,9 +122,12 @@ jobs:
             -f charts/stalwart/ci/v1-migrate-values.yaml \
             > /tmp/v1-migrate-render.yaml
           grep -q 'component: v1-migrate' /tmp/v1-migrate-render.yaml
+          grep -q 'component: v1-mark' /tmp/v1-migrate-render.yaml
           grep -q 'stalwartlabs/stalwart-migrate:1.0.0' /tmp/v1-migrate-render.yaml
           grep -q 'in_memory_cluster' /tmp/v1-migrate-render.yaml
+          grep -q 'http_forwarded' /tmp/v1-migrate-render.yaml
           grep -q 'stalwart_v1' /tmp/v1-migrate-render.yaml
+          python3 charts/stalwart/ci/check-v1-migrate-render.py /tmp/v1-migrate-render.yaml
           if helm template test charts/stalwart \
             -f charts/stalwart/ci/ha-cluster-values.yaml \
             --set v1Migrate.enabled=true 2>/dev/null; then

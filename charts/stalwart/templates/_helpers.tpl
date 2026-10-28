@@ -76,9 +76,16 @@ redis://{{ include "valkey.fullname" $vk }}.{{ .Release.Namespace }}.svc:{{ dig 
 {{- or .Values.recoveryAdmin.enabled (and .Values.bootstrap.enabled .Values.recoveryAdmin.existingSecret) (and (include "stalwart.hasCoordinator" .) .Values.recoveryAdmin.existingSecret) (include "stalwart.mailTls.enabled" .) -}}
 {{- end -}}
 
+{{- define "stalwart.v1MarkerName" -}}
+{{- printf "%s-v1-migrated" (include "stalwart.fullname" .) -}}
+{{- end -}}
+
 {{- define "stalwart.cluster.validate" -}}
 {{- if and .Values.migration.enabled .Values.v1Migrate.enabled -}}
 {{- fail "migration.enabled and v1Migrate.enabled cannot both be true" -}}
+{{- end -}}
+{{- if and .Release.IsUpgrade (not .Values.v1Migrate.enabled) (not .Values.v1Migrate.alreadyDone) (not (lookup "v1" "ConfigMap" .Release.Namespace (include "stalwart.v1MarkerName" .))) -}}
+{{- fail "Stalwart 1.0 cannot open a 0.16 store. Enable v1Migrate (see chart README), or set v1Migrate.alreadyDone=true if this release already runs 1.0." -}}
 {{- end -}}
 {{- if .Values.v1Migrate.enabled -}}
 {{- if empty .Values.v1Migrate.sourceConfig -}}
@@ -144,6 +151,10 @@ mode = "reuse"
 
 [instance.oauth_registration."x:OidcProvider"]
 action = "accept"
+
+[instance.http_forwarded."x:Http"]
+source = "xForwardedFor"
+hops = 1
 
 [instance.in_memory_cluster."x:InMemoryStore"]
 action = "replace"

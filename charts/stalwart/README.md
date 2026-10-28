@@ -25,6 +25,7 @@ Deploys [Stalwart Mail Server](https://stalw.art/) as a StatefulSet with persist
 | `migration.enabled` | `false` | One-shot RocksDB PVC → shared store (not 0.16→1.0) |
 | `migration.dataClaim` | `""` | Required when migrating (e.g. `data-…-0`) |
 | `v1Migrate.enabled` | `false` | One-shot 0.16 → 1.0 via `stalwart-migrate` |
+| `v1Migrate.alreadyDone` | `false` | Escape hatch when the store is already on 1.0 |
 | `v1Migrate.sourceConfig` | `{}` | Live 0.16 DataStore (`config` is the empty 1.0 target) |
 | `service.type` | `ClusterIP` | Main Service (use ingress for the management UI) |
 | `mailService.enabled` | `false` | Separate LoadBalancer for mail ports |
@@ -47,11 +48,11 @@ Full knobs: [values.yaml](values.yaml). Upstream K8s notes: [Stalwart docs](http
 
 ## Upgrade to Stalwart 1.0
 
-Stalwart 1.0 cannot open a 0.16 data store. This chart runs [`stalwart-migrate`](https://stalw.art/docs/migration/upgrade-0-16/) as a pre-upgrade Job when `v1Migrate.enabled` is set (short downtime while pods are scaled to 0).
+Stalwart 1.0 cannot open a 0.16 data store. Helm upgrades refuse to render until you either run `v1Migrate`, set `v1Migrate.alreadyDone=true` (store already on 1.0), or the `*-v1-migrated` ConfigMap exists. Fresh installs write that marker automatically.
 
 1. Create a **new empty** database (same Postgres is fine, new database name).
 2. One Helm upgrade: point `config` at the empty target, set `v1Migrate.sourceConfig` to the live 0.16 store, enable `v1Migrate`, keep Valkey/coordinator as today.
-3. Wait for the `*-v1-migrate` Job and the `*-v1-migrated` ConfigMap. Mail comes back on 1.0.
+3. Wait for the `*-v1-migrate` Job, then `*-v1-mark` (writes `*-v1-migrated`). Mail comes back on 1.0.
 4. Set `v1Migrate.enabled: false` on the next upgrade (marker keeps the Job from re-running).
 
 ```yaml
@@ -77,7 +78,7 @@ v1Migrate:
       variableName: STALWART_DB_PASSWORD
 ```
 
-The Job ships default `answers.toml` (all main data categories, recommended defaults, blob reuse, Redis in-memory from Valkey/`inMemoryStore`, OAuth registration accept). If `prepare` still asks about an OIDC directory id or similar, append those stanzas to `v1Migrate.answers` and retry.
+Default `answers.toml` covers main data categories, recommended defaults, blob reuse, proxy client IP (`xForwardedFor`), Redis in-memory from Valkey/`inMemoryStore`, and OAuth registration accept. If `prepare` still asks about an OIDC directory id, append those stanzas to `v1Migrate.answers` and retry.
 
 `migration.enabled` remains RocksDB PVC → shared store only. It is not the 0.16→1.0 path.
 
