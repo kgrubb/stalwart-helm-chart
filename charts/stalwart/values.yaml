@@ -65,6 +65,14 @@ metrics:
 valkey:
   enabled: false
 
+# In-memory store singleton. Clusters require Redis/Valkey (1.0 refuses the
+# local Default store when a coordinator is set). Empty + valkey.enabled wires
+# apply to the Valkey Service. https://stalw.art/docs/storage/in-memory/
+inMemoryStore: {}
+# inMemoryStore:
+#   "@type": Redis
+#   url: redis://redis.redis.svc.cluster.local:6379
+
 # Coordinator singleton. When set, a post-install/upgrade Job waits for
 # ready, runs `stalwart-cli apply`, then rolls the StatefulSet.
 # Required for replicaCount > 1 unless valkey.enabled. https://stalw.art/docs/management/cli/apply/
@@ -86,6 +94,19 @@ migration:
   dataClaim: ""
   ttlSecondsAfterFinished: 86400
 
+# One-shot 0.16 -> 1.0 via stalwart-migrate (pre-upgrade, short downtime).
+# Create an empty target database first. Point config at that target, set
+# sourceConfig to the live 0.16 store, enable once, helm upgrade, then disable.
+# https://stalw.art/docs/migration/upgrade-0-16/
+v1Migrate:
+  enabled: false
+  image: stalwartlabs/stalwart-migrate:1.0.0
+  sourceConfig: {}
+  # Optional answers.toml appended after chart defaults (OIDC directory ids, etc.).
+  answers: ""
+  activeDeadlineSeconds: 7200
+  ttlSecondsAfterFinished: 86400
+
 # Hook Job: domain, accounts, and OIDC directory via JMAP.
 bootstrap:
   enabled: false
@@ -98,8 +119,7 @@ bootstrap:
   oidc:
     issuerUrl: ""
     description: ""
-    requireAudience: ""
-    requireScopes: []
+    acceptedAudiences: []
     claimUsername: ""
     usernameDomain: ""
     claimName: ""

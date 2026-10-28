@@ -116,6 +116,10 @@
       },
       "required": ["enabled"]
     },
+    "inMemoryStore": {
+      "type": "object",
+      "additionalProperties": true
+    },
     "coordinator": {
       "type": "object",
       "additionalProperties": true
@@ -140,6 +144,19 @@
         "ttlSecondsAfterFinished": { "type": "integer", "minimum": 0 }
       },
       "required": ["enabled", "dataClaim", "ttlSecondsAfterFinished"]
+    },
+    "v1Migrate": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "image": { "type": "string", "minLength": 1 },
+        "sourceConfig": { "type": "object" },
+        "answers": { "type": "string" },
+        "activeDeadlineSeconds": { "type": "integer", "minimum": 1 },
+        "ttlSecondsAfterFinished": { "type": "integer", "minimum": 0 }
+      },
+      "required": ["enabled", "image", "sourceConfig", "answers", "activeDeadlineSeconds", "ttlSecondsAfterFinished"]
     },
     "bootstrap": {
       "type": "object",
@@ -185,8 +202,7 @@
           "properties": {
             "issuerUrl": { "type": "string" },
             "description": { "type": "string" },
-            "requireAudience": { "type": "string" },
-            "requireScopes": {
+            "acceptedAudiences": {
               "type": "array",
               "items": { "type": "string" }
             },
@@ -198,8 +214,7 @@
           "required": [
             "issuerUrl",
             "description",
-            "requireAudience",
-            "requireScopes",
+            "acceptedAudiences",
             "claimUsername",
             "usernameDomain",
             "claimName",

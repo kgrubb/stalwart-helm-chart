@@ -44,6 +44,21 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 redis://{{ include "valkey.fullname" $vk }}.{{ .Release.Namespace }}.svc:{{ dig "service" "port" 6379 .Values.valkey }}
 {{- end -}}
 
+{{- define "stalwart.inMemoryObject" -}}
+{{- if not (empty .Values.inMemoryStore) -}}
+{{- .Values.inMemoryStore | toJson -}}
+{{- else if .Values.valkey.enabled -}}
+{{- if dig "auth" "enabled" false .Values.valkey -}}
+{{- fail "valkey.auth.enabled requires an explicit inMemoryStore url with credentials" -}}
+{{- end -}}
+{{- dict "@type" "Redis" "url" (include "stalwart.valkey.url" .) | toJson -}}
+{{- else if and (not (empty .Values.coordinator)) (eq (index .Values.coordinator "@type" | toString) "Redis") (index .Values.coordinator "url") -}}
+{{- dict "@type" "Redis" "url" (index .Values.coordinator "url") | toJson -}}
+{{- else -}}
+{}
+{{- end -}}
+{{- end -}}
+
 {{- define "stalwart.coordinatorObject" -}}
 {{- if not (empty .Values.coordinator) -}}
 {{- .Values.coordinator | toJson -}}
@@ -62,6 +77,26 @@ redis://{{ include "valkey.fullname" $vk }}.{{ .Release.Namespace }}.svc:{{ dig 
 {{- end -}}
 
 {{- define "stalwart.cluster.validate" -}}
+{{- if and .Values.migration.enabled .Values.v1Migrate.enabled -}}
+{{- fail "migration.enabled and v1Migrate.enabled cannot both be true" -}}
+{{- end -}}
+{{- if .Values.v1Migrate.enabled -}}
+{{- if empty .Values.v1Migrate.sourceConfig -}}
+{{- fail "v1Migrate.enabled requires v1Migrate.sourceConfig (the live 0.16 DataStore)" -}}
+{{- end -}}
+{{- if eq (.Values.v1Migrate.sourceConfig | toJson) (.Values.config | toJson) -}}
+{{- fail "v1Migrate.sourceConfig must differ from config (config is the empty 1.0 target store)" -}}
+{{- end -}}
+{{- $mem := include "stalwart.inMemoryObject" . | fromJson -}}
+{{- if or (ne (index $mem "@type" | toString) "Redis") (not (index $mem "url")) -}}
+{{- fail "v1Migrate requires Redis inMemoryStore with url (or valkey.enabled)" -}}
+{{- end -}}
+{{- end -}}
+{{- if include "stalwart.hasCoordinator" . -}}
+{{- if eq (include "stalwart.inMemoryObject" .) "{}" -}}
+{{- fail "coordinator/valkey requires inMemoryStore (Redis) or valkey.enabled" -}}
+{{- end -}}
+{{- end -}}
 {{- if gt (.Values.replicaCount | int) 1 -}}
 {{- if eq (index .Values.config "@type" | toString) "RocksDb" -}}
 {{- fail "replicaCount > 1 requires a shared DataStore (config.@type must not be RocksDb)" -}}
@@ -76,6 +111,51 @@ redis://{{ include "valkey.fullname" $vk }}.{{ .Release.Namespace }}.svc:{{ dig 
 {{- fail "replicaCount > 1 requires recoveryAdmin credentials for the coordinator apply Job" -}}
 {{- end -}}
 {{- end -}}
+{{- end -}}
+
+{{/* answers.toml defaults for stalwart-migrate prepare --non-interactive */}}
+{{- define "stalwart.v1Migrate.answers" -}}
+version = 1
+
+[global.categories]
+include = [
+  "settings",
+  "principals",
+  "mail",
+  "calendars",
+  "contacts",
+  "files",
+  "sieve",
+  "identities",
+  "push_subscriptions",
+  "spam_samples",
+  "reports",
+  "archive",
+  "spam_model",
+  "queue",
+  "tasks",
+]
+
+[global.changed_defaults]
+policy = "recommended"
+
+[global.blob_store]
+mode = "reuse"
+
+[instance.oauth_registration."x:OidcProvider"]
+action = "accept"
+
+[instance.in_memory_cluster."x:InMemoryStore"]
+action = "replace"
+
+[instance.in_memory_cluster."x:InMemoryStore".store]
+{{- $mem := include "stalwart.inMemoryObject" . | fromJson }}
+"@type" = "Redis"
+url = {{ index $mem "url" | quote }}
+{{- with .Values.v1Migrate.answers }}
+
+{{ . }}
+{{- end }}
 {{- end -}}
 
 {{- define "stalwart.needsChartEnvSecret" -}}

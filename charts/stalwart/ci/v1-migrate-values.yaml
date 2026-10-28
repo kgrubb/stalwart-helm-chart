@@ -1,0 +1,21 @@
+# Overlay on ha-cluster-values.yaml to render the v1Migrate Job.
+v1Migrate:
+  enabled: true
+  sourceConfig:
+    "@type": PostgreSql
+    host: postgres.example.svc
+    port: 5432
+    database: stalwart
+    authUsername: stalwart
+    authSecret:
+      "@type": EnvironmentVariable
+      variableName: STALWART_DB_PASSWORD
+config:
+  "@type": PostgreSql
+  host: postgres.example.svc
+  port: 5432
+  database: stalwart_v1
+  authUsername: stalwart
+  authSecret:
+    "@type": EnvironmentVariable
+    variableName: STALWART_DB_PASSWORD
