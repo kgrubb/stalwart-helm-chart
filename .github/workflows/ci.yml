@@ -117,9 +117,16 @@ jobs:
             echo "replicaCount > 1 with RocksDb must fail"
             exit 1
           fi
+          if helm template test charts/stalwart \
+            -f charts/stalwart/ci/ha-cluster-values.yaml \
+            -f charts/stalwart/ci/v1-migrate-values.yaml 2>/dev/null; then
+            echo "v1Migrate on install must fail (upgrade-only)"
+            exit 1
+          fi
           helm template test charts/stalwart \
             -f charts/stalwart/ci/ha-cluster-values.yaml \
             -f charts/stalwart/ci/v1-migrate-values.yaml \
+            --is-upgrade \
             > /tmp/v1-migrate-render.yaml
           grep -q 'component: v1-migrate' /tmp/v1-migrate-render.yaml
           grep -q 'component: v1-mark' /tmp/v1-migrate-render.yaml
@@ -130,7 +137,8 @@ jobs:
           python3 charts/stalwart/ci/check-v1-migrate-render.py /tmp/v1-migrate-render.yaml
           if helm template test charts/stalwart \
             -f charts/stalwart/ci/ha-cluster-values.yaml \
-            --set v1Migrate.enabled=true 2>/dev/null; then
+            --set v1Migrate.enabled=true \
+            --is-upgrade 2>/dev/null; then
             echo "v1Migrate without sourceConfig must fail"
             exit 1
           fi

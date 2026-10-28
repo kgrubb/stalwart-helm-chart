@@ -11,7 +11,7 @@
 {{- $v1Marker := include "stalwart.v1MarkerName" . }}
 {{- $hasV1Marker := lookup "v1" "ConfigMap" .Release.Namespace $v1Marker }}
 {{- $doRocksMigrate := and .Values.migration.enabled .Values.migration.dataClaim (not (lookup "v1" "ConfigMap" .Release.Namespace $rocksMarker)) }}
-{{- $doV1Migrate := and .Values.v1Migrate.enabled (not (empty .Values.v1Migrate.sourceConfig)) (not $hasV1Marker) }}
+{{- $doV1Migrate := and .Release.IsUpgrade .Values.v1Migrate.enabled (not (empty .Values.v1Migrate.sourceConfig)) (not $hasV1Marker) }}
 {{- $doV1Mark := or $doV1Migrate (and .Release.IsInstall (not .Values.v1Migrate.enabled)) (and .Values.v1Migrate.alreadyDone (not $hasV1Marker)) }}
 {{- $doMigrate := or $doRocksMigrate $doV1Migrate }}
 {{- $url := default (printf "http://%s:%v" $name .Values.service.ports.mgmt) .Values.apply.apiUrl }}

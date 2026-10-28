@@ -48,7 +48,7 @@ Full knobs: [values.yaml](values.yaml). Upstream K8s notes: [Stalwart docs](http
 
 ## Upgrade to Stalwart 1.0
 
-Stalwart 1.0 cannot open a 0.16 data store. Helm upgrades refuse to render until you either run `v1Migrate`, set `v1Migrate.alreadyDone=true` (store already on 1.0), or the `*-v1-migrated` ConfigMap exists. Fresh installs write that marker automatically.
+Stalwart 1.0 cannot open a 0.16 data store. Helm upgrades refuse to render until you either run `v1Migrate`, set `v1Migrate.alreadyDone=true` (store already on 1.0), or the `*-v1-migrated` ConfigMap exists. Fresh installs write that marker automatically. `v1Migrate.enabled` is upgrade-only.
 
 1. Create a **new empty** database (same Postgres is fine, new database name).
 2. One Helm upgrade: point `config` at the empty target, set `v1Migrate.sourceConfig` to the live 0.16 store, enable `v1Migrate`, keep Valkey/coordinator as today.

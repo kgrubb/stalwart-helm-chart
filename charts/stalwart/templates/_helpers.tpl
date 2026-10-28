@@ -84,6 +84,9 @@ redis://{{ include "valkey.fullname" $vk }}.{{ .Release.Namespace }}.svc:{{ dig 
 {{- if and .Values.migration.enabled .Values.v1Migrate.enabled -}}
 {{- fail "migration.enabled and v1Migrate.enabled cannot both be true" -}}
 {{- end -}}
+{{- if and .Release.IsInstall .Values.v1Migrate.enabled -}}
+{{- fail "v1Migrate.enabled is upgrade-only (migrate hooks are pre-upgrade). Fresh installs start on 1.0 without it." -}}
+{{- end -}}
 {{- if and .Release.IsUpgrade (not .Values.v1Migrate.enabled) (not .Values.v1Migrate.alreadyDone) (not (lookup "v1" "ConfigMap" .Release.Namespace (include "stalwart.v1MarkerName" .))) -}}
 {{- fail "Stalwart 1.0 cannot open a 0.16 store. Enable v1Migrate (see chart README), or set v1Migrate.alreadyDone=true if this release already runs 1.0." -}}
 {{- end -}}
