@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-10-29
+
+### Fixed
+- grant `statefulsets/scale` on the hooks Role so migrate prepare can scale the mail StatefulSet to 0 ([#44](https://github.com/kgrubb/stalwart-helm-chart/pull/44))
+- allow migrate hooks to scale StatefulSets
+
+
+
 ## [1.0.0] - 2026-10-29
 
 ### Changed
