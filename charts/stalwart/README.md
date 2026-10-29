@@ -48,6 +48,8 @@ Full knobs: [values.yaml](values.yaml). Upstream K8s notes: [Stalwart docs](http
 
 ## Upgrade to Stalwart 1.0
 
+Chart **1.0.0** is the first release that refuse-closes upgrades without `v1Migrate` / `alreadyDone` / the marker. Treat it as a breaking chart major.
+
 Stalwart 1.0 cannot open a 0.16 data store. Helm upgrades refuse to render until you either run `v1Migrate`, set `v1Migrate.alreadyDone=true` (store already on 1.0), or the `*-v1-migrated` ConfigMap exists. Fresh installs write that marker automatically. `v1Migrate.enabled` is upgrade-only.
 
 1. Create a **new empty** database (same Postgres is fine, new database name).
