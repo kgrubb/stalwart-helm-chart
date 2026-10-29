@@ -56,7 +56,7 @@ Stalwart 1.0 cannot open a 0.16 data store. Helm upgrades refuse to render until
 
 1. Create a **new empty** database (same Postgres is fine, new database name).
 2. One Helm upgrade: point `config` at the empty target, set `v1Migrate.sourceConfig` to the live 0.16 store, enable `v1Migrate`, keep Valkey/coordinator as today.
-3. Wait for the `*-v1-migrate` Job, then `*-v1-mark` (writes `*-v1-migrated`). Mail comes back on 1.0.
+3. Wait for `*-migrate-prepare` (removes PDBs, scales mail to 0), then `*-v1-migrate`, then `*-v1-mark`. Mail comes back on 1.0. Do not run a second helm upgrade while that is in flight.
 4. Set `v1Migrate.enabled: false` on the next upgrade (marker keeps the Job from re-running).
 
 ```yaml

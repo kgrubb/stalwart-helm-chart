@@ -44,6 +44,11 @@ rules:
   - apiGroups: [""]
     resources: ["pods"]
     verbs: ["get", "list", "watch"{{- if $doMigrate }}, "delete"{{- end }}]
+  {{- if $doMigrate }}
+  - apiGroups: ["policy"]
+    resources: ["poddisruptionbudgets"]
+    verbs: ["get", "list", "delete"]
+  {{- end }}
   {{- if or $doMigrate $doV1Mark }}
   - apiGroups: [""]
     resources: ["configmaps"]
@@ -84,7 +89,7 @@ metadata:
     helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
 spec:
   backoffLimit: 0
-  activeDeadlineSeconds: 600
+  activeDeadlineSeconds: {{ if $doV1Migrate }}900{{ else }}600{{ end }}
   ttlSecondsAfterFinished: {{ if $doV1Migrate }}{{ .Values.v1Migrate.ttlSecondsAfterFinished }}{{ else }}{{ .Values.migration.ttlSecondsAfterFinished }}{{ end }}
   template:
     metadata:
@@ -107,10 +112,20 @@ spec:
               set -eu
               ns="$STALWART_NAMESPACE" sts="$STALWART_STS_NAME"
               kubectl get sts -n "$ns" "$sts" >/dev/null 2>&1 || exit 0
+              # minAvailable PDBs block scale-to-0. Remove them for the cutover window.
+              # The upgrade recreates the chart PDB after migrate hooks finish.
+              kubectl delete pdb -n "$ns" -l "app.kubernetes.io/name=$STALWART_NAME,app.kubernetes.io/instance=$STALWART_INSTANCE" --ignore-not-found
               kubectl scale sts -n "$ns" "$sts" --replicas=0
               kubectl wait -n "$ns" --for=delete pod \
                 -l "app.kubernetes.io/name=$STALWART_NAME,app.kubernetes.io/instance=$STALWART_INSTANCE,app.kubernetes.io/component=server" \
-                --timeout=300s
+                --timeout=600s
+              # Re-assert stop. A racing controller must not bring mail back before migrate.
+              kubectl scale sts -n "$ns" "$sts" --replicas=0
+              still="$(kubectl get pods -n "$ns" -l "app.kubernetes.io/name=$STALWART_NAME,app.kubernetes.io/instance=$STALWART_INSTANCE,app.kubernetes.io/component=server" --no-headers 2>/dev/null | wc -l | tr -d ' ')"
+              if [ "${still:-0}" != "0" ]; then
+                echo "server pods still present after scale-to-0: $still" >&2
+                exit 1
+              fi
               vct="$(kubectl get sts -n "$ns" "$sts" -o jsonpath='{.spec.volumeClaimTemplates}' 2>/dev/null || true)"
               if [ -n "$vct" ] && [ "$vct" != "null" ] && [ "$vct" != "[]" ]; then
                 kubectl delete sts -n "$ns" "$sts" --cascade=orphan
