@@ -39,7 +39,7 @@ metadata:
     helm.sh/hook-delete-policy: before-hook-creation
 rules:
   - apiGroups: ["apps"]
-    resources: ["statefulsets"]
+    resources: ["statefulsets", "statefulsets/scale"]
     verbs: ["get", "list", "watch", "update", "patch"{{- if $doMigrate }}, "delete"{{- end }}]
   - apiGroups: [""]
     resources: ["pods"]
