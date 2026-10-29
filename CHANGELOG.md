@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-10-29
+
+### Fixed
+- complete v1Migrate answers and clear state dir safely ([#45](https://github.com/kgrubb/stalwart-helm-chart/pull/45))
+  - default `new_permissions` to grant
+  - strip deep-merged RocksDb `path` from shared store migrate JSON
+  - clear emptyDir state contents instead of `rm` on the mount point
+- complete v1Migrate answers and clear state dir safely
+
+
+
 ## [1.0.1] - 2026-10-29
 
 ### Fixed
