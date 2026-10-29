@@ -1,0 +1,63 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/kgrubb/stalwart-helm-chart/issues
+    - name: source
+      url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/signKey: |
+    fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
+    url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+apiVersion: v2
+appVersion: v1.0.0
+dependencies:
+- - condition: valkey.enabled
+  name: valkey
+  repository: oci://ghcr.io/valkey-io/valkey-helm
+  version: 0.12.0
+description: Helm chart for the Stalwart mail and collaboration server
+home: https://stalw.art
+icon: https://kgrubb.github.io/stalwart-helm-chart/logo.svg
+keywords:
+- - mail
+- - smtp
+- - imap
+- - jmap
+- - stalwart
+maintainers:
+- - email: 8471701+kgrubb@users.noreply.github.com
+  name: kgrubb
+  url: https://github.com/kgrubb
+name: stalwart
+sources:
+- - https://github.com/stalwartlabs/stalwart
+- - https://stalw.art/docs/cluster/orchestration/kubernetes/
+- - https://github.com/kgrubb/stalwart-helm-chart
+type: application
+version: 0.9.7
+
+...
+files:
+  stalwart-0.9.7.tgz: sha256:1d58ebc43d8922c6fa0356e3769c68397f8f21b17bc18c999090a0ce6306249a
+-----BEGIN PGP SIGNATURE-----
+
+wsFcBAEBCgAQBQJq4rEfCRDKmZpzOV9F/QAAPyIQAC5YYTjIBkiiysmoTYgYD5HN
+Y/TkPfxbrp4CErxjPzvPVNmvb8gSstQYZgQdXS24k/k8gopAa08PTGKE8McT5kdX
+n88oJqkl/uqj6sIwzEBq8+vQphQ4c69QCu52n1vvRXk3J+i12+4gN9rZ2tpb6JkC
+2nNiXWhQHsSUpibW7FdPD9ZjfhFqLfxAzytjmuY+SRqLW0iDzw85z31xJOccTlnD
+RPqM4wTpJXkM+YB4FSXxMwaA7JEGlhy+9DlESyca+v6zI33vGJLgZydFPnmtzRqC
+9xa3kkP0rEL4inirekaN1tT6PwFth4Kt4TQTlYSJPfruGOT0wfTFZvdtLX1I1dzH
+vdNQuxewcOpmC9+EX26cMVqkyT12+uCx1f6JFV8i/0X9wKWngcACWZx+GJLbSRbW
+fUyCq0rh1QyDbYy4Ps6z/dFMy2G2x8B6KJrkbLglngl93zX0VLrPvMrMl4OW3uIm
+wj4X/zyEutooheM/bWGmu2ewjQIKFDp0x125GozqJtwL060AyKwoaweZbpu25QAW
+ZNKUCc6qB0sV2cKX7syX7ETW1PmOPeOuPwcg2sb6+k1hOVwwgGc4oenKyvfE4G8B
+8pR39s0Eeod67AqASRpL/PSd/CYpzB3TrzpK8MDM/P77yWZW1kn4abDdYWkXzT3/
+4Er2ihLi2qvePx04d6iV
+=Malx
+-----END PGP SIGNATURE-----
