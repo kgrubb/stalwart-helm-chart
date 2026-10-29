@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-10-29
+
+### Fixed
+- drain PDBs before v1Migrate scale-to-0 ([#46](https://github.com/kgrubb/stalwart-helm-chart/pull/46))
+  - delete release PodDisruptionBudgets before scale-to-0 so migrate-prepare can stop mail
+  - re-assert replicas=0 and fail if server pods remain
+  - grant hooks Role `policy/poddisruptionbudgets` delete
+- drain PDBs before v1Migrate scale-to-0
+
+
+
 ## [1.0.2] - 2026-10-29
 
 ### Fixed
