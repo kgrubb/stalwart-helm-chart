@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.4] - 2026-10-29
+
+### Fixed
+- apply wait uses in-cluster Service ([#47](https://github.com/kgrubb/stalwart-helm-chart/pull/47))
+  - apply / health wait always hits the in-cluster Service, ignoring `apply.apiUrl`
+  - pin apply CLI to 1.0.14 (1.0.13 blows up on server v1.0.0 schema `sieve`)
+- pin apply CLI to 1.0.14
+- wait for apply on in-cluster Service
+
+
+
 ## [1.0.3] - 2026-10-29
 
 ### Fixed
