@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.6] - 2026-10-29
+
+### Fixed
+- seamless Stalwart 1.0 cutover via v1Migrate ([#41](https://github.com/kgrubb/stalwart-helm-chart/pull/41))
+  - add `v1Migrate`: one helm upgrade scales mail to 0, runs `stalwart-migrate` into an empty target (`config`), then marks the release
+  - refuse upgrades that would start 1.0 on a 0.16 store unless `v1Migrate` runs, `alreadyDone` is set, or the marker exists
+  - apply `InMemoryStore` before `Coordinator`, fix OIDC bootstrap for 1.0, skip auto major image bumps
+- keep v1Migrate upgrade-only so install cannot false-mark
+- harden v1Migrate cutover against silent upgrades
+- cut over 0.16 to 1.0 with a migrate Job
+
+
+
 ## [0.9.5] - 2026-10-27
 
 ### Changed
