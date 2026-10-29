@@ -17,9 +17,13 @@ fi
 IFS='.' read -r cur_maj cur_min _ <<< "$current"
 IFS='.' read -r new_maj new_min _ <<< "$latest"
 
+# Majors need a store migration (stalwart-migrate) and a manual chart PR.
 if (( new_maj > cur_maj )); then
-  prefix="feat!(image)"
-elif (( new_min > cur_min )); then
+  echo "skip major app bump ${current} -> ${latest} (needs manual migrate PR)" >&2
+  exit 0
+fi
+
+if (( new_min > cur_min )); then
   prefix="feat(image)"
 else
   prefix="fix(image)"

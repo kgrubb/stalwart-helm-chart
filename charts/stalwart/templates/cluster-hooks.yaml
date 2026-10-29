@@ -7,10 +7,15 @@
 {{- fail "migration.enabled requires a shared DataStore (config.@type must not be RocksDb)" }}
 {{- end }}
 {{- $name := include "stalwart.fullname" . }}
-{{- $marker := printf "%s-migrated" $name }}
-{{- $doMigrate := and .Values.migration.enabled .Values.migration.dataClaim (not (lookup "v1" "ConfigMap" .Release.Namespace $marker)) }}
+{{- $rocksMarker := printf "%s-migrated" $name }}
+{{- $v1Marker := include "stalwart.v1MarkerName" . }}
+{{- $hasV1Marker := lookup "v1" "ConfigMap" .Release.Namespace $v1Marker }}
+{{- $doRocksMigrate := and .Values.migration.enabled .Values.migration.dataClaim (not (lookup "v1" "ConfigMap" .Release.Namespace $rocksMarker)) }}
+{{- $doV1Migrate := and .Release.IsUpgrade .Values.v1Migrate.enabled (not (empty .Values.v1Migrate.sourceConfig)) (not $hasV1Marker) }}
+{{- $doV1Mark := or $doV1Migrate (and .Release.IsInstall (not .Values.v1Migrate.enabled)) (and .Values.v1Migrate.alreadyDone (not $hasV1Marker)) }}
+{{- $doMigrate := or $doRocksMigrate $doV1Migrate }}
 {{- $url := default (printf "http://%s:%v" $name .Values.service.ports.mgmt) .Values.apply.apiUrl }}
-{{- if or $apply $doMigrate }}
+{{- if or $apply $doMigrate $doV1Mark }}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -39,7 +44,7 @@ rules:
   - apiGroups: [""]
     resources: ["pods"]
     verbs: ["get", "list", "watch"{{- if $doMigrate }}, "delete"{{- end }}]
-  {{- if $doMigrate }}
+  {{- if or $doMigrate $doV1Mark }}
   - apiGroups: [""]
     resources: ["configmaps"]
     verbs: ["get", "list", "create", "update", "patch"]
@@ -65,20 +70,6 @@ subjects:
 {{- end }}
 {{- if $doMigrate }}
 ---
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ $name }}-migrate
-  labels:
-    {{- include "stalwart.labels" . | nindent 4 }}
-  annotations:
-    helm.sh/hook: pre-upgrade
-    helm.sh/hook-weight: "-18"
-    helm.sh/hook-delete-policy: before-hook-creation
-data:
-  migrate.sh: |
-{{ .Files.Get "files/migrate.sh" | indent 4 }}
----
 # Separate Job so RWO PVC attach does not deadlock scale-down.
 apiVersion: batch/v1
 kind: Job
@@ -94,7 +85,7 @@ metadata:
 spec:
   backoffLimit: 0
   activeDeadlineSeconds: 600
-  ttlSecondsAfterFinished: {{ .Values.migration.ttlSecondsAfterFinished }}
+  ttlSecondsAfterFinished: {{ if $doV1Migrate }}{{ .Values.v1Migrate.ttlSecondsAfterFinished }}{{ else }}{{ .Values.migration.ttlSecondsAfterFinished }}{{ end }}
   template:
     metadata:
       labels:
@@ -134,6 +125,22 @@ spec:
               value: {{ include "stalwart.name" . | quote }}
             - name: STALWART_INSTANCE
               value: {{ .Release.Name | quote }}
+{{- end }}
+{{- if $doRocksMigrate }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $name }}-migrate
+  labels:
+    {{- include "stalwart.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: pre-upgrade
+    helm.sh/hook-weight: "-18"
+    helm.sh/hook-delete-policy: before-hook-creation
+data:
+  migrate.sh: |
+{{ .Files.Get "files/migrate.sh" | indent 4 }}
 ---
 apiVersion: batch/v1
 kind: Job
@@ -201,7 +208,7 @@ spec:
             - name: STALWART_NAMESPACE
               value: {{ .Release.Namespace | quote }}
             - name: MIGRATION_MARKER
-              value: {{ $marker | quote }}
+              value: {{ $rocksMarker | quote }}
             - name: DATA_CLAIM
               value: {{ .Values.migration.dataClaim | quote }}
       volumes:
@@ -217,6 +224,144 @@ spec:
         - name: tmp
           emptyDir: {}
 {{- end }}
+{{- if $doV1Migrate }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $name }}-v1-migrate
+  labels:
+    {{- include "stalwart.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: pre-upgrade
+    helm.sh/hook-weight: "-18"
+    helm.sh/hook-delete-policy: before-hook-creation
+data:
+  v1-migrate.sh: |
+{{ .Files.Get "files/v1-migrate.sh" | indent 4 }}
+  answers.toml: |
+{{ include "stalwart.v1Migrate.answers" . | indent 4 }}
+---
+# Job success is migrate success only. Marker is a separate Job so a ConfigMap
+# blip cannot force a remigrate into a non-empty target.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $name }}-v1-migrate
+  labels:
+    {{- include "stalwart.labels" . | nindent 4 }}
+    app.kubernetes.io/component: v1-migrate
+  annotations:
+    helm.sh/hook: pre-upgrade
+    helm.sh/hook-weight: "-5"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: {{ .Values.v1Migrate.activeDeadlineSeconds }}
+  ttlSecondsAfterFinished: {{ .Values.v1Migrate.ttlSecondsAfterFinished }}
+  template:
+    metadata:
+      labels:
+        {{- include "stalwart.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: v1-migrate
+    spec:
+      restartPolicy: Never
+      serviceAccountName: {{ $name }}-hooks
+      securityContext:
+        fsGroup: 2000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: migrate
+          image: {{ .Values.v1Migrate.image | quote }}
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "/scripts/v1-migrate.sh"]
+          {{- include "stalwart.hooks.containerSecurity" (dict "uid" 2000 "noDrop" true) | nindent 10 }}
+          {{- with .Values.envFrom }}
+          envFrom:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            - name: SOURCE_JSON
+              value: {{ .Values.v1Migrate.sourceConfig | toJson | quote }}
+            - name: TARGET_JSON
+              value: {{ .Values.config | toJson | quote }}
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+              readOnly: true
+            - name: answers
+              mountPath: /answers
+              readOnly: true
+            - name: state
+              mountPath: /var/lib/stalwart-migrate
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: scripts
+          configMap:
+            name: {{ $name }}-v1-migrate
+            items:
+              - key: v1-migrate.sh
+                path: v1-migrate.sh
+            defaultMode: 0555
+        - name: answers
+          configMap:
+            name: {{ $name }}-v1-migrate
+            items:
+              - key: answers.toml
+                path: answers.toml
+        - name: state
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+{{- end }}
+{{- if $doV1Mark }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $name }}-v1-mark
+  labels:
+    {{- include "stalwart.labels" . | nindent 4 }}
+    app.kubernetes.io/component: v1-mark
+  annotations:
+    helm.sh/hook: pre-upgrade,post-install
+    helm.sh/hook-weight: "-4"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 3
+  activeDeadlineSeconds: 120
+  ttlSecondsAfterFinished: {{ .Values.v1Migrate.ttlSecondsAfterFinished }}
+  template:
+    metadata:
+      labels:
+        {{- include "stalwart.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: v1-mark
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: {{ $name }}-hooks
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: mark
+          image: {{ .Values.apply.kubectlImage | quote }}
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              kubectl create configmap -n "$STALWART_NAMESPACE" "$MIGRATION_MARKER" \
+                --from-literal=status=migrated \
+                --dry-run=client -o yaml | kubectl apply -f -
+          {{- include "stalwart.hooks.containerSecurity" (dict "uid" 65534) | nindent 10 }}
+          env:
+            - name: STALWART_NAMESPACE
+              value: {{ .Release.Namespace | quote }}
+            - name: MIGRATION_MARKER
+              value: {{ $v1Marker | quote }}
+{{- end }}
 {{- if $apply }}
 ---
 apiVersion: v1
@@ -231,6 +376,7 @@ metadata:
     helm.sh/hook-delete-policy: before-hook-creation
 data:
   plan.ndjson: |
+    {"@type":"update","object":"InMemoryStore","value":{{ include "stalwart.inMemoryObject" . }}}
     {"@type":"update","object":"Coordinator","value":{{ include "stalwart.coordinatorObject" . }}}
 ---
 apiVersion: batch/v1

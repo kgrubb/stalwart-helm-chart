@@ -12,8 +12,7 @@ USING = ["urn:ietf:params:jmap:core", "urn:stalwart:jmap"]
 OIDC_FIELDS = (
     "description",
     "issuerUrl",
-    "requireAudience",
-    "requireScopes",
+    "acceptedAudiences",
     "claimUsername",
     "usernameDomain",
     "claimName",
