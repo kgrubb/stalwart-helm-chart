@@ -283,9 +283,9 @@ spec:
           {{- end }}
           env:
             - name: SOURCE_JSON
-              value: {{ .Values.v1Migrate.sourceConfig | toJson | quote }}
+              value: {{ include "stalwart.v1Migrate.storeJson" (dict "store" .Values.v1Migrate.sourceConfig) | quote }}
             - name: TARGET_JSON
-              value: {{ .Values.config | toJson | quote }}
+              value: {{ include "stalwart.v1Migrate.storeJson" (dict "store" .Values.config) | quote }}
           volumeMounts:
             - name: scripts
               mountPath: /scripts

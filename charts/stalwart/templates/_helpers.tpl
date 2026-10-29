@@ -80,6 +80,15 @@ redis://{{ include "valkey.fullname" $vk }}.{{ .Release.Namespace }}.svc:{{ dig 
 {{- printf "%s-v1-migrated" (include "stalwart.fullname" .) -}}
 {{- end -}}
 
+{{/* Drop deep-merged RocksDb path from shared-store configs before migrate. */}}
+{{- define "stalwart.v1Migrate.storeJson" -}}
+{{- $store := deepCopy .store -}}
+{{- if ne (index $store "@type" | toString) "RocksDb" -}}
+{{- $_ := unset $store "path" -}}
+{{- end -}}
+{{- $store | toJson -}}
+{{- end -}}
+
 {{- define "stalwart.cluster.validate" -}}
 {{- if and .Values.migration.enabled .Values.v1Migrate.enabled -}}
 {{- fail "migration.enabled and v1Migrate.enabled cannot both be true" -}}
@@ -148,6 +157,9 @@ include = [
 
 [global.changed_defaults]
 policy = "recommended"
+
+[global.new_permissions]
+action = "grant"
 
 [global.blob_store]
 mode = "reuse"
