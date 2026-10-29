@@ -129,6 +129,8 @@ jobs:
             --is-upgrade \
             > /tmp/v1-migrate-render.yaml
           grep -q 'statefulsets/scale' /tmp/v1-migrate-render.yaml
+          grep -q 'poddisruptionbudgets' /tmp/v1-migrate-render.yaml
+          grep -q 'delete pdb' /tmp/v1-migrate-render.yaml
           grep -q 'component: v1-migrate' /tmp/v1-migrate-render.yaml
           grep -q 'component: v1-mark' /tmp/v1-migrate-render.yaml
           grep -q 'stalwartlabs/stalwart-migrate:1.0.0' /tmp/v1-migrate-render.yaml
