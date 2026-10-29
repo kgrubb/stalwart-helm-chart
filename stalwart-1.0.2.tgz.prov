@@ -1,0 +1,63 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/kgrubb/stalwart-helm-chart/issues
+    - name: source
+      url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/signKey: |
+    fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
+    url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+apiVersion: v2
+appVersion: v1.0.0
+dependencies:
+- - condition: valkey.enabled
+  name: valkey
+  repository: oci://ghcr.io/valkey-io/valkey-helm
+  version: 0.12.0
+description: Helm chart for the Stalwart mail and collaboration server
+home: https://stalw.art
+icon: https://kgrubb.github.io/stalwart-helm-chart/logo.svg
+keywords:
+- - mail
+- - smtp
+- - imap
+- - jmap
+- - stalwart
+maintainers:
+- - email: 8471701+kgrubb@users.noreply.github.com
+  name: kgrubb
+  url: https://github.com/kgrubb
+name: stalwart
+sources:
+- - https://github.com/stalwartlabs/stalwart
+- - https://stalw.art/docs/cluster/orchestration/kubernetes/
+- - https://github.com/kgrubb/stalwart-helm-chart
+type: application
+version: 1.0.2
+
+...
+files:
+  stalwart-1.0.2.tgz: sha256:7aa453eeac3157b0274899c44ef8c3babbb679bfe7647372fff2f7a489893ffa
+-----BEGIN PGP SIGNATURE-----
+
+wsFcBAEBCgAQBQJq4rQuCRDKmZpzOV9F/QAAIXIQAEy0eiqtAV5sfUmr+HvoAiGJ
+keX0pFHseHwK5t6wperE5FEv+erJpO3bLEpr56sA4yOz1luDByt3h+m332r3J2zQ
+NlHB2lBvGw2Bnlp/w+6ULXvnARavdWercbrbN26GDiqVEHdWchO36Ale3f6RxewP
+3cRLQ3eLQXrHSuiISGI1H53J7PLNEtfyE6t5aE0hNRCFTOq3qi16woveND7xv3FZ
+uwivx/HIzrTq47uaq0qtyFKOjzBrMs25vWYPOXRYsCuentdayvpJFCNGWJLJpFc0
+Vs0XnS5CQxGjLOrOzIkl3GkH6ykroWhTTtIscMYHAbtoUJsZ10co8bryQd06RiSq
+zMn0ODARBTDbjd6n/R7TqCZtx1pgqwOjYw5f4E8PmFgLLgSi5gyY7rQPfuJGYuo3
+frgzJpU0U0/DCGY6CeSgW6Aq7e1uRQIs1Q74QdzUe7gk6eLvwSQoK+CgNiKzN3tH
+OGptIRRlnQVL+J8A8odvJjRTMlOtTpQRsXrUKc9IibNWKTeSw894TzeamWSZmVoP
+x+CsB97k+/+dSN22b3at36hs9+DRnGLvPVXpNT/2m5a5KmMdjtCdFNrawen6pZGw
+tA9gTOK9RumAu6OGV3EeM3fbzoJoQQKWoKwAovRz1q+agVPrmXtkmXgVjck0FxZi
+VnCLd7X+XVYd8Y2XSOsv
+=2USM
+-----END PGP SIGNATURE-----
