@@ -103,8 +103,21 @@ jobs:
           grep -q 'sha256sum /plan/plan.ndjson' /tmp/ha-render.yaml
           grep -q 'kind: PodDisruptionBudget' /tmp/ha-render.yaml
           grep -A20 'kind: PodDisruptionBudget' /tmp/ha-render.yaml | grep -q 'component: server'
-          grep -q 'stalwartlabs/cli:1.0.13' /tmp/ha-render.yaml
+          grep -q 'stalwartlabs/cli:1.0.14' /tmp/ha-render.yaml
           grep -q 'alpine/kubectl:1.37.1' /tmp/ha-render.yaml
+          grep -q 'value: http://test-stalwart:8080' /tmp/ha-render.yaml
+          # apply.apiUrl must not override the in-cluster wait/apply URL
+          helm template test charts/stalwart \
+            -f charts/stalwart/ci/ha-cluster-values.yaml \
+            --set apply.apiUrl=https://mail.example.org \
+            | grep -q 'value: http://test-stalwart:8080'
+          if helm template test charts/stalwart \
+            -f charts/stalwart/ci/ha-cluster-values.yaml \
+            --set apply.apiUrl=https://mail.example.org \
+            | grep -q 'value: https://mail.example.org'; then
+            echo "apply.apiUrl must not become STALWART_URL"
+            exit 1
+          fi
           helm template test charts/stalwart \
             -f charts/stalwart/ci/ha-cluster-values.yaml \
             -f charts/stalwart/ci/migrate-values.yaml \
