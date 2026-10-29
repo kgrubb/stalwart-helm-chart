@@ -82,7 +82,7 @@ coordinator: {}
 #   url: redis://redis.redis.svc.cluster.local:6379
 
 apply:
-  image: stalwartlabs/cli:1.0.13
+  image: stalwartlabs/cli:1.0.14
   kubectlImage: alpine/kubectl:1.37.1
   # Unused by apply hooks (always in-cluster Service). Kept for schema compat.
   apiUrl: ""
