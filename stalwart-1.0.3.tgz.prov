@@ -1,0 +1,63 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/kgrubb/stalwart-helm-chart/issues
+    - name: source
+      url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/signKey: |
+    fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
+    url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+apiVersion: v2
+appVersion: v1.0.0
+dependencies:
+- - condition: valkey.enabled
+  name: valkey
+  repository: oci://ghcr.io/valkey-io/valkey-helm
+  version: 0.12.0
+description: Helm chart for the Stalwart mail and collaboration server
+home: https://stalw.art
+icon: https://kgrubb.github.io/stalwart-helm-chart/logo.svg
+keywords:
+- - mail
+- - smtp
+- - imap
+- - jmap
+- - stalwart
+maintainers:
+- - email: 8471701+kgrubb@users.noreply.github.com
+  name: kgrubb
+  url: https://github.com/kgrubb
+name: stalwart
+sources:
+- - https://github.com/stalwartlabs/stalwart
+- - https://stalw.art/docs/cluster/orchestration/kubernetes/
+- - https://github.com/kgrubb/stalwart-helm-chart
+type: application
+version: 1.0.3
+
+...
+files:
+  stalwart-1.0.3.tgz: sha256:49154cd128c7c007856d2d3f845bfea97d1291b932b306d5617cd35132011f84
+-----BEGIN PGP SIGNATURE-----
+
+wsFcBAEBCgAQBQJq4rq/CRDKmZpzOV9F/QAAt+4QAI3+CpMdMipUrlrlhqPSCUoE
+Drj8IdA4W/czn0/MKJc/zoADnScFnfBTJaT+M9YQESXO2T0JWZtgDATn7/++3PN8
+KWyIF4aOtGhx61YBPqQurQJIZlb+f/kHMXhnpRZhAkkPj2qkTTj/pVE5ypeJRKnN
+iZ9UmibySozlxVs9JgOoaJfQAbZGWZWzKmUXuD58rdVg0llzfDCqpWOv0uIIWKW1
+4RbmQrYdIAPPLnxxGLVUL9pI+9Fn7xby4J/tvr/m9nE4FyhN0WqVSwbh9rDlBn+9
+OfieH97JfMm7auiJGhuBQpF7YN9GH0YVcpwBIlSaQIH8NsIY4aOz+XdmmVlmlL4S
+U9GVkFgjPPz5zfdfjJcuSeOJAdlNRcawBg3LxbHu6WsKNyvkwq3Vv9hl3wcE186Q
+Fkzxj2lGLcyiuZCKtZ+1WPmpGiUGVF/qtPCpxwJr2uq5zO9cJsQs83Hly1moDKtb
+9pi4iZHwHzxCX5tm5oiIh2TVepHvwGpPbN23kS/r1TUc1BCdHfu1+oY7OucJn1wc
+yWTEl6dIBJGADlQ5CicSve2JF001RlcAg32RDErFf3NI0gWNYGX4zcecOx2JaJEH
+VNc1w0GKci0k1S6eaB0S6da1Gd23//rLsncuUahbMD/dchst5lY3F1/j9OrVd1UZ
+lW27AejonDg2R9/qz/ur
+=AEJp
+-----END PGP SIGNATURE-----
