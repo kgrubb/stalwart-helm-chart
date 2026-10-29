@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-29
+
+### Changed
+- release 1.0.0 for breaking v1Migrate cutover ([#43](https://github.com/kgrubb/stalwart-helm-chart/pull/43))
+  - prior merge used `feat!(chart):`, which the bump script does not treat as breaking, so it shipped 0.9.7
+  - this uses `feat(chart)!:` so release bumps to 1.0.0
+- bump major for refuse-closed v1Migrate cutover
+
+
+
 ## [0.9.7] - 2026-10-29
 
 ### Changed
