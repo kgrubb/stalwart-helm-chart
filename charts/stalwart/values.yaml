@@ -84,6 +84,7 @@ coordinator: {}
 apply:
   image: stalwartlabs/cli:1.0.13
   kubectlImage: alpine/kubectl:1.37.1
+  # Unused by apply hooks (always in-cluster Service). Kept for schema compat.
   apiUrl: ""
   ttlSecondsAfterFinished: 300
 
