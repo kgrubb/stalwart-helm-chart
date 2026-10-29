@@ -1,0 +1,63 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/kgrubb/stalwart-helm-chart/issues
+    - name: source
+      url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/signKey: |
+    fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
+    url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+apiVersion: v2
+appVersion: v1.0.0
+dependencies:
+- - condition: valkey.enabled
+  name: valkey
+  repository: oci://ghcr.io/valkey-io/valkey-helm
+  version: 0.12.0
+description: Helm chart for the Stalwart mail and collaboration server
+home: https://stalw.art
+icon: https://kgrubb.github.io/stalwart-helm-chart/logo.svg
+keywords:
+- - mail
+- - smtp
+- - imap
+- - jmap
+- - stalwart
+maintainers:
+- - email: 8471701+kgrubb@users.noreply.github.com
+  name: kgrubb
+  url: https://github.com/kgrubb
+name: stalwart
+sources:
+- - https://github.com/stalwartlabs/stalwart
+- - https://stalw.art/docs/cluster/orchestration/kubernetes/
+- - https://github.com/kgrubb/stalwart-helm-chart
+type: application
+version: 0.9.6
+
+...
+files:
+  stalwart-0.9.6.tgz: sha256:11aba58f3b3165fd204e0c2c5cf1ec83ae8cf5cbd0194217bb8b65eca718f465
+-----BEGIN PGP SIGNATURE-----
+
+wsFcBAEBCgAQBQJq4p4bCRDKmZpzOV9F/QAAJIgQAB8ddYygQTTu1z+YXLldfcwa
+dMecQXP6jZJqdDISKZlnMR4vndDJCJNjEz/FeXWPQCzET859W5mx+/O+RSLdHiwg
+gD6NIAU9EUrLU6n/PEH8sBlTb+vhIpfHPNARYqC13cctbF9OvEtgeNzxbiHg+wTb
+RUW6FrWSOExhZDN9fGIfwFmU2pHaSDHeC8qtjp3b4wiS33jmAWJPfgbEpABUAPa5
+fiDDRoSwth5AjySNVGqW+KgHTBgO0Zws3qXwZxx2DQcbZv0J6onDhtBZncij2FL3
+f3XsltmIAW+tE24wwY9Fgqd30foUM7wzNW2XaFJlQ1TvMeFg5Fyt/HqSRYEzIf/q
+/3jstXSh9cwmScWsftvxra/AX8ba8EYmz9RzqOfK5HYfOSjKZ8aGuaMjURAikXyQ
++EZGZX/WZwQhUuUsa3cRgqms/0okumIyLTjeQgh6VjGuDScGqCJp9XLYqFnFRue+
+YXvRc1rvMDawhbbhUY83cBa5uwm9l8t2OzlVEZjEe+YgbWaSnWFKajs+HNQu6ijT
+j/u6nh/AWoyjOcV3miKZiwwr/EnUtGrxm4r7NmERdLX40KLHoigsyrfJHkTiOXbQ
+OG6UE7ffROgwfdAAkAs5+aenwfmudcZxSolLzrimdNDQwEqZtPsfsmL0jvx+RgGP
+bx/fhoneOHwDVGXIORCu
+=Zdlc
+-----END PGP SIGNATURE-----
