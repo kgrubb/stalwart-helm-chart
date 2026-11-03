@@ -1,0 +1,63 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/kgrubb/stalwart-helm-chart/issues
+    - name: source
+      url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/signKey: |
+    fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
+    url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+apiVersion: v2
+appVersion: v1.0.2
+dependencies:
+- - condition: valkey.enabled
+  name: valkey
+  repository: oci://ghcr.io/valkey-io/valkey-helm
+  version: 0.12.0
+description: Helm chart for the Stalwart mail and collaboration server
+home: https://stalw.art
+icon: https://kgrubb.github.io/stalwart-helm-chart/logo.svg
+keywords:
+- - mail
+- - smtp
+- - imap
+- - jmap
+- - stalwart
+maintainers:
+- - email: 8471701+kgrubb@users.noreply.github.com
+  name: kgrubb
+  url: https://github.com/kgrubb
+name: stalwart
+sources:
+- - https://github.com/stalwartlabs/stalwart
+- - https://stalw.art/docs/cluster/orchestration/kubernetes/
+- - https://github.com/kgrubb/stalwart-helm-chart
+type: application
+version: 1.0.6
+
+...
+files:
+  stalwart-1.0.6.tgz: sha256:63dcf21a144528b3e92783866a463453306b348a09924e6b6f1b3dcbba97e0fb
+-----BEGIN PGP SIGNATURE-----
+
+wsFcBAEBCgAQBQJq6X1TCRDKmZpzOV9F/QAA1B0QAFe2LN96coteRRmNucHeI3l3
+g/ytXYWw+2XERj1sLV9EcWU9+LyhpWojZOQYiboC+a7NIkW0c02lsnhnZalzOQCv
+LCZYbDmjGJdDh1nf79+4eLnh3GzCkzB1m/+tobgboWtwGuNf5YeACSb78SyeW+hu
+ZuV7kVEqhxivcTjmUErHG0JnrCFZtEa6PB13khqFhYdMw3Npc0prMzAFOF00PoF+
+ayFr4Rc2Cf+7+3br6xte+Z0Y9zS/jKuQyJuW8PvsxVyQJDEUERurJXCOqQBfkvFQ
+0x1ezTtI/gtLWrXLFdFB9bQ4NqcNByI6Y9+lE6GODy+vVcgh/czJCMvwI2eUsiiY
+a64liWCO1TQaLHYFkAu7pEsyohiSzhHwgOI08k8Qq07fi3eo8VPtDCQDg3T9uKKx
+x5C0KgCs3ghnS1GtVkcU9f5tEP+xqEbX8ui9742mq8teI3z01aBzq6Su53LF9RR3
+lAAI6cwnOFdPNGrVfcd/2JJkBV4BaCYtW+iDyVKz94hOlxsKIDsVUJMe7abyT/IO
+uIgWYVkmBlKEYyKRt4p24lK3aHNK20qqNFj2vHnQmK9d7OZBg14egujs6icR/g8v
+lN6Afvk2COPiscI2vai6gsVBQiE8S7CuCYN1hPVh49JHuO1PKSnMJHKhyerlWcWL
+n3njvAaNNOuoRUKlGBJa
+=EZDP
+-----END PGP SIGNATURE-----
