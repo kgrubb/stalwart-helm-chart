@@ -1,0 +1,63 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/kgrubb/stalwart-helm-chart/issues
+    - name: source
+      url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/signKey: |
+    fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
+    url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+apiVersion: v2
+appVersion: v1.2.0
+dependencies:
+- - condition: valkey.enabled
+  name: valkey
+  repository: oci://ghcr.io/valkey-io/valkey-helm
+  version: 0.12.0
+description: Helm chart for the Stalwart mail and collaboration server
+home: https://stalw.art
+icon: https://kgrubb.github.io/stalwart-helm-chart/logo.svg
+keywords:
+- - mail
+- - smtp
+- - imap
+- - jmap
+- - stalwart
+maintainers:
+- - email: 8471701+kgrubb@users.noreply.github.com
+  name: kgrubb
+  url: https://github.com/kgrubb
+name: stalwart
+sources:
+- - https://github.com/stalwartlabs/stalwart
+- - https://stalw.art/docs/cluster/orchestration/kubernetes/
+- - https://github.com/kgrubb/stalwart-helm-chart
+type: application
+version: 1.2.0
+
+...
+files:
+  stalwart-1.2.0.tgz: sha256:2a8afa829777bfd0a2253da1232c025495f57dadce1c16aca131fd7d8e6c9143
+-----BEGIN PGP SIGNATURE-----
+
+wsFcBAEBCgAQBQJrBVpRCRDKmZpzOV9F/QAAOSMQAIFVLs4m5n2e3GIjlBkkDXym
+vHtV4c3yBf39vI8nu2whSlXy71LXwi329jypop7J3pdy5IgKzV45qlhcgxzrC0+s
+bQoUS0dgldOHpx8QkWXSvYBzQ7EGOUxzwDFAc+WKvj9pOOyspl0Y0YHiVs26RNSH
+QraeMbTYv+EynuYo9rTqUsyymPqr+GKkHwY5GmY6w7ZkvpO9ZMCT9FiZLsDAfc/j
+VANx2wZIAcI7qyra/ZByTOc9tDiwOkd+pL3wNof7IqQ6fM16XFC+ufCZ3XIgVSzH
+fOz5wpLT8XIQrhes62BskWDlE9qcSx8MwGqFq0mh9m/LKW+F9x9WaiBKUNAEsiit
+qNFFztbt3LlYLnpTfjNc5cnn7iEB7cGpAXI/5Gh8AqZQY73zIeRHt50RZgStNsSp
+DgeEgRw9zucJjWDTFJp36pW4RkG3EfQM5oxUzchsSTqb2YnuOrBbaBgoOeGRhgea
+9Uia638b+XzGX3b/wEMxlNqnvYULsOtXkGuUhA2xMN715v+8xK8WPwdOFm/eCxAi
+4mkaOgsNLaYvTeZPHh4hdLokqIf3Q2/pzo6bjy3UD6Gp5fz7J/pSEOg8pHWwVSlV
+QE6YFJbB8qE14nHbpVAdMd0/rR/xyMk5z+MymH954SJs75+IyLODSGKk7qRBrEW3
+BO6GPTQKkkzjTxx1hl+r
+=ffb2
+-----END PGP SIGNATURE-----
