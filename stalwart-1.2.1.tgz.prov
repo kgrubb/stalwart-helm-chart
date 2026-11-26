@@ -1,0 +1,63 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+annotations:
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/kgrubb/stalwart-helm-chart/issues
+    - name: source
+      url: https://github.com/kgrubb/stalwart-helm-chart
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/signKey: |
+    fingerprint: AFB495384FDAD4EDC0EBF8FECA999A73395F45FD
+    url: https://kgrubb.github.io/stalwart-helm-chart/public.key
+apiVersion: v2
+appVersion: v1.2.1
+dependencies:
+- - condition: valkey.enabled
+  name: valkey
+  repository: oci://ghcr.io/valkey-io/valkey-helm
+  version: 0.12.0
+description: Helm chart for the Stalwart mail and collaboration server
+home: https://stalw.art
+icon: https://kgrubb.github.io/stalwart-helm-chart/logo.svg
+keywords:
+- - mail
+- - smtp
+- - imap
+- - jmap
+- - stalwart
+maintainers:
+- - email: 8471701+kgrubb@users.noreply.github.com
+  name: kgrubb
+  url: https://github.com/kgrubb
+name: stalwart
+sources:
+- - https://github.com/stalwartlabs/stalwart
+- - https://stalw.art/docs/cluster/orchestration/kubernetes/
+- - https://github.com/kgrubb/stalwart-helm-chart
+type: application
+version: 1.2.1
+
+...
+files:
+  stalwart-1.2.1.tgz: sha256:7d83cc509a85ddf4c59e5d5181dbad527dccda360f1d9cc28033d809fd7798e6
+-----BEGIN PGP SIGNATURE-----
+
+wsFcBAEBCgAQBQJrB+YPCRDKmZpzOV9F/QAAU9wQAF0UIytlz7tO9hLQcRelW+56
+yL20LlYQvbP1e6VC6rOqejQA5Z5xt+ROruRTr+9Og6MQEgQAg0Txzm3Y7oDRibEA
+SlXK9dYGKs5WrcFEEMwzUVfDI+0hqOhb/T92WmTD9p65OYuv35f+msC7HRnUqLaU
+LSZ1A6mASxZGBSF5R2zWSmxwiI5qpJD/OxITCHJtJvvXJ1Y9IQEkbvQtY2PqoS2L
+zJtIZ8Cyfrp055GHeAAcMxwz4q0WJtnGp5QxunqCzL0PZRugN9pUCwvoXTKiApIJ
+EOSxSKKrms6cqZLJ+o/c6/dnxV37nxsACEUEW2iuJz+j3gY8K/+EkOOvAuRV+8EM
+fkk+wMCEJlbc0lPHjeKtR0rGBsM53mnBz7bRVQz+IpQPGPf8JI3wpHlLq/rWJWYB
+EIj5rm6EUMvvD2HJsIAwpbyrBtwbLV3Cb96EVR6CqNJje6x2vIC9W2tofXp5oq5W
+oW5HJ0LgQfUK8cwRHuIP1VnCAiTIVlfaGKL/NRRhZuPfb2F8uYL1Ad7Gc204u5Yb
+BClQPoc0rEWWXaVrXOvcjrUepnIBlisNTTu/tlSCvoROeukMAAQov+rdcQpmzP68
+JJfzu2cXTAPC0Z1e2WG/FuD/frR5rr0hc63bF0cLkdIje3hRgQURtLl/deKAyNku
+MGaGtvanNmUdIuLtLwuI
+=A0u+
+-----END PGP SIGNATURE-----
